@@ -1,0 +1,14 @@
+{
+  "name": "enjaz",
+  "private": true,
+  "version": "0.1.0",
+  "description": "ENJAZ AI Workforce SaaS Platform",
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "build": "pnpm --recursive build",
+    "test": "pnpm --recursive test",
+    "lint": "pnpm --recursive lint",
+    "typecheck": "pnpm --recursive typecheck"
+  }
+}
