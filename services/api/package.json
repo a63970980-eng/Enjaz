@@ -1,1 +1,1 @@
-{"name":"@enjaz/api","private":true,"version":"0.2.0","type":"module","scripts":{"dev":"node src/index.js","start":"node src/index.js","test":"node --test"},"dependencies":{}}
+{"name":"@enjaz/api","private":true,"version":"0.4.0","type":"module","scripts":{"dev":"node src/index.js","start":"node src/index.js","test":"node --test"},"dependencies":{"pg":"^8.16.3"}}
