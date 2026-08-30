@@ -1,0 +1,9 @@
+import { getTool, listTools } from './tool-registry.js';
+
+const SYSTEM='You are an ENJAZ AI employee planner. Return only valid JSON. Break the goal into safe, concrete steps. Never invent tools. Mark steps requiring external side effects or sensitive actions as approval_required.';
+
+export function buildBrainContext({employee,goal,memory=[]}){return {system:SYSTEM,employee:{name:employee.name,role:employee.role,goal:employee.goal,skills:employee.skills||[],permissions:employee.permissions||[],tools:employee.tools||[]},goal,memory:memory.slice(-20),availableTools:listTools()};}
+
+export function validatePlan(plan,employee){if(!plan||!Array.isArray(plan.steps)||plan.steps.length<1||plan.steps.length>20)throw new Error('Invalid AI plan: steps must contain 1-20 items');const allowed=new Set((employee.tools||[]).map(t=>typeof t==='string'?t:t?.name));return {...plan,steps:plan.steps.map((step,i)=>{if(!step?.action||!allowed.has(step.action)||!getTool(step.action))throw new Error(`Plan step ${i+1} uses an unavailable tool: ${step?.action||'unknown'}`);return {id:step.id||`step-${i+1}`,action:step.action,input:step.input||{},approval_required:Boolean(step.approval_required||getTool(step.action)?.risk==='high'),depends_on:Array.isArray(step.depends_on)?step.depends_on:[]};})};}
+
+export function createDeterministicPlan({employee,goal}){const tools=(employee.tools||[]).map(t=>typeof t==='string'?t:t?.name).filter(Boolean);const action=tools.includes('data.analyze')?'data.analyze':tools.includes('report.create')?'report.create':null;if(!action)throw new Error('No suitable assigned tool is available for planning');return {goal,steps:[{id:'step-1',action,input:{goal},approval_required:getTool(action)?.risk==='high',depends_on:[]}]};}
