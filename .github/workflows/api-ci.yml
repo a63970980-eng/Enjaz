@@ -27,11 +27,12 @@ jobs:
     env:
       DATABASE_URL: postgresql://enjaz:enjaz@localhost:5432/enjaz_test
       DATABASE_SSL: "false"
+      NODE_ENV: test
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
       - run: npm install --ignore-scripts
       - name: Apply database migrations
         run: npm run migrate
