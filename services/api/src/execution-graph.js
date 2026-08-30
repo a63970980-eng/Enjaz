@@ -8,9 +8,9 @@ export async function materializePlan({workspaceId,employeeId,taskId,plan}){
  return withTransaction(async client=>{
   const graphId=randomUUID();
   await client.query("insert into execution_graphs(id,workspace_id,task_id,employee_id,goal,status) values($1,$2,$3,$4,$5,'pending')",[graphId,workspaceId,taskId,employeeId,plan.goal]);
-  for(const step of plan.steps){await client.query('insert into execution_steps(id,graph_id,step_key,intent,action,input,depends_on,status) values($1,$2,$3,$4,$5,$6::jsonb,$7,$8)',[randomUUID(),graphId,step.id,step.intent,step.action,JSON.stringify(step.input||{}),step.dependsOn||[],step.dependsOn?.length?'pending':'ready']);}
+  for(const step of plan.steps) await client.query('insert into execution_steps(id,graph_id,step_key,intent,action,input,depends_on,status) values($1,$2,$3,$4,$5,$6::jsonb,$7,$8)',[randomUUID(),graphId,step.id,step.intent,step.action,JSON.stringify(step.input||{}),step.dependsOn||[],step.dependsOn?.length?'pending':'ready']);
   const ready=plan.steps.filter(s=>!s.dependsOn?.length);const jobs=[];
-  for(const step of ready){const job=await enqueueJob({workspaceId,jobType:'employee.step',payload:{graphId,taskId,employeeId,step},maxAttempts:3});jobs.push(job);await client.query("update execution_steps set job_id=$1,status='running',updated_at=now() where graph_id=$2 and step_key=$3",[job.id,graphId,step.id]);}
+  for(const step of ready){const job=await enqueueJob({workspaceId,jobType:'employee.step',payload:{graphId,taskId,employeeId,step},maxAttempts:3,client});jobs.push(job);await client.query("update execution_steps set job_id=$1,status='running',updated_at=now() where graph_id=$2 and step_key=$3",[job.id,graphId,step.id]);}
   await client.query("update execution_graphs set status='running',updated_at=now() where id=$1",[graphId]);return {graphId,taskId,employeeId,jobs,readyStepKeys:ready.map(s=>s.id)};
  });
 }
