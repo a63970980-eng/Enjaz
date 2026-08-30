@@ -10,6 +10,22 @@ jobs:
     defaults:
       run:
         working-directory: services/api
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: enjaz
+          POSTGRES_PASSWORD: enjaz
+          POSTGRES_DB: enjaz_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U enjaz -d enjaz_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      DATABASE_URL: postgresql://enjaz:enjaz@localhost:5432/enjaz_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,4 +34,6 @@ jobs:
           cache: npm
           cache-dependency-path: services/api/package-lock.json
       - run: npm ci
+      - name: Apply database migrations
+        run: npm run migrate
       - run: npm test
