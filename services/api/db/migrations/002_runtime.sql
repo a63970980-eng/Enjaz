@@ -1,5 +1,27 @@
 begin;
 
+-- Tenant predicate used by all RLS policies. Supabase provides auth.uid(); keeping
+-- this helper in the private schema prevents it from becoming a public RPC surface.
+create schema if not exists private;
+create or replace function private.is_workspace_member(target_workspace uuid)
+returns boolean
+language plpgsql
+stable
+security definer
+set search_path = public, private, auth
+as $$
+begin
+  return exists (
+    select 1 from public.workspace_members wm
+    join public.users u on u.id=wm.user_id
+    where wm.workspace_id=target_workspace
+      and u.auth_user_id=auth.uid()
+  );
+end;
+$$;
+revoke all on function private.is_workspace_member(uuid) from public, anon;
+grant execute on function private.is_workspace_member(uuid) to authenticated;
+
 create table if not exists public.job_queue (
  id uuid primary key default gen_random_uuid(), workspace_id uuid not null references public.workspaces(id) on delete cascade,
  job_type text not null, payload jsonb not null default '{}', status text not null default 'queued' check(status in ('queued','running','succeeded','failed','dead')),
