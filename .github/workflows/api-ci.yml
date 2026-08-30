@@ -26,12 +26,14 @@ jobs:
           --health-retries 20
     env:
       DATABASE_URL: postgresql://enjaz:enjaz@localhost:5432/enjaz_test
+      DATABASE_SSL: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm install --ignore-scripts
       - name: Apply database migrations
         run: npm run migrate
-      - run: npm test
+      - name: Run API tests
+        run: npm test
