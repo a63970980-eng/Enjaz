@@ -17,7 +17,7 @@ async function requireWorkspace(req,workspaceId){const user=await authUser(req);
 function requireManager(user){if(!['owner','admin','manager'].includes(user.role))throw Object.assign(new Error('Manager permission required'),{status:403});}
 const server=http.createServer(async(req,res)=>{const origin=req.headers.origin||'';if(req.method==='OPTIONS')return json(res,204,{},origin);const ip=req.socket.remoteAddress||'unknown';const rl=limiter(ip);if(!rl.allowed){res.setHeader('Retry-After',Math.ceil((rl.resetAt-Date.now())/1000));return json(res,429,{error:'Rate limit exceeded'},origin);}const url=new URL(req.url,`http://${req.headers.host}`);try{
 if(req.method==='GET'&&url.pathname==='/health'){const h=await getHealth();return json(res,h.status==='unhealthy'?503:200,h,origin);}
-if(req.method==='GET'&&url.pathname==='/ops/health'){const user=await authUser(req);if(!user)throw Object.assign(new Error('Authentication required'),{status:401});return json(res,200,await getOpsSnapshot(),origin);}
+if(req.method==='GET'&&url.pathname==='/ops/health'){const user=await authUser(req);if(!user)throw Object.assign(new Error('Authentication required'),{status:401});const workspaceId=url.searchParams.get('workspaceId');if(!workspaceId)throw Object.assign(new Error('workspaceId is required'),{status:400});const access=await getWorkspaceAccess(workspaceId,user.id);if(!access)throw Object.assign(new Error('Workspace access denied'),{status:403});requireManager({...user,role:access.role});return json(res,200,await getOpsSnapshot({workspaceId}),origin);}
 if(req.method==='GET'&&url.pathname==='/api/v1')return json(res,200,{name:'ENJAZ API',version:'0.7.0',storage:'postgresql',auth:'supabase',runtime:'enabled',integrations:'enabled',status:'ready'},origin);
 const workspaceId=url.searchParams.get('workspaceId');const user=await requireWorkspace(req,workspaceId);
 if(req.method==='GET'&&url.pathname==='/api/v1/employees')return json(res,200,{data:await listEmployees(workspaceId)},origin);
@@ -31,4 +31,5 @@ const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin);
 return json(res,404,{error:'Not Found'},origin);
 }catch(e){return json(res,e.status||400,{error:e.message},origin);}});
+server.requestTimeout=30_000;server.headersTimeout=15_000;server.keepAliveTimeout=5_000;server.maxRequestsPerSocket=1000;
 server.listen(port,()=>console.log(`ENJAZ API listening on ${port}`));
