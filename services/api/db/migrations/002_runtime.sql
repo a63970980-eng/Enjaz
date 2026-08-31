@@ -19,7 +19,7 @@ begin
   );
 end;
 $$;
-revoke all on function private.is_workspace_member(uuid) from public, anon;
+revoke all on function private.is_workspace_member(uuid) from public;
 grant execute on function private.is_workspace_member(uuid) to authenticated;
 
 create table if not exists public.job_queue (
