@@ -6,9 +6,9 @@ export async function runOpsRecovery(){
   const recovered=await recoverQueue();
   return {recoveredCount:recovered.length,recovered};
 }
-export async function getOpsSnapshot(){
-  const [workers,queue]=await Promise.all([getWorkerHealth({staleSeconds:90}),getQueueHealth()]);
-  return {timestamp:new Date().toISOString(),workers,queue};
+export async function getOpsSnapshot({workspaceId=null}={}){
+  const [workers,queue]=await Promise.all([getWorkerHealth({staleSeconds:90}),getQueueHealth(workspaceId)]);
+  return {timestamp:new Date().toISOString(),workers,queue,workspaceId};
 }
 export function installWorkerLifecycle({workerId,controller}){
   let stopped=false;
