@@ -1,0 +1,65 @@
+openapi: 3.1.0
+info:
+  title: ENJAZ AI Workforce API
+  version: 0.7.0
+  description: Multi-tenant API for AI employees, tasks, approvals and audit events.
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+paths:
+  /health:
+    get:
+      security: []
+      responses:
+        '200': {description: Healthy}
+        '503': {description: Unhealthy}
+  /api/v1:
+    get:
+      security: []
+      responses:
+        '200': {description: API metadata}
+  /api/v1/employees:
+    get:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'200': {description: Employees}}
+    post:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'201': {description: Employee created}, '403': {description: Forbidden}}
+  /api/v1/tasks:
+    get:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'200': {description: Tasks}}
+    post:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'201': {description: Task created}}
+  /api/v1/tasks/{taskId}/run:
+    post:
+      parameters:
+        - {name: taskId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}
+      responses: {'200': {description: Task execution result}, '403': {description: Forbidden}}
+  /api/v1/approvals:
+    get:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'200': {description: Pending approvals}}
+    post:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'201': {description: Approval created}}
+  /api/v1/approvals/{approvalId}/{decision}:
+    post:
+      parameters:
+        - {name: approvalId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: decision, in: path, required: true, schema: {type: string, enum: [approve, reject]}}
+        - {name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}
+      responses: {'200': {description: Approval decision}}
+  /api/v1/audit:
+    get:
+      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
+      responses: {'200': {description: Audit events}}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
