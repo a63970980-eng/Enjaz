@@ -1,7 +1,7 @@
 import http from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import { createEmployee, listEmployees, createTask, listTasks, createApproval, decideApproval, listApprovals, listAudit, getWorkspaceAccess } from './workforce-repository.js';
-import { runEmployeeTask } from './agent-runtime.js';
+import { runEmployeeTask, executeApprovedTask } from './agent-runtime.js';
 import { getHealth } from './health.js';
 import { getOpsSnapshot } from './ops-runtime.js';
 import './integrations/index.js';
@@ -25,7 +25,7 @@ if(req.method==='POST'&&url.pathname==='/api/v1/tasks')return json(res,201,{data
 if(req.method==='POST'&&url.pathname.match(/^\/api\/v1\/tasks\/[^/]+\/run$/)){requireManager(user);const id=url.pathname.split('/')[4];const input=await body(req);return json(res,200,{data:await runEmployeeTask({workspaceId,taskId:id,employeeId:input.employeeId,action:input.action||'data.analyze',input:input.input||{}})},origin);}
 if(req.method==='GET'&&url.pathname==='/api/v1/approvals')return json(res,200,{data:await listApprovals(workspaceId)},origin);
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals'){requireManager(user);return json(res,201,{data:await createApproval({...await body(req),workspaceId})},origin);}
-const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);return json(res,200,{data:await decideApproval(match[1],workspaceId,match[2]==='approve'?'approved':'rejected',user.id)},origin);}
+const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);const approvalId=match[1];const status=match[2]==='approve'?'approved':'rejected';const approval=await decideApproval(approvalId,workspaceId,status,user.id);if(status==='approved')return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId,actorUserId:user.id})},origin);return json(res,200,{data:approval},origin);}
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin);
 return json(res,404,{error:'Not Found'},origin);
 }catch(e){return json(res,e.status||400,{error:e.message},origin);}});
