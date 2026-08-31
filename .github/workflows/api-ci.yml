@@ -35,10 +35,13 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - run: npm install --ignore-scripts
-      - name: Prepare Supabase-compatible auth role for RLS tests
+      - name: Prepare Supabase-compatible auth roles for RLS tests
         run: |
           PGPASSWORD=enjaz psql -h 127.0.0.1 -U enjaz -d enjaz_test -v ON_ERROR_STOP=1 <<'SQL'
           DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+              CREATE ROLE anon NOLOGIN;
+            END IF;
             IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
               CREATE ROLE authenticated NOLOGIN;
             END IF;
