@@ -15,7 +15,15 @@ try {
     if(exists.rowCount) continue;
     const sql=await fs.readFile(path.join(migrationsDir,file),'utf8');
     const client=await pool.connect();
-    try { await client.query('begin'); await client.query(sql); await client.query('insert into schema_migrations(version) values($1)',[version]); await client.query('commit'); console.log(`applied ${version}`); }
-    catch(error){await client.query('rollback');throw new Error(`Migration ${version} failed: ${error.message}`,{cause:error});} finally {client.release();}
+    try {
+      await client.query('begin');
+      await client.query(sql);
+      await client.query('insert into schema_migrations(version) values($1) on conflict (version) do nothing',[version]);
+      await client.query('commit');
+      console.log(`applied ${version}`);
+    } catch(error){
+      await client.query('rollback');
+      throw new Error(`Migration ${version} failed: ${error.message}`,{cause:error});
+    } finally {client.release();}
   }
 } finally { await pool.end(); }
