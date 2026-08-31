@@ -6,6 +6,7 @@ import { getHealth } from './health.js';
 import { getOpsSnapshot } from './ops-runtime.js';
 import { rateLimit } from './rate-limit.js';
 import { requestContext } from './request-context.js';
+import { closeDb } from './db.js';
 import './integrations/index.js';
 const port=process.env.PORT||4000;
 const supabase=(process.env.SUPABASE_URL&&process.env.SUPABASE_ANON_KEY)?createClient(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY,{auth:{persistSession:false}}):null;
@@ -33,4 +34,7 @@ if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:
 return json(res,404,{error:'Not Found',requestId:context.id},origin,context.id);
 }catch(e){return json(res,e.status||400,{error:e.message,requestId:context.id},origin,context.id);}});
 server.requestTimeout=30_000;server.headersTimeout=15_000;server.keepAliveTimeout=5_000;server.maxRequestsPerSocket=1000;
+let shuttingDown=false;
+async function shutdown(signal){if(shuttingDown)return;shuttingDown=true;console.log(`ENJAZ API shutting down (${signal})`);server.close(async()=>{try{await closeDb();process.exit(0);}catch(error){console.error('Database shutdown failed',error);process.exit(1);}});setTimeout(()=>process.exit(1),10_000).unref();}
+process.once('SIGTERM',()=>void shutdown('SIGTERM'));process.once('SIGINT',()=>void shutdown('SIGINT'));
 server.listen(port,()=>console.log(`ENJAZ API listening on ${port}`));
