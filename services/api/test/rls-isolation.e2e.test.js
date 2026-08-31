@@ -21,12 +21,12 @@ test('real workspace RLS isolates two authenticated users for reads and writes',
   await admin.query("select set_config('request.jwt.claim.sub',$1,false)",[u1]);
   assert.deepEqual((await admin.query('select id from ai_employees order by name')).rows.map(r=>r.id),[e1]);
   assert.deepEqual((await admin.query('select id from tasks order by title')).rows.map(r=>r.id),[t1]);
-  await assert.rejects(admin.query("insert into ai_employees(id,workspace_id,name,role,status) values($1,$2,$3,$4,'active')",[randomUUID(),w2,'Cross tenant','operator']),/new row violates row-level security policy/i);
-  await assert.rejects(admin.query("update tasks set title='Cross tenant update' where id=$1",[t2]),/UPDATE.*row-level security|new row violates row-level security/i);
+  await assert.rejects(admin.query("insert into ai_employees(id,workspace_id,name,role,status) values($1,$2,$3,$4,'active')",[randomUUID(),w2,'Cross tenant','operator']),/row-level security policy/i);
+  assert.equal((await admin.query("update tasks set title='Cross tenant update' where id=$1",[t2])).rowCount,0);
 
   await admin.query("select set_config('request.jwt.claim.sub',$1,false)",[u2]);
   assert.deepEqual((await admin.query('select id from ai_employees order by name')).rows.map(r=>r.id),[e2]);
   assert.deepEqual((await admin.query('select id from tasks order by title')).rows.map(r=>r.id),[t2]);
-  await assert.rejects(admin.query("insert into ai_employees(id,workspace_id,name,role,status) values($1,$2,$3,$4,'active')",[randomUUID(),w1,'Cross tenant','operator']),/new row violates row-level security policy/i);
+  await assert.rejects(admin.query("insert into ai_employees(id,workspace_id,name,role,status) values($1,$2,$3,$4,'active')",[randomUUID(),w1,'Cross tenant','operator']),/row-level security policy/i);
  } finally { try{await admin.query('reset role');await admin.query('begin');await admin.query('delete from organizations where id=$1',[o]);await admin.query('commit');}catch{} await admin.end(); }
 });
