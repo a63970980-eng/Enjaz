@@ -54,8 +54,8 @@ create policy job_queue_manager_insert on public.job_queue for insert to authent
 create policy job_queue_manager_update on public.job_queue for update to authenticated using (private.has_workspace_role(workspace_id, ARRAY['manager'::text])) with check (private.has_workspace_role(workspace_id, ARRAY['manager'::text]));
 create policy job_queue_manager_delete on public.job_queue for delete to authenticated using (private.has_workspace_role(workspace_id, ARRAY['manager'::text]));
 
--- Foreign-key indexes used by deletes/joins.
-create index if not exists idx_ai_employee_memory_task_id on public.ai_employee_memory(task_id);
+-- Foreign-key indexes. Use the actual schema column names from earlier migrations.
+create index if not exists idx_ai_employee_memory_source_task_id on public.ai_employee_memory(source_task_id);
 create index if not exists idx_ai_employee_memory_workspace_id on public.ai_employee_memory(workspace_id);
 create index if not exists idx_ai_employee_usage_task_id on public.ai_employee_usage(task_id);
 create index if not exists idx_approvals_decided_by on public.approvals(decided_by);
