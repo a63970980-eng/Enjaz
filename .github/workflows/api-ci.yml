@@ -52,6 +52,8 @@ jobs:
           $$;
           GRANT USAGE ON SCHEMA auth TO authenticated;
           GRANT EXECUTE ON FUNCTION auth.uid() TO authenticated;
+          GRANT USAGE ON SCHEMA public TO authenticated;
+          GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
           SQL
       - name: Apply database migrations
         run: npm run migrate
