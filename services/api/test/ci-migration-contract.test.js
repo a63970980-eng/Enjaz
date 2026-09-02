@@ -12,7 +12,7 @@ test('migration runner serializes schema changes with an advisory lock', async()
 });
 
 test('CI provisions Supabase-compatible roles and runs migrations before tests', async()=>{
-  const source=await readFile(new URL('../../\.github/workflows/api-ci.yml',import.meta.url),'utf8');
+  const source=await readFile(new URL('../../../.github/workflows/api-ci.yml',import.meta.url),'utf8');
   assert.match(source,/postgres:16/);
   assert.match(source,/CREATE ROLE authenticated/);
   assert.match(source,/CREATE OR REPLACE FUNCTION auth\.uid/);
