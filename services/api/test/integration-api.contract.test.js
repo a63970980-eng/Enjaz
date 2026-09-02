@@ -17,7 +17,7 @@ test('integration listing uses the credential-safe vault projection',()=>{
 });
 
 test('integration revocation is manager-only, workspace scoped, and audited',()=>{
-  assert.match(source,/integrations\\\/\\(\[\^\\\/\]\+\\\/revoke/);
+  assert.match(source,/const integrationMatch=url\.pathname\.match\(\/\^\\\\\/api\\\\\/v1\\\\\/integrations\\\\\/\(\[\^\\\\\/\]\+\)\\\\\/revoke\$\/\)/);
   assert.match(source,/req\.method==='DELETE'&&integrationMatch\)\{requireManager\(user\)/);
   assert.match(source,/revokeConnection\(\{workspaceId,connectionId:integrationMatch\[1\],actorUserId:user\.id\}\)/);
   assert.match(vault,/update integration_connections set enabled=false,status='revoked'/);
