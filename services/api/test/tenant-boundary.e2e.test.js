@@ -12,7 +12,7 @@ test('tenant boundary rejects cross-workspace execution and approval access', {s
     await db.query('insert into organizations(id,name,slug) values($1,$2,$3)',[ids.org,'Boundary Org',`boundary-${Date.now()}`]);
     await db.query('insert into workspaces(id,organization_id,name,slug) values($1,$2,$3,$4),($5,$2,$6,$7)',[ids.w1,ids.org,'A',`a-${Date.now()}`,ids.w2,'B',`b-${Date.now()}`]);
     await db.query('insert into users(id,organization_id,email,name,auth_user_id) values($1,$2,$3,$4,$1),($5,$2,$6,$7,$5)',[ids.u1,ids.org,`a-${Date.now()}@test.local`,'A',ids.u2,`b-${Date.now()}@test.local`,'B']);
-    await db.query('insert into workspace_members(workspace_id,user_id,role) values($1,$2,$3),($4,$5,$3)',[ids.w1,ids.u1,'manager',ids.w2,ids.u2,'manager']);
+    await db.query('insert into workspace_members(workspace_id,user_id,role) values($1,$2,$3),($4,$5,$3)',[ids.w1,ids.u1,'manager',ids.w2,ids.u2]);
     await db.query('insert into ai_employees(id,workspace_id,name,role,status) values($1,$2,$3,$4,$5)',[ids.e1,ids.w1,'A','operator','active']);
     await db.query('insert into tasks(id,workspace_id,employee_id,title,objective) values($1,$2,$3,$4,$5)',[ids.t1,ids.w1,ids.e1,'Boundary','test']);
     await db.query('insert into approvals(id,workspace_id,task_id,action,reason,payload) values($1,$2,$3,$4,$5,$6::jsonb)',[ids.a1,ids.w1,ids.t1,'report.create','boundary',JSON.stringify({input:{}})]);
