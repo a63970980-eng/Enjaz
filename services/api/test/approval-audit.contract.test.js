@@ -13,9 +13,8 @@ test('approval decisions are tenant scoped and auditable',()=>{
 });
 
 test('rejected approvals cancel the waiting task and graph in the same workspace',()=>{
-  assert.match(source,/update tasks set status='cancelled'/);
-  assert.match(source,/completed_at=coalesce\(completed_at,now\)/);
-  assert.match(source,/execution_graphs set status='cancelled'/);
-  assert.match(source,/status='waiting_approval'/);
-  assert.match(source,/where id=\$1 and workspace_id=\$2/);
+  assert.ok(source.includes("update tasks set status='cancelled',completed_at=coalesce(completed_at,now())"));
+  assert.ok(source.includes("execution_graphs set status='cancelled'"));
+  assert.ok(source.includes("status='waiting_approval'"));
+  assert.ok(source.includes('where id=$1 and workspace_id=$2'));
 });
