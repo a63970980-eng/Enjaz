@@ -13,7 +13,7 @@ test('E2E workforce flow keeps tenants isolated', {skip:!url}, async()=>{
   await admin.query('insert into organizations(id,name,slug) values($1,$2,$3)',[ids.org,'E2E Org',`e2e-${Date.now()}`]);
   await admin.query('insert into workspaces(id,organization_id,name,slug) values($1,$2,$3,$4),($5,$2,$6,$7)',[ids.w1,ids.org,'A','e2ea',ids.w2,'B','e2eb']);
   await admin.query('insert into users(id,organization_id,email,name,auth_user_id) values($1,$2,$3,$4,$1),($5,$2,$6,$7,$5)',[ids.u1,ids.org,`a-${Date.now()}@e2e.test`,'A',ids.u2,`b-${Date.now()}@e2e.test`,'B']);
-  await admin.query('insert into workspace_members(workspace_id,user_id,role) values($1,$2,$3),($4,$5,$3)',[ids.w1,ids.u1,'manager',ids.w2,ids.u2,'manager']);await admin.query('commit');
+  await admin.query('insert into workspace_members(workspace_id,user_id,role) values($1,$2,$3),($4,$5,$3)',[ids.w1,ids.u1,'manager',ids.w2,ids.u2]);await admin.query('commit');
   const employee=await createEmployee({workspaceId:ids.w1,name:'E2E Agent',role:'operator',goal:'create reports',tools:['report.create'],budgetCents:1000});
   const task=await createTask({workspaceId:ids.w1,employeeId:employee.id,title:'E2E report',objective:'Create a report',priority:5});
   assert.ok(await getWorkspaceAccess(ids.w1,ids.u1));assert.equal(await getWorkspaceAccess(ids.w2,ids.u1),null);
