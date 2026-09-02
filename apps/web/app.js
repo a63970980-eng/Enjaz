@@ -19,7 +19,7 @@ async function load(){
   }catch(e){state.error=e.message}
   finally{state.loading=false;render()}
 }
-function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c))}
+function esc(v){return String(v??'').replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]||c))}
 function status(v){return `<span class="status">${esc(v||'—')}</span>`}
 function render(){
   const title=navItems.find(x=>x[0]===state.section)?.[1]||'لوحة التحكم';
