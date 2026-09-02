@@ -10,6 +10,7 @@ test('approval decisions are tenant scoped and auditable',()=>{
   assert.match(source,/approval\.\$\{status\}/);
   assert.match(source,/actor_type/);
   assert.match(source,/approvalId:id/);
+  assert.match(source,/withTransaction\(async client=>/);
 });
 
 test('rejected approvals cancel the waiting task and graph in the same workspace',()=>{
