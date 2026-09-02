@@ -7,7 +7,7 @@ const source=await readFile(new URL('../src/index.js',import.meta.url),'utf8');
 test('integration creation is manager-only and workspace scoped',()=>{
   assert.match(source,/url\.pathname==='\/api\/v1\/integrations'/);
   assert.match(source,/if\(req\.method==='POST'&&url\.pathname==='\/api\/v1\/integrations'\)\{requireManager\(user\)/);
-  assert.match(source,/saveConnection\(\{\.\.\.input,workspaceId\}\)/);
+  assert.match(source,/saveConnection\(\{\.\.\.input,workspaceId,actorUserId:user\.id\}\)/);
 });
 
 test('integration listing uses the credential-safe vault projection',()=>{
