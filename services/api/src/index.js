@@ -1,7 +1,8 @@
 import http from 'node:http';
 import { createClient } from '@supabase/supabase-js';
-import { createEmployee, listEmployees, createTask, listTasks, createApproval, decideApproval, listApprovals, listAudit, getWorkspaceAccess } from './workforce-repository.js';
+import { createEmployee, listEmployees, getEmployee, createTask, listTasks, getTask, createApproval, decideApproval, listApprovals, listAudit, getWorkspaceAccess } from './workforce-repository.js';
 import { runEmployeeTask, executeApprovedTask } from './agent-runtime.js';
+import { planEmployeeTask } from './brain-orchestrator.js';
 import { listTools } from './tool-registry.js';
 import { saveConnection, listConnections, revokeConnection } from './credentials-vault.js';
 import { getHealth } from './health.js';
@@ -33,6 +34,7 @@ if(req.method==='GET'&&url.pathname==='/api/v1/employees')return json(res,200,{d
 if(req.method==='POST'&&url.pathname==='/api/v1/employees'){requireManager(user);return json(res,201,{data:await createEmployee({...await body(req),workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tasks')return json(res,200,{data:await listTasks(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/tasks')return json(res,201,{data:await createTask({...await body(req),workspaceId})},origin,context.id);
+if(req.method==='POST'&&url.pathname.match(/^\/api\/v1\/tasks\/[^/]+\/plan$/)){requireManager(user);const id=url.pathname.split('/')[4];const task=await getTask(id,workspaceId);if(!task)throw Object.assign(new Error('Task not found'),{status:404});const employee=await getEmployee(task.employee_id,workspaceId);if(!employee)throw Object.assign(new Error('Employee not found'),{status:404});const input=await body(req);const goal=String(input.goal||task.objective||employee.goal||'').trim();if(!goal)throw Object.assign(new Error('A goal is required to plan this task'),{status:400});const provider=input.provider||'deterministic';return json(res,200,{data:await planEmployeeTask({employee,workspaceId,employeeId:employee.id,taskId:task.id,goal,provider})},origin,context.id);}
 if(req.method==='POST'&&url.pathname.match(/^\/api\/v1\/tasks\/[^/]+\/run$/)){requireManager(user);const id=url.pathname.split('/')[4];const input=await body(req);return json(res,200,{data:await runEmployeeTask({workspaceId,taskId:id,employeeId:input.employeeId,action:input.action||'data.analyze',input:input.input||{}})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/workflows')return json(res,200,{data:await listWorkflows(workspaceId)},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/approvals')return json(res,200,{data:await listApprovals(workspaceId)},origin,context.id);
