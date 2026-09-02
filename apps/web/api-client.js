@@ -12,5 +12,6 @@ export const apiClient={
  workflows:(workspaceId,token)=>api(`/api/v1/workflows?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  integrations:(workspaceId,token)=>api(`/api/v1/integrations?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createIntegration:(workspaceId,token,body)=>api(`/api/v1/integrations?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
+ revokeIntegration:(workspaceId,token,connectionId)=>api(`/api/v1/integrations/${encodeURIComponent(connectionId)}/revoke?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'DELETE'}),
  audit:(workspaceId,token)=>api(`/api/v1/audit?workspaceId=${encodeURIComponent(workspaceId)}`,{token})
 };
