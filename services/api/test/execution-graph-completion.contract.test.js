@@ -7,7 +7,7 @@ const source=await readFile(new URL('../src/execution-graph.js',import.meta.url)
 test('graph completion must validate the completed step belongs to the graph',()=>{
   assert.match(source,/steps\.find\(s=>s\.step_key===completedStepKey\)/);
   assert.match(source,/if\(!completedStep\)throw new Error/);
-  assert.match(source,/\['running','succeeded'\]\.includes\(completedStep\.status\)/);
+  assert.match(source,/\['running','succeeded','failed'\]\.includes\(completedStep\.status\)/);
   assert.match(source,/const completed=new Set\(refreshed\.filter\(s=>s\.status==='succeeded'\)/);
 });
 
