@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createEmployee, listEmployees, createTask, listTasks, createApproval, decideApproval, listApprovals, listAudit, getWorkspaceAccess } from './workforce-repository.js';
 import { runEmployeeTask, executeApprovedTask } from './agent-runtime.js';
 import { listTools } from './tool-registry.js';
+import { saveConnection, listConnections } from './credentials-vault.js';
 import { getHealth } from './health.js';
 import { getOpsSnapshot } from './ops-runtime.js';
 import { rateLimit } from './rate-limit.js';
@@ -19,7 +20,6 @@ async function authUser(req){if(!supabase)return null;const h=req.headers.author
 async function requireWorkspace(req,workspaceId){const user=await authUser(req);if(!user)throw Object.assign(new Error('Authentication required'),{status:401});if(!workspaceId)throw Object.assign(new Error('workspaceId is required'),{status:400});const access=await getWorkspaceAccess(workspaceId,user.id);if(!access)throw Object.assign(new Error('Workspace access denied'),{status:403});return {...user,role:access.role};}
 function requireManager(user){if(!['owner','admin','manager'].includes(user.role))throw Object.assign(new Error('Manager permission required'),{status:403});}
 async function listWorkflows(workspaceId){const {rows}=await db.query(`select g.id,g.task_id,g.employee_id,g.goal,g.status,g.created_at,g.updated_at,count(s.id)::int as step_count,count(s.id) filter (where s.status='succeeded')::int as succeeded_steps from execution_graphs g left join execution_steps s on s.graph_id=g.id where g.workspace_id=$1 group by g.id order by g.created_at desc limit 100`,[workspaceId]);return rows;}
-async function listIntegrations(workspaceId){const {rows}=await db.query(`select id,provider,name,config,enabled,last_used_at,created_at,updated_at from integration_connections where workspace_id=$1 order by created_at desc limit 100`,[workspaceId]);return rows;}
 const server=http.createServer(async(req,res)=>{const context=requestContext(req);const origin=req.headers.origin||'';if(req.method==='OPTIONS')return json(res,204,{},origin,context.id);const ip=req.socket.remoteAddress||'unknown';const rl=limiter(ip);if(!rl.allowed){res.setHeader('Retry-After',Math.ceil((rl.resetAt-Date.now())/1000));return json(res,429,{error:'Rate limit exceeded',requestId:context.id},origin,context.id);}const url=new URL(req.url,`http://${req.headers.host}`);try{
 if(req.method==='GET'&&url.pathname==='/health'){const h=await getHealth();return json(res,h.status==='unhealthy'?503:200,h,origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/ops/health'){const user=await authUser(req);if(!user)throw Object.assign(new Error('Authentication required'),{status:401});const workspaceId=url.searchParams.get('workspaceId');if(!workspaceId)throw Object.assign(new Error('workspaceId is required'),{status:400});const access=await getWorkspaceAccess(workspaceId,user.id);if(!access)throw Object.assign(new Error('Workspace access denied'),{status:403});requireManager({...user,role:access.role});return json(res,200,await getOpsSnapshot({workspaceId}),origin,context.id);}
@@ -35,7 +35,8 @@ if(req.method==='GET'&&url.pathname==='/api/v1/workflows')return json(res,200,{d
 if(req.method==='GET'&&url.pathname==='/api/v1/approvals')return json(res,200,{data:await listApprovals(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals'){requireManager(user);return json(res,201,{data:await createApproval({...await body(req),workspaceId})},origin,context.id);}
 const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);const approvalId=match[1];const status=match[2]==='approve'?'approved':'rejected';const approval=await decideApproval(approvalId,workspaceId,status,user.id);if(status==='approved')return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId,actorUserId:user.id})},origin,context.id);return json(res,200,{data:approval},origin,context.id);}
-if(req.method==='GET'&&url.pathname==='/api/v1/integrations')return json(res,200,{data:await listIntegrations(workspaceId)},origin,context.id);
+if(req.method==='GET'&&url.pathname==='/api/v1/integrations')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
+if(req.method==='POST'&&url.pathname==='/api/v1/integrations'){requireManager(user);const input=await body(req);return json(res,201,{data:await saveConnection({...input,workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin,context.id);
 return json(res,404,{error:'Not Found',requestId:context.id},origin,context.id);
 }catch(e){return json(res,e.status||400,{error:e.message,requestId:context.id},origin,context.id);}});
