@@ -13,10 +13,12 @@ test('agent runtime revalidates employee, task, tool and policy at execution tim
   ]) assert.match(source,new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')));
 });
 
-test('approved execution is workspace scoped and consumes budget before tool execution', async()=>{
+test('approved execution is workspace scoped, leased, and budgeted before tool execution', async()=>{
   const source=await readFile(new URL('../src/agent-runtime.js',import.meta.url),'utf8');
   assert.match(source,/a\.workspace_id=\$2/);
   assert.match(source,/status='approved'/);
+  assert.match(source,/execution_claimed_at=now\(\)/);
   assert.match(source,/await chargeBudget/);
   assert.match(source,/approved:true/);
+  assert.match(source,/policy\.limits\.maxOutputBytes/);
 });
