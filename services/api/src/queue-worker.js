@@ -6,14 +6,19 @@ import { runEmployeeTask } from './agent-runtime.js';
 import { heartbeat, markAttemptStarted, markAttemptFinished } from './worker-observability.js';
 
 async function dispatch(job){
- if(job.job_type==='workflow.run') return runWorkflow(job.payload);
+ if(job.job_type==='workflow.run'){
+  const p=job.payload||{};
+  if(!p.workflowId)throw new Error('Workflow job requires workflowId');
+  return runWorkflow({...p,workspaceId:job.workspace_id});
+ }
  if(job.job_type==='employee.step'){
   const p=job.payload||{},s=p.step||{};
   if(p.graphId&&s.id){
-   const r=await query("select status,output from execution_steps where graph_id=$1 and step_key=$2",[p.graphId,s.id]);
+   const r=await query("select s.status,s.output from execution_steps s join execution_graphs g on g.id=s.graph_id where s.graph_id=$1 and s.step_key=$2 and g.workspace_id=$3",[p.graphId,s.id,job.workspace_id]);
    const current=r.rows[0];
    if(current?.status==='succeeded')return {status:'already_completed',output:current.output};
    if(current?.status==='failed')throw new Error(`Execution step is already failed: ${s.id}`);
+   if(!current)throw new Error(`Execution step not found: ${s.id}`);
   }
   return runEmployeeTask({workspaceId:job.workspace_id,taskId:p.taskId,employeeId:p.employeeId,action:s.action||'data.analyze',input:s.input||{},graphId:p.graphId||null,stepKey:s.id||null});
  }
