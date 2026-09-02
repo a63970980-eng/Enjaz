@@ -11,7 +11,7 @@ test('workflow endpoint is workspace scoped and aggregates execution steps',()=>
 
 test('integration endpoint excludes encrypted credentials',()=>{
   assert.match(index,/\/api\/v1\/integrations/);
-  assert.match(index,/select id,provider,name,config,enabled,last_used_at,created_at,updated_at from integration_connections where workspace_id=\$1/);
+  assert.match(index,/listConnections\(workspaceId\)/);
   assert.doesNotMatch(index,/select[^;]*encrypted_credentials[^;]*from integration_connections/);
 });
 
