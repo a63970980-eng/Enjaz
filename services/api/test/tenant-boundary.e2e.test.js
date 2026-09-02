@@ -21,6 +21,7 @@ test('tenant boundary rejects cross-workspace execution and approval access', {s
     await db.query("select set_config('request.jwt.claim.sub',$1,false)",[ids.u2]);
     assert.equal((await db.query('select count(*)::int count from tasks where id=$1',[ids.t1])).rows[0].count,0);
     assert.equal((await db.query('select count(*)::int count from approvals where id=$1',[ids.a1])).rows[0].count,0);
-    await assert.rejects(db.query('update approvals set reason=$1 where id=$2',['cross-tenant',ids.a1]),/row-level security policy/i);
+    const result=await db.query('update approvals set reason=$1 where id=$2',['cross-tenant',ids.a1]);
+    assert.equal(result.rowCount,0,'cross-tenant approval update must affect zero rows');
   } finally { try { await db.query('reset role'); await db.query('delete from organizations where id=$1',[ids.org]); } catch {} await db.end(); }
 });
