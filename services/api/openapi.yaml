@@ -2,64 +2,332 @@ openapi: 3.1.0
 info:
   title: ENJAZ AI Workforce API
   version: 0.7.0
-  description: Multi-tenant API for AI employees, tasks, approvals and audit events.
+  description: Multi-tenant API for AI employees, tasks, workflows, approvals, integrations and audit events.
 servers:
   - url: /
 security:
   - bearerAuth: []
+tags:
+  - name: System
+  - name: Workforce
+  - name: Execution
+  - name: Integrations
+  - name: Operations
 paths:
   /health:
     get:
+      tags: [System]
       security: []
       responses:
         '200': {description: Healthy}
         '503': {description: Unhealthy}
   /api/v1:
     get:
+      tags: [System]
       security: []
       responses:
-        '200': {description: API metadata}
+        '200':
+          description: API metadata
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ApiMetadata'}
+  /ops/health:
+    get:
+      tags: [Operations]
+      summary: Operational health snapshot
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Operational snapshot}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/tools:
+    get:
+      tags: [Workforce]
+      summary: List registered tools
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200':
+          description: Registered tools
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ToolListResponse'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
   /api/v1/employees:
     get:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'200': {description: Employees}}
+      tags: [Workforce]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Employees}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
     post:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'201': {description: Employee created}, '403': {description: Forbidden}}
+      tags: [Workforce]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/EmployeeInput'}
+      responses:
+        '201': {description: Employee created}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
   /api/v1/tasks:
     get:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'200': {description: Tasks}}
+      tags: [Execution]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Tasks}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
     post:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'201': {description: Task created}}
+      tags: [Execution]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TaskInput'}
+      responses:
+        '201': {description: Task created}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
   /api/v1/tasks/{taskId}/run:
     post:
+      tags: [Execution]
       parameters:
-        - {name: taskId, in: path, required: true, schema: {type: string, format: uuid}}
-        - {name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}
-      responses: {'200': {description: Task execution result}, '403': {description: Forbidden}}
+        - {$ref: '#/components/parameters/taskId'}
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RunTaskInput'}
+      responses:
+        '200': {description: Task execution result}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/workflows:
+    get:
+      tags: [Execution]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Workflow execution summaries}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
   /api/v1/approvals:
     get:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'200': {description: Pending approvals}}
+      tags: [Execution]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Approvals}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
     post:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'201': {description: Approval created}}
+      tags: [Execution]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ApprovalInput'}
+      responses:
+        '201': {description: Approval created}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
   /api/v1/approvals/{approvalId}/{decision}:
     post:
+      tags: [Execution]
       parameters:
-        - {name: approvalId, in: path, required: true, schema: {type: string, format: uuid}}
-        - {name: decision, in: path, required: true, schema: {type: string, enum: [approve, reject]}}
-        - {name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}
-      responses: {'200': {description: Approval decision}}
+        - {$ref: '#/components/parameters/approvalId'}
+        - name: decision
+          in: path
+          required: true
+          schema: {type: string, enum: [approve, reject]}
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Approval decision and, for approval, execution result}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Approval not found}
+  /api/v1/integrations:
+    get:
+      tags: [Integrations]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Integration connections; credentials are never returned}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [Integrations]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/IntegrationInput'}
+      responses:
+        '201': {description: Integration connection created}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/integrations/{connectionId}/revoke:
+    delete:
+      tags: [Integrations]
+      parameters:
+        - {$ref: '#/components/parameters/connectionId'}
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Integration revoked}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Integration connection not found}
   /api/v1/audit:
     get:
-      parameters: [{name: workspaceId, in: query, required: true, schema: {type: string, format: uuid}}]
-      responses: {'200': {description: Audit events}}
+      tags: [Execution]
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Audit events}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  parameters:
+    workspaceId:
+      name: workspaceId
+      in: query
+      required: true
+      schema: {type: string, format: uuid}
+    taskId:
+      name: taskId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    approvalId:
+      name: approvalId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    connectionId:
+      name: connectionId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+    Forbidden:
+      description: Workspace or role access denied
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Error'}
+  schemas:
+    ApiMetadata:
+      type: object
+      properties:
+        name: {type: string}
+        version: {type: string}
+        storage: {type: string}
+        auth: {type: string}
+        runtime: {type: string}
+        integrations: {type: string}
+        status: {type: string}
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: {type: string}
+        requestId: {type: string}
+    EmployeeInput:
+      type: object
+      required: [name, role]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 200}
+        role: {type: string, minLength: 1, maxLength: 200}
+        goal: {type: string, maxLength: 5000}
+        skills: {type: array, items: {type: string}}
+        tools: {type: array}
+        permissions: {type: array}
+        memory: {type: object}
+        model: {type: string, maxLength: 200}
+        budgetCents: {type: integer, minimum: 0}
+        schedule: {type: object}
+        status: {type: string, enum: [draft, active, paused, archived]}
+        policy: {type: object}
+    TaskInput:
+      type: object
+      required: [employeeId, title, objective]
+      properties:
+        employeeId: {type: string, format: uuid}
+        title: {type: string, minLength: 1, maxLength: 300}
+        objective: {type: string, minLength: 1, maxLength: 10000}
+        priority: {type: integer, minimum: 1, maximum: 10}
+        input: {type: object}
+    RunTaskInput:
+      type: object
+      properties:
+        employeeId: {type: string, format: uuid}
+        action: {type: string, maxLength: 200}
+        input: {type: object}
+    ApprovalInput:
+      type: object
+      required: [taskId, action]
+      properties:
+        taskId: {type: string, format: uuid}
+        action: {type: string, maxLength: 200}
+        reason: {type: string, maxLength: 5000}
+        payload: {type: object}
+    IntegrationInput:
+      type: object
+      required: [provider, name, credentials]
+      properties:
+        provider: {type: string, minLength: 1, maxLength: 100}
+        name: {type: string, minLength: 1, maxLength: 200}
+        displayName: {type: string, maxLength: 200}
+        authType: {type: string, maxLength: 100}
+        credentials: {type: object}
+        scopes: {type: array, items: {type: string}}
+        metadata: {type: object}
+        config: {type: object}
+        enabled: {type: boolean}
+        expiresAt: {type: string, format: date-time}
+    ToolListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name: {type: string}
+              description: {type: string}
+              risk: {type: string}
