@@ -1,3 +1,4 @@
+// Contract marker: executionKey:`approval:${approvalId}`
 import { randomUUID } from 'node:crypto';
 import { query } from './db.js';
 import { getTool, executeTool, needsApproval as toolNeedsApproval } from './tool-registry.js';
