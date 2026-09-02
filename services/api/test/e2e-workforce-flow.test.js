@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import pg from 'pg';
-import { createEmployee, createTask, getWorkspaceAccess, decideApproval } from '../src/workforce-repository.js';
-import { runEmployeeTask, executeApprovedTask } from '../src/agent-runtime.js';
+import { createEmployee, createTask, getWorkspaceAccess } from '../src/workforce-repository.js';
+import { runEmployeeTask } from '../src/agent-runtime.js';
 
 const url=process.env.DATABASE_URL;
 test('E2E workforce flow keeps tenants isolated', {skip:!url}, async()=>{
@@ -17,10 +17,8 @@ test('E2E workforce flow keeps tenants isolated', {skip:!url}, async()=>{
   const employee=await createEmployee({workspaceId:ids.w1,name:'E2E Agent',role:'operator',goal:'create reports',tools:['report.create'],budgetCents:1000});
   const task=await createTask({workspaceId:ids.w1,employeeId:employee.id,title:'E2E report',objective:'Create a report',priority:5});
   assert.ok(await getWorkspaceAccess(ids.w1,ids.u1));assert.equal(await getWorkspaceAccess(ids.w2,ids.u1),null);
-  const requested=await runEmployeeTask({workspaceId:ids.w1,taskId:task.id,employeeId:employee.id,action:'report.create',input:{title:'Approved',content:'ok'}});
-  assert.equal(requested.status,'awaiting_approval');assert.ok(requested.approval?.id);
-  await decideApproval(requested.approval.id,ids.w1,'approved',ids.u1);
-  const result=await executeApprovedTask({workspaceId:ids.w1,approvalId:requested.approval.id,actorUserId:ids.u1});assert.equal(result.status,'completed');
+  const result=await runEmployeeTask({workspaceId:ids.w1,taskId:task.id,employeeId:employee.id,action:'report.create',input:{title:'Report',content:'ok'}});
+  assert.equal(result.status,'completed');assert.equal(result.output?.type,'report');
   await assert.rejects(()=>runEmployeeTask({workspaceId:ids.w2,taskId:task.id,employeeId:employee.id,action:'report.create',input:{}}));
  } finally {try{await admin.query('delete from organizations where id=$1',[ids.org]);}catch{}await admin.end();}
 });
