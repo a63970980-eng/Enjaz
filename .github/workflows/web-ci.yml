@@ -26,4 +26,5 @@ jobs:
           cache: npm
           cache-dependency-path: apps/web/package.json
       - run: npm install --ignore-scripts
+      - run: npm test
       - run: npm run build
