@@ -8,9 +8,7 @@ export async function materializePlan({workspaceId,employeeId,taskId,plan}){
  return withTransaction(async client=>{
   const owner=(await client.query("select t.id from tasks t join ai_employees e on e.id=t.employee_id and e.workspace_id=t.workspace_id where t.id=$1 and t.workspace_id=$2 and t.employee_id=$3 and e.status='active'",[taskId,workspaceId,employeeId])).rows[0];
   if(!owner)throw new Error('Task, employee, and workspace ownership mismatch');
-  for(const step of plan.steps){
-   if(step.employeeId&&step.employeeId!==employeeId)throw new Error('Workflow step employee must match the execution employee');
-  }
+  for(const step of plan.steps){if(step.employeeId&&step.employeeId!==employeeId)throw new Error('Workflow step employee must match the execution employee');}
   const graphId=randomUUID();
   await client.query("insert into execution_graphs(id,workspace_id,task_id,employee_id,goal,status) values($1,$2,$3,$4,$5,'pending')",[graphId,workspaceId,taskId,employeeId,plan.goal]);
   for(const step of plan.steps) await client.query('insert into execution_steps(id,graph_id,step_key,intent,action,input,depends_on,status) values($1,$2,$3,$4,$5,$6::jsonb,$7,$8)',[randomUUID(),graphId,step.id,step.intent,step.action,JSON.stringify(step.input||{}),step.dependsOn||[],step.dependsOn?.length?'pending':'ready']);
@@ -25,9 +23,8 @@ export async function advanceGraph({graphId,completedStepKey}){
   const graph=(await client.query('select * from execution_graphs where id=$1 for update',[graphId])).rows[0];if(!graph)throw new Error('Execution graph not found');
   if(['succeeded','failed','cancelled'].includes(graph.status))return {graphId,ready:[],jobs:[],terminal:graph.status};
   const steps=(await client.query('select * from execution_steps where graph_id=$1 for update',[graphId])).rows;
-  const completedStep=steps.find(s=>s.step_key===completedStepKey);
-  if(!completedStep)throw new Error(`Execution step not found in graph: ${completedStepKey}`);
-  if(!['running','succeeded'].includes(completedStep.status))throw new Error(`Execution step is not executable: ${completedStepKey}`);
+  const completedStep=steps.find(s=>s.step_key===completedStepKey);if(!completedStep)throw new Error(`Execution step not found in graph: ${completedStepKey}`);
+  if(!['running','succeeded','failed'].includes(completedStep.status))throw new Error(`Execution step is not executable: ${completedStepKey}`);
   if(completedStep.status==='running')await client.query("update execution_steps set status='succeeded',updated_at=now() where id=$1 and graph_id=$2 and status='running'",[completedStep.id,graphId]);
   const refreshed=(await client.query('select * from execution_steps where graph_id=$1 for update',[graphId])).rows;
   const completed=new Set(refreshed.filter(s=>s.status==='succeeded').map(s=>s.step_key));
