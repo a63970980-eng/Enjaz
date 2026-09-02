@@ -2,6 +2,7 @@ import http from 'node:http';
 import { createClient } from '@supabase/supabase-js';
 import { createEmployee, listEmployees, createTask, listTasks, createApproval, decideApproval, listApprovals, listAudit, getWorkspaceAccess } from './workforce-repository.js';
 import { runEmployeeTask, executeApprovedTask } from './agent-runtime.js';
+import { listTools } from './tool-registry.js';
 import { getHealth } from './health.js';
 import { getOpsSnapshot } from './ops-runtime.js';
 import { rateLimit } from './rate-limit.js';
@@ -24,6 +25,7 @@ if(req.method==='GET'&&url.pathname==='/health'){const h=await getHealth();retur
 if(req.method==='GET'&&url.pathname==='/ops/health'){const user=await authUser(req);if(!user)throw Object.assign(new Error('Authentication required'),{status:401});const workspaceId=url.searchParams.get('workspaceId');if(!workspaceId)throw Object.assign(new Error('workspaceId is required'),{status:400});const access=await getWorkspaceAccess(workspaceId,user.id);if(!access)throw Object.assign(new Error('Workspace access denied'),{status:403});requireManager({...user,role:access.role});return json(res,200,await getOpsSnapshot({workspaceId}),origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1')return json(res,200,{name:'ENJAZ API',version:'0.7.0',storage:'postgresql',auth:'supabase',runtime:'enabled',integrations:'enabled',status:'ready'},origin,context.id);
 const workspaceId=url.searchParams.get('workspaceId');const user=await requireWorkspace(req,workspaceId);
+if(req.method==='GET'&&url.pathname==='/api/v1/tools')return json(res,200,{data:listTools()},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/employees')return json(res,200,{data:await listEmployees(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/employees'){requireManager(user);return json(res,201,{data:await createEmployee({...await body(req),workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tasks')return json(res,200,{data:await listTasks(workspaceId)},origin,context.id);
