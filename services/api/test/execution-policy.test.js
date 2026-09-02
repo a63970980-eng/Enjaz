@@ -9,3 +9,12 @@ test('high-risk actions require human approval',()=>{
 test('unknown low-risk action does not become high-risk by name alone',()=>{
   assert.equal(needsApproval('data.analyze'),false);
 });
+
+test('always approval policy protects low-risk actions too',()=>{
+  assert.equal(needsApproval('data.analyze',{policy:{approvalMode:'always'}}),true);
+});
+
+test('none approval policy only bypasses approval for low-risk actions',()=>{
+  assert.equal(needsApproval('data.analyze',{policy:{approvalMode:'none'}}),false);
+  assert.equal(needsApproval('payment',{policy:{approvalMode:'none'}}),true);
+});
