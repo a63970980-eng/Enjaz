@@ -17,8 +17,10 @@ test('E2E workforce flow keeps tenants isolated', {skip:!url}, async()=>{
   const employee=await createEmployee({workspaceId:ids.w1,name:'E2E Agent',role:'operator',goal:'create reports',tools:['report.create'],budgetCents:1000});
   const task=await createTask({workspaceId:ids.w1,employeeId:employee.id,title:'E2E report',objective:'Create a report',priority:5});
   assert.ok(await getWorkspaceAccess(ids.w1,ids.u1));assert.equal(await getWorkspaceAccess(ids.w2,ids.u1),null);
-  const approval=(await admin.query('insert into approvals(id,workspace_id,task_id,action,reason,payload) values($1,$2,$3,$4,$5,$6::jsonb) returning *',[crypto.randomUUID(),ids.w1,task.id,'report.create','E2E approval',JSON.stringify({input:{title:'Approved',content:'ok'}})])).rows[0];
-  await decideApproval(approval.id,ids.w1,'approved',ids.u1);const result=await executeApprovedTask({workspaceId:ids.w1,approvalId:approval.id,actorUserId:ids.u1});assert.equal(result.status,'completed');
+  const requested=await runEmployeeTask({workspaceId:ids.w1,taskId:task.id,employeeId:employee.id,action:'report.create',input:{title:'Approved',content:'ok'}});
+  assert.equal(requested.status,'awaiting_approval');assert.ok(requested.approval?.id);
+  await decideApproval(requested.approval.id,ids.w1,'approved',ids.u1);
+  const result=await executeApprovedTask({workspaceId:ids.w1,approvalId:requested.approval.id,actorUserId:ids.u1});assert.equal(result.status,'completed');
   await assert.rejects(()=>runEmployeeTask({workspaceId:ids.w2,taskId:task.id,employeeId:employee.id,action:'report.create',input:{}}));
  } finally {try{await admin.query('delete from organizations where id=$1',[ids.org]);}catch{}await admin.end();}
 });
