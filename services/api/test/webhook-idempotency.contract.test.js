@@ -12,5 +12,5 @@ test('webhook execution receives a bounded idempotency key',()=>{
 });
 
 test('approved execution derives its idempotency key from the approval identity',()=>{
-  assert.match(runtime,/executionKey:`approval:\$\{approvalId\}`/);
+  assert.match(runtime,/const executionKey=`approval:\$\{approvalId\}`/);
 });
