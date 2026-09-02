@@ -20,13 +20,15 @@ registerTool({
  name:'webhook.request',
  description:'Send a JSON request to a customer-configured public HTTPS webhook.',
  risk:'high',
- execute:async({input})=>{
+ execute:async({input,context={}})=>{
   const url=await validateWebhookUrl(input?.url);
   const method=String(input?.method||'POST').toUpperCase();
   if(!['POST','PUT','PATCH','GET'].includes(method))throw new Error('Unsupported webhook method');
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),10_000);
   try{
-   const init={method,headers:{'Content-Type':'application/json','Accept':'application/json,text/plain;q=0.9,*/*;q=0.1'},redirect:'error',signal:controller.signal};
+   const headers={'Content-Type':'application/json','Accept':'application/json,text/plain;q=0.9,*/*;q=0.1'};
+   if(typeof context.executionKey==='string'&&context.executionKey)headers['Idempotency-Key']=context.executionKey.slice(0,200);
+   const init={method,headers,redirect:'error',signal:controller.signal};
    if(method!=='GET')init.body=JSON.stringify(input.payload||{});
    const response=await fetch(url,init);
    const text=await response.text();
