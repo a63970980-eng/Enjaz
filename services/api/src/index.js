@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { createEmployee, listEmployees, createTask, listTasks, createApproval, decideApproval, listApprovals, listAudit, getWorkspaceAccess } from './workforce-repository.js';
 import { runEmployeeTask, executeApprovedTask } from './agent-runtime.js';
 import { listTools } from './tool-registry.js';
-import { saveConnection, listConnections } from './credentials-vault.js';
+import { saveConnection, listConnections, revokeConnection } from './credentials-vault.js';
 import { getHealth } from './health.js';
 import { getOpsSnapshot } from './ops-runtime.js';
 import { rateLimit } from './rate-limit.js';
@@ -37,6 +37,7 @@ if(req.method==='POST'&&url.pathname==='/api/v1/approvals'){requireManager(user)
 const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);const approvalId=match[1];const status=match[2]==='approve'?'approved':'rejected';const approval=await decideApproval(approvalId,workspaceId,status,user.id);if(status==='approved')return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId,actorUserId:user.id})},origin,context.id);return json(res,200,{data:approval},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/integrations')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/integrations'){requireManager(user);const input=await body(req);return json(res,201,{data:await saveConnection({...input,workspaceId,actorUserId:user.id})},origin,context.id);}
+const integrationMatch=url.pathname.match(/^\/api\/v1\/integrations\/([^/]+)\/revoke$/);if(req.method==='DELETE'&&integrationMatch){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:integrationMatch[1],actorUserId:user.id})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin,context.id);
 return json(res,404,{error:'Not Found',requestId:context.id},origin,context.id);
 }catch(e){return json(res,e.status||400,{error:e.message,requestId:context.id},origin,context.id);}});
