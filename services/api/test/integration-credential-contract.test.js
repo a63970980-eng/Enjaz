@@ -23,3 +23,9 @@ test('integration metadata migration is additive and constrains credential statu
   for(const column of ['auth_type','scopes','status','metadata','expires_at'])assert.match(migration,new RegExp(`add column if not exists ${column}`));
   assert.match(migration,/check \(status in \('active','disabled','expired','error'\)\)/);
 });
+
+test('public integration metadata rejects secret-like fields instead of storing them',()=>{
+  assert.match(vault,/validatePublicMetadata/);
+  assert.match(vault,/password\|secret\|token\|api/);
+  assert.match(vault,/secret-like field/);
+});
