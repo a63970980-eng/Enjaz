@@ -5,26 +5,33 @@ on:
     paths:
       - 'apps/web/**'
       - '.github/workflows/web-ci.yml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: [main]
     paths:
       - 'apps/web/**'
       - '.github/workflows/web-ci.yml'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
   workflow_dispatch:
 
 jobs:
   build-web:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/web
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+          run_install: false
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: apps/web/package.json
-      - run: npm install --ignore-scripts
-      - run: npm test
-      - run: npm run build
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm --filter @enjaz/web test
+      - run: pnpm --filter @enjaz/web build
