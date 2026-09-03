@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "description": "ENJAZ AI Workforce SaaS Platform",
   "packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
     "build": "pnpm --recursive build",
