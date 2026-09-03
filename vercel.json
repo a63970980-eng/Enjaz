@@ -1,5 +1,6 @@
 {
-  "buildCommand": "pnpm --filter @enjaz/web build",
-  "outputDirectory": "apps/web/dist",
-  "installCommand": "pnpm install --no-frozen-lockfile"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install --prefix apps/web",
+  "buildCommand": "npm run build --prefix apps/web",
+  "outputDirectory": "apps/web/dist"
 }
