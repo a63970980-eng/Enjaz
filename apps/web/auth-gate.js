@@ -93,8 +93,15 @@ if (!production) {
   authClient.me(apiBase).then(profile => {
     if (!profile) { location.reload(); return; }
     if (profile.workspaces?.[0]) {
-      localStorage.setItem('ENJAZ_WORKSPACE_ID', q.get('workspaceId') || localStorage.getItem('ENJAZ_WORKSPACE_ID') || profile.workspaces[0].id);
+      const workspaceId = q.get('workspaceId') || localStorage.getItem('ENJAZ_WORKSPACE_ID') || profile.workspaces[0].id;
+      localStorage.setItem('ENJAZ_WORKSPACE_ID', workspaceId);
+      sessionStorage.setItem('ENJAZ_WORKSPACES', JSON.stringify(profile.workspaces));
       sessionStorage.setItem('ENJAZ_USER_PROFILE', JSON.stringify(profile));
+      if (window.ENJAZ_WORKSPACE_ID !== workspaceId) {
+        window.ENJAZ_WORKSPACE_ID = workspaceId;
+        window.ENJAZ_ACCESS_TOKEN = authClient.token();
+        location.reload();
+      }
     } else {
       workspaceSetup(profile);
     }
