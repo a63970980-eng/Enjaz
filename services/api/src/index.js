@@ -35,6 +35,7 @@ if(req.method==='GET'&&url.pathname==='/api/v1/auth/me'){const identity=await au
 if(req.method==='POST'&&url.pathname==='/api/v1/onboarding/bootstrap'){const identity=await authIdentity(req);if(!identity)throw Object.assign(new Error('Authentication required'),{status:401});const input=await body(req);const result=await bootstrapWorkspace({authUserId:identity.authId,email:identity.email,name:input.name||identity.name,organizationName:input.organizationName,workspaceName:input.workspaceName});return json(res,result.created?201:200,{data:result},origin,context.id);}
 const workspaceId=url.searchParams.get('workspaceId');const user=await requireWorkspace(req,workspaceId);
 if(req.method==='GET'&&url.pathname==='/api/v1/runtime/summary')return json(res,200,{data:await getRuntimeSummary(workspaceId)},origin,context.id);
+if(req.method==='GET'&&url.pathname==='/api/v1/runtime/ops'){requireManager(user);return json(res,200,{data:await getOpsSnapshot({workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tools')return json(res,200,{data:listTools()},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/employees')return json(res,200,{data:await listEmployees(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/employees'){requireManager(user);return json(res,201,{data:await createEmployee({...await body(req),workspaceId})},origin,context.id);}
