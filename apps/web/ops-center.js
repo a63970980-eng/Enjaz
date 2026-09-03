@@ -1,0 +1,17 @@
+(()=>{
+ const api=()=>window.ENJAZ_API_BASE||'';
+ const token=()=>sessionStorage.getItem('ENJAZ_ACCESS_TOKEN')||window.ENJAZ_ACCESS_TOKEN||'';
+ const workspace=()=>localStorage.getItem('ENJAZ_WORKSPACE_ID')||window.ENJAZ_WORKSPACE_ID||new URLSearchParams(location.search).get('workspaceId')||'';
+ const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+ const fmtTime=v=>{if(!v)return '—';try{return new Intl.DateTimeFormat('ar',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'}).format(new Date(v));}catch{return '—'}};
+ const fetchOps=async()=>{const w=workspace();const t=token();if(!w||!t)return null;const r=await fetch(`${api()}/ops/health?workspaceId=${encodeURIComponent(w)}`,{headers:{Authorization:`Bearer ${t}`}});if(!r.ok)throw new Error('ops');return r.json();};
+ const render=async()=>{
+  const anchor=document.querySelector('.hero'); if(!anchor||document.querySelector('[data-ops-center]'))return;
+  const el=document.createElement('section');el.className='ops-center';el.dataset.opsCenter='';el.innerHTML='<div class="ops-head"><div><span class="ops-kicker">OPERATIONS CENTER</span><h2>مركز التشغيل</h2><p>صحة الطابور والعمال الرقميين في لحظة واحدة.</p></div><span class="ops-live"><i></i> مراقبة مباشرة</span></div><div class="ops-grid"><div class="ops-stat"><small>قيد التنفيذ</small><strong data-o="running">—</strong></div><div class="ops-stat"><small>في الطابور</small><strong data-o="queued">—</strong></div><div class="ops-stat"><small>بانتظار الموافقة</small><strong data-o="blocked">—</strong></div><div class="ops-stat"><small>فشل نهائي</small><strong data-o="dead">—</strong></div><div class="ops-stat"><small>عمال متصلون</small><strong data-o="workers">—</strong></div><div class="ops-stat"><small>عمال غير مستقرين</small><strong data-o="unhealthy">—</strong></div></div><div class="ops-bottom"><div><b>آخر نشاط تشغيلي</b><span data-o="last">—</span></div><button type="button" data-o-refresh>تحديث الآن</button></div><div class="ops-alert" data-o-alert hidden></div></section>';
+  anchor.insertAdjacentElement('afterend',el);
+  const load=async()=>{const alert=el.querySelector('[data-o-alert]');try{const d=await fetchOps();if(!d)return;const q=d.queue||{};const workers=d.workers||[];el.querySelector('[data-o="running"]').textContent=q.running??0;el.querySelector('[data-o="queued"]').textContent=q.queued??0;el.querySelector('[data-o="blocked"]').textContent=q.blocked??0;el.querySelector('[data-o="dead"]').textContent=q.dead??0;el.querySelector('[data-o="workers"]').textContent=workers.filter(x=>x.healthy).length;el.querySelector('[data-o="unhealthy"]').textContent=workers.filter(x=>!x.healthy).length;el.querySelector('[data-o="last"]').textContent=fmtTime(d.recent?.[0]?.created_at||null);if((q.dead||0)>0||(q.blocked||0)>0){alert.hidden=false;alert.textContent=(q.blocked||0)>0?`هناك ${q.blocked} مهمة بانتظار قرار بشري.`:`هناك ${q.dead} مهمة وصلت إلى الحد الأقصى للمحاولات.`;}else alert.hidden=true;}catch{alert.hidden=false;alert.textContent='تعذر قراءة حالة التشغيل مؤقتاً.';}};
+  el.querySelector('[data-o-refresh]').addEventListener('click',load);await load();setInterval(load,30000);
+ };
+ const boot=()=>setTimeout(render,250);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();new MutationObserver(boot).observe(document.body,{childList:true,subtree:true});
+})();
