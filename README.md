@@ -4,84 +4,60 @@
 
 ENJAZ enables organizations to create, configure, operate, and govern AI employees that perform real work inside company systems.
 
-## Product Principles
-
-- AI employees are task-oriented, tool-enabled, permissioned, budgeted, and auditable.
-- Human approval remains required for sensitive operations.
-- Every organization is isolated through a multi-tenant workspace model.
-- Execution is separated from the business/product layer.
-- LinkWork is treated as an execution/infrastructure layer, not the ENJAZ product itself.
-
-## Core Domain
+## Launch architecture
 
 `Organization → Workspace → AI Employee → Task → Plan → Tool Call → Approval → Execution → Audit Event`
 
-## Runtime Architecture
+The production foundation includes PostgreSQL persistence, Supabase Auth, tenant-scoped access, RLS, an execution runtime, durable queue primitives, approvals, encrypted integration credentials, audit events, and a responsive Arabic RTL web console.
 
-```text
-ENJAZ
-├── Web App
-├── API + Auth boundary
-├── PostgreSQL + RLS
-├── AI Employee Runtime
-│   ├── Policy enforcement
-│   ├── Tool registry
-│   ├── Memory
-│   └── Budget controls
-├── Execution Graph
-├── Durable Job Queue
-│   ├── Leasing
-│   ├── Retries
-│   ├── Recovery
-│   └── Idempotency
-├── Workflow / Integration Layer
-├── Governance + Approvals
-├── Audit + Operations
-└── LinkWork execution/infrastructure layer
-```
+## Product surface
 
-## Security Baseline
+- Executive operations dashboard
+- AI employee builder with role, goal, model strategy, autonomy, skills, tools, budget, policy and schedule
+- Task planning and execution
+- Smart teams
+- Workflow execution visibility
+- Human approval controls
+- Integration vault
+- Audit trail
+- Preview mode for evaluating the product before connecting a production workspace
+
+## Security baseline
 
 - Tenant isolation at every data and service boundary.
 - PostgreSQL RLS policies scoped by authenticated workspace membership.
-- Database-level workspace integrity for execution graphs.
-- Least-privilege tool permissions.
-- Explicit approval policies for sensitive actions.
+- Supabase Auth identity bridge for API sessions.
+- Least-privilege tool permissions and explicit approval policies.
 - AI budget enforcement and API rate limits.
-- Encrypted credentials using AES-256-GCM with a 32-byte master key supplied through `ENJAZ_CREDENTIALS_KEY`.
-- Public health endpoint intentionally exposes only minimal liveness information.
-- Operational telemetry requires authenticated manager access and workspace-scoped queue data.
-- Outbound webhook execution is HTTPS-only, blocks non-public targets, rejects redirects, limits methods, and has a 10-second timeout.
-- Secrets are never committed to source control.
+- Encrypted credentials using AES-256-GCM with `ENJAZ_CREDENTIALS_KEY`.
+- Public health endpoint exposes only minimal liveness information.
+- Operational telemetry requires authenticated manager access.
+- HTTPS-only outbound webhooks with public-target validation, redirect rejection and bounded timeout.
+- No secrets committed to source control.
 
 ## Reliability
 
-- Row-level tenant isolation is covered by real PostgreSQL RLS integration tests.
-- Queue workers use leases and renewal to prevent premature stale recovery.
-- Failed jobs use bounded exponential backoff and dead-letter state.
-- Execution steps use idempotency constraints to reduce duplicate execution.
-- Worker shutdown is graceful and records offline state.
+- Clean-database migration chain under `services/api/db/migrations`.
+- Real PostgreSQL RLS integration coverage.
+- Queue leases, retries, recovery and dead-letter state.
+- Idempotency constraints for execution steps.
+- Graceful worker shutdown.
 
-## Development
+## Production configuration
 
-### API
+API requires `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DATABASE_URL`, and the encryption key for credential storage. Configure `CORS_ORIGINS` to the production web origin. Never expose database credentials or service-role/secret keys to the browser.
 
-```bash
-cd services/api
-npm install
-npm run migrate
-npm test
-npm start
-```
+The web console accepts `VITE_ENJAZ_API_BASE` at build time. Without a configured API it intentionally remains in preview mode and stores preview employees locally; production data must flow through the authenticated API and PostgreSQL.
 
-The API test suite includes security contracts, credential encryption, rate limiting, RLS isolation, execution policy, approval lifecycle, and workforce E2E coverage.
+## Release gates
 
-### CI
+Before public commercial launch, verify:
 
-GitHub Actions runs the API test environment against PostgreSQL 16, prepares Supabase-compatible Auth roles for the isolated test database, applies migrations from an empty database, and then executes the API tests.
+1. Clean-database migration and CI pass.
+2. Real Supabase Auth login and workspace membership E2E.
+3. Frontend-to-API integration using a production workspace.
+4. Worker/graph failure recovery and idempotency checks.
+5. Staging security and performance checks.
+6. Production monitoring, backups, alerting and incident procedures.
 
-> Note: commits created through the connected GitHub integration may not create a new Actions run automatically because GitHub suppresses workflow recursion for token-generated events. A developer push or manual workflow run can be used to execute the pipeline against the latest commit.
-
-## Release Readiness
-
-The project is being hardened toward Release Candidate status. Before production launch, the remaining gates are a successful clean-database CI run, real Auth/RLS E2E validation, worker/graph failure-recovery validation, frontend-to-API integration verification, and staging deployment with security/performance checks.
+The codebase is designed to reach Release Candidate status through these gates rather than treating a successful frontend deployment alone as a production launch.
