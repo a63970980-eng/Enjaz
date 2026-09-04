@@ -6,6 +6,8 @@ export async function api(path,{token,method='GET',body}={}){const r=await fetch
 export const apiClient={
  health:()=>api('/api/v1'),
  runtimeSummary:(workspaceId,token)=>api(`/api/v1/runtime/summary?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  employees:async(workspaceId,token)=>API_BASE?api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token}):{data:localEmployees(workspaceId)},
  createEmployee:async(workspaceId,token,body)=>{if(API_BASE)return api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body});const employee={id:`local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,name:body.name,role:body.role,goal:body.goal,model:body.model||'auto',autonomy:body.autonomy||'balanced',skills:Array.isArray(body.skills)?body.skills:[],tools:Array.isArray(body.tools)?body.tools:[],budgetCents:body.budgetCents||0,schedule:body.schedule||{type:'always'},policy:body.policy||{approvalMode:'required'},status:'active',created_at:new Date().toISOString()};const data=localEmployees(workspaceId);data.unshift(employee);saveLocalEmployees(workspaceId,data);return{data:employee};},
  departments:(workspaceId,token)=>api(`/api/v1/departments?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
@@ -16,6 +18,7 @@ export const apiClient={
  createEmployeeKnowledge:(workspaceId,token,employeeId,body)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}/knowledge?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  tasks:(workspaceId,token)=>api(`/api/v1/tasks?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createTask:(workspaceId,token,body)=>api(`/api/v1/tasks?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
+ getTask:(workspaceId,token,taskId)=>api(`/api/v1/tasks/${encodeURIComponent(taskId)}?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  taskComments:(workspaceId,token,taskId)=>api(`/api/v1/tasks/${encodeURIComponent(taskId)}/comments?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createTaskComment:(workspaceId,token,taskId,body)=>api(`/api/v1/tasks/${encodeURIComponent(taskId)}/comments?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  handoffs:(workspaceId,token,taskId='')=>api(`/api/v1/handoffs?workspaceId=${encodeURIComponent(workspaceId)}${taskId?`&taskId=${encodeURIComponent(taskId)}`:''}`,{token}),
@@ -28,6 +31,9 @@ export const apiClient={
  integrations:(workspaceId,token)=>api(`/api/v1/integrations?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createIntegration:(workspaceId,token,body)=>api(`/api/v1/integrations?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  revokeIntegration:(workspaceId,token,connectionId)=>api(`/api/v1/integrations/${encodeURIComponent(connectionId)}/revoke?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'DELETE'}),
- audit:(workspaceId,token)=>api(`/api/v1/audit?workspaceId=${encodeURIComponent(workspaceId)}`,{token})
+ audit:(workspaceId,token)=>api(`/api/v1/audit?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ billingPlans:(workspaceId,token)=>api(`/api/v1/billing/plans?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ billingSubscription:(workspaceId,token)=>api(`/api/v1/billing/subscription?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ billingUsage:(workspaceId,token)=>api(`/api/v1/billing/usage?workspaceId=${encodeURIComponent(workspaceId)}`,{token})
 };
 if(typeof window!=='undefined')window.apiClient=apiClient;
