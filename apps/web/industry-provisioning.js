@@ -58,7 +58,7 @@ function attachModalButton() {
   button.textContent = 'إنشاء الهيكل الرقمي';
   button.addEventListener('click', event => {
     event.preventDefault();
-    event.stopPropagation();
+    event.stopImmediatePropagation();
     void provision(button);
   }, true);
 }
