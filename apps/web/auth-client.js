@@ -19,5 +19,19 @@ export const authClient={
   async signUp(email,password,name){const redirectTo=`${location.origin}${location.pathname}`;const data=await authRequest('signup',{email,password,data:{full_name:name},options:{email_redirect_to:redirectTo}});if(data.access_token){sessionStorage.setItem(key,data.access_token||'');if(data.refresh_token)sessionStorage.setItem(refreshKey,data.refresh_token);}return {data,needsEmailConfirmation:!data.access_token};},
   signOut(){sessionStorage.removeItem(key);sessionStorage.removeItem(refreshKey);sessionStorage.removeItem('ENJAZ_USER_PROFILE');sessionStorage.removeItem('ENJAZ_WORKSPACES');sessionStorage.removeItem('ENJAZ_ACCESS_TOKEN');},
   async bootstrap(apiBase,{name,organizationName,workspaceName}){const token=this.token();const r=await fetch(`${apiBase}/api/v1/onboarding/bootstrap`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,organizationName,workspaceName})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر إنشاء مساحة العمل');return data.data;},
-  async me(apiBase){const token=this.token();if(!token)return null;const r=await fetch(`${apiBase}/api/v1/auth/me`,{headers:{Authorization:`Bearer ${token}`}});if(r.status===401){this.signOut();return null;}const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر قراءة جلسة المستخدم');return data.data;}
+  async me(apiBase){
+    const token=this.token();
+    if(!token)return null;
+    const savedWorkspace=localStorage.getItem('ENJAZ_WORKSPACE_ID')||new URLSearchParams(location.search).get('workspaceId')||'';
+    const query=savedWorkspace?`?workspaceId=${encodeURIComponent(savedWorkspace)}`:'';
+    let r=await fetch(`${apiBase}/api/v1/auth/me${query}`,{headers:{Authorization:`Bearer ${token}`}});
+    if(r.status===401){this.signOut();return null;}
+    let data=await r.json().catch(()=>({}));
+    if(!r.ok && /workspaceId is required/i.test(String(data.error||'')) && !savedWorkspace){
+      r=await fetch(`${apiBase}/api/v1/auth/me?workspaceId=`,{headers:{Authorization:`Bearer ${token}`}});
+      data=await r.json().catch(()=>({}));
+    }
+    if(!r.ok)throw new Error(data.error||'تعذر قراءة جلسة المستخدم');
+    return data.data;
+  }
 };
