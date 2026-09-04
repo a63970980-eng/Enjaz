@@ -11,6 +11,7 @@ import { getOpsSnapshot } from './ops-runtime.js';
 import { rateLimit } from './rate-limit.js';
 import { requestContext } from './request-context.js';
 import { closeDb, db } from './db.js';
+import { listIndustryPacks, provisionIndustryPack } from './industry-provisioning.js';
 import './integrations/index.js';
 const port=process.env.PORT||4000; const isProduction=process.env.NODE_ENV==='production';
 const supabase=(process.env.SUPABASE_URL&&process.env.SUPABASE_ANON_KEY)?createClient(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY,{auth:{persistSession:false}}):null;
@@ -32,6 +33,8 @@ if(req.method==='GET'&&url.pathname==='/api/v1')return json(res,200,{name:'ENJAZ
 if(req.method==='GET'&&url.pathname==='/api/v1/auth/me'){const identity=await authIdentity(req);if(!identity)throw Object.assign(new Error('Authentication required'),{status:401});const profile=await getUserByAuthId(identity.authId);const workspaces=profile?await listUserWorkspaces(profile.id):[];return json(res,200,{data:{identity,profile,workspaces}},origin,context.id);}
 if(req.method==='POST'&&url.pathname==='/api/v1/onboarding/bootstrap'){const identity=await authIdentity(req);if(!identity)throw Object.assign(new Error('Authentication required'),{status:401});const input=await body(req);const result=await bootstrapWorkspace({authUserId:identity.authId,email:identity.email,name:input.name||identity.name,organizationName:input.organizationName,workspaceName:input.workspaceName});return json(res,result.created?201:200,{data:result},origin,context.id);}
 const workspaceId=url.searchParams.get('workspaceId');const user=await requireWorkspace(req,workspaceId);
+if(req.method==='GET'&&url.pathname==='/api/v1/industry-packs')return json(res,200,{data:listIndustryPacks()},origin,context.id);
+const industryMatch=url.pathname.match(/^\/api\/v1\/industry-packs\/([^/]+)\/provision$/);if(industryMatch&&req.method==='POST'){requireManager(user);return json(res,201,{data:await provisionIndustryPack({workspaceId,pack:industryMatch[1],actorUserId:user.id})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/runtime/summary')return json(res,200,{data:await getRuntimeSummary(workspaceId)},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/runtime/ops'){requireManager(user);return json(res,200,{data:await getOpsSnapshot({workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tools')return json(res,200,{data:listTools()},origin,context.id);
