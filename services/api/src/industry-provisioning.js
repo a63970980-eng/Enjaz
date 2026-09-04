@@ -1,105 +1,86 @@
 import { randomUUID } from 'node:crypto';
-import { query, withTransaction } from './db.js';
+import { withTransaction } from './db.js';
 
 const PACKS = {
-  hospital: {
-    label: 'المستشفيات',
-    departments: [
-      ['الإدارة التنفيذية', 'إدارة المستشفى والقرارات التشغيلية', [['مدير المستشفى', 'قيادة التشغيل وتحقيق أهداف المستشفى'], ['محلل الأداء', 'قياس الأداء والجودة ورفع التقارير']]],
-      ['العمليات وخدمة المرضى', 'المواعيد والاستقبال وتجربة المريض', [['مدير العمليات', 'تنسيق العمليات اليومية وتحسين تدفق الخدمة'], ['خدمة المرضى والمواعيد', 'إدارة المواعيد والاستفسارات ومتابعة الخدمة']]],
-      ['المشتريات والمخزون', 'إدارة الإمدادات والمخزون والتوريد', [['مسؤول المشتريات', 'إدارة طلبات الشراء والموردين'], ['مسؤول المخزون', 'مراقبة المخزون والتنبيه إلى النقص']]],
-      ['المالية والموارد البشرية', 'المالية والفوترة والموارد البشرية', [['مدير المالية', 'متابعة الفوترة والتكاليف والتقارير المالية'], ['مدير الموارد البشرية', 'إدارة القوى العاملة والحضور والاحتياجات البشرية']]],
-    ],
-  },
-  restaurant: {
-    label: 'المطاعم',
-    departments: [
-      ['الإدارة والتشغيل', 'إدارة المطعم والفروع والأداء', [['مدير المطعم', 'قيادة التشغيل وتحقيق أهداف الفرع'], ['منسق العمليات', 'متابعة سير العمل وحل الاختناقات']]],
-      ['الطلبات وخدمة العملاء', 'إدارة الطلبات وتجربة العملاء', [['خدمة العملاء والطلبات', 'استقبال الطلبات وحل المشكلات ومتابعة العملاء'], ['منسق التوصيل', 'تنسيق الطلبات والتسليم ومتابعة التأخير']]],
-      ['المخزون والمشتريات', 'التوريد والمخزون والهدر', [['مسؤول المخزون', 'مراقبة مستويات المخزون والهدر'], ['مسؤول المشتريات', 'إدارة الموردين وإعادة الطلبات']]],
-      ['المالية والتسويق', 'الإيرادات والمصروفات والنمو', [['المحاسب', 'متابعة الإيرادات والمصروفات والتسويات'], ['مسؤول التسويق والمبيعات', 'تنمية المبيعات والحملات وقياس العائد']]],
-    ],
-  },
-  hotel: {
-    label: 'الفنادق',
-    departments: [
-      ['الإدارة والتشغيل', 'إدارة الفندق وجودة الخدمة', [['مدير الفندق', 'قيادة التشغيل وتحقيق أهداف الفندق'], ['مدير العمليات', 'تنسيق الأقسام ومراقبة جودة التشغيل']]],
-      ['الحجوزات والاستقبال', 'الحجوزات والوصول والمغادرة وخدمة النزلاء', [['مدير الحجوزات والاستقبال', 'رفع الإشغال وتحسين دورة الحجز'], ['خدمة النزلاء', 'متابعة طلبات النزلاء وحل المشكلات']]],
-      ['التدبير والصيانة', 'الغرف والنظافة والصيانة التشغيلية', [['مدير التدبير الفندقي', 'ضمان جاهزية الغرف وجودة النظافة'], ['منسق الصيانة', 'متابعة الأعطال وأعمال الصيانة']]],
-      ['الإيرادات والمشتريات', 'التسعير والإيرادات والتوريد', [['مدير الإيرادات', 'تحسين الإشغال والإيراد لكل غرفة'], ['مسؤول المشتريات', 'إدارة التوريد والموردين والتكاليف']]],
-    ],
-  },
-  enterprise: {
-    label: 'الشركات',
-    departments: [
-      ['الإدارة التنفيذية', 'الاستراتيجية والقرارات التنفيذية', [['المدير التنفيذي', 'تنسيق أهداف الشركة وقراراتها الرئيسية'], ['المحلل التنفيذي', 'تحليل الأداء وإعداد تقارير الإدارة']]],
-      ['العمليات', 'التشغيل وتحسين العمليات', [['مدير العمليات', 'رفع الكفاءة وإدارة العمليات العابرة للأقسام'], ['منسق المشاريع', 'متابعة الأعمال والمواعيد والاعتماديات']]],
-      ['المبيعات والتسويق', 'اكتساب العملاء والنمو', [['مدير المبيعات', 'تنمية خط المبيعات وتحويل الفرص'], ['مسؤول التسويق', 'إدارة الحملات والمحتوى وقياس النمو']]],
-      ['المالية والموارد البشرية', 'المالية والقوى العاملة', [['مدير المالية', 'إدارة الأداء المالي والتدفقات والتقارير'], ['مدير الموارد البشرية', 'إدارة المواهب والاحتياجات والقوى العاملة']]],
-    ],
-  },
-  government: {
-    label: 'الجهات الحكومية',
-    departments: [
-      ['الإدارة والخدمات', 'إدارة الخدمات والقرارات الإدارية', [['مدير الخدمة', 'قيادة الخدمة وتحسين تجربة المستفيد'], ['منسق العمليات', 'تنسيق الأعمال بين الوحدات']]],
-      ['استقبال الطلبات', 'استقبال الطلبات وتصنيفها وتوجيهها', [['موظف استقبال الطلبات', 'استقبال الطلبات والتحقق من اكتمالها'], ['موظف التوجيه', 'توجيه المعاملات إلى الجهة المختصة']]],
-      ['المعاملات والتقارير', 'متابعة المعاملات ومؤشرات الأداء', [['مدير المعاملات', 'متابعة دورة المعاملات وتقليل التأخير'], ['محلل التقارير', 'إعداد تقارير الأداء والخدمات']]],
-      ['المراجعة والموافقة', 'الرقابة والمراجعة والقرارات الحساسة', [['مراجع الامتثال', 'مراجعة الالتزام والسياسات قبل التنفيذ'], ['منسق الموافقات', 'إدارة الموافقات البشرية وتصعيد الحالات الحساسة']]],
-    ],
-  },
+  hospital: { label: 'المستشفيات', departments: [
+    ['الإدارة التنفيذية','قيادة المستشفى والقرارات',['مدير المستشفى','مساعد مدير المستشفى']],
+    ['العمليات والاستقبال','تشغيل اليوم والمواعيد والاستقبال',['مدير العمليات','موظف الاستقبال','منسق المواعيد']],
+    ['خدمة المرضى والجودة','تجربة المرضى والجودة والامتثال',['مسؤول خدمة المرضى','مسؤول الجودة والامتثال']],
+    ['المالية والموارد البشرية','المالية والقوى العاملة',['محلل مالي','مدير الموارد البشرية']],
+    ['المشتريات والمخزون والتحليل','الإمداد والتحليل التشغيلي',['مسؤول المشتريات','مسؤول المخزون الطبي','محلل عمليات المستشفى']],
+  ]},
+  restaurant: { label: 'المطاعم', departments: [
+    ['الإدارة والتشغيل','قيادة الفروع والأداء',['مدير المطعم','مدير الفروع']],
+    ['الاستقبال وخدمة العملاء','الحجوزات والطلبات وتجربة العميل',['موظف الاستقبال والحجوزات','موظف خدمة العملاء','منسق الطلبات والتوصيل']],
+    ['المشتريات والمخزون','التوريد والمخزون وتقليل الهدر',['موظف المشتريات','موظف المخزون']],
+    ['المالية والموارد البشرية','المالية والقوى العاملة',['المحاسب','موظف الموارد البشرية']],
+    ['التسويق والجودة','النمو والجودة وسلامة الغذاء',['مسؤول التسويق','مسؤول مراقبة الجودة']],
+  ]},
+  hotel: { label: 'الفنادق', departments: [
+    ['الإدارة والتشغيل','قيادة الفندق والتشغيل',['مدير الفندق','مدير العمليات']],
+    ['الحجوزات والاستقبال','الحجوزات والوصول والمغادرة',['موظف الحجوزات','موظف الاستقبال','موظف خدمة النزلاء']],
+    ['الإشغال والتدبير والصيانة','الإشغال وجاهزية الغرف والصيانة',['مدير الإشغال','مدير التدبير الفندقي','منسق الصيانة']],
+    ['المشتريات والمخزون','الإمداد والتوريد',['مسؤول المشتريات','مسؤول المخزون']],
+    ['المالية والموارد البشرية والتسويق','الإيرادات والقوى العاملة والنمو',['مسؤول المالية','مسؤول الموارد البشرية','مسؤول التسويق']],
+  ]},
+  enterprise: { label: 'الشركات', departments: [
+    ['الإدارة التنفيذية','الاستراتيجية ودعم القيادة',['CEO Assistant','المحلل التنفيذي']],
+    ['العمليات والمشاريع','التشغيل وإدارة المشاريع',['مدير العمليات','Project Manager']],
+    ['المبيعات ونجاح العملاء','الإيرادات والعملاء',['Sales Manager','Customer Success']],
+    ['التسويق والبيانات','النمو والتحليل',['Marketing Manager','Data Analyst']],
+    ['المالية والموارد البشرية والمشتريات','الوظائف المؤسسية',['Finance Manager','HR Manager','Procurement Manager']],
+  ]},
+  government: { label: 'الجهات الحكومية', departments: [
+    ['الخدمات والمعاملات','الخدمات المقدمة للمستفيدين',['موظف خدمات','موظف معاملات']],
+    ['الموارد البشرية والمشتريات','الدعم المؤسسي',['موظف موارد بشرية','موظف مشتريات']],
+    ['البيانات والمتابعة','القياس والمتابعة',['محلل بيانات','مسؤول متابعة']],
+    ['الشكاوى والجودة','تجربة المستفيد والجودة',['مسؤول شكاوى','مسؤول جودة']],
+    ['العمليات والتدقيق','التشغيل والرقابة',['مدير عمليات','موظف تدقيق ومراجعة']],
+  ]},
 };
 
-const DEFAULT_TOOLS = ['data.analyze', 'report.create'];
-const DEFAULT_PERMISSIONS = ['read_workspace', 'read_tasks', 'create_tasks', 'read_knowledge', 'write_knowledge'];
+const ROLE_PROFILES = {
+  'مدير المستشفى':['قيادة التشغيل','تحليل الأداء','إدارة المخاطر'], 'مدير المطعم':['إدارة الفروع','تحسين التشغيل','تحليل المبيعات'], 'مدير الفندق':['إدارة الضيافة','تحسين الإشغال','إدارة الجودة'],
+  'مدير العمليات':['تصميم الإجراءات','إدارة الأولويات','تحسين الأداء'], 'مدير الفروع':['إدارة الفروع','تحليل الأداء','حل الاختناقات'], 'مدير الإشغال':['التنبؤ بالطلب','إدارة الإشغال','التسعير'],
+  'CEO Assistant':['إدارة الأولويات','إعداد التقارير','تنسيق الاجتماعات'], 'Project Manager':['تخطيط المشاريع','إدارة الاعتماديات','إدارة المخاطر'], 'Sales Manager':['إدارة الفرص','التنبؤ بالمبيعات','إدارة العملاء'], 'Customer Success':['إدارة العملاء','حل المشكلات','قياس الرضا'],
+  'Marketing Manager':['إدارة الحملات','تحليل القنوات','إدارة المحتوى'], 'Data Analyst':['تحليل البيانات','لوحات المؤشرات','استخراج الرؤى'], 'Finance Manager':['التحليل المالي','التقارير','الموازنات'], 'HR Manager':['إدارة المواهب','التوظيف','تخطيط القوى العاملة'], 'Procurement Manager':['إدارة الموردين','طلبات الشراء','تحليل التكلفة'],
+  'محلل مالي':['التحليل المالي','التقارير','التنبؤ'], 'محلل عمليات المستشفى':['تحليل العمليات','قياس الأداء','تحسين التدفق'], 'محلل بيانات':['تحليل البيانات','التقارير','جودة البيانات'],
+};
+const defaultSkills=['إدارة المهام','تحليل البيانات','التعاون بين الأقسام','إعداد التقارير'];
+const defaultTools=['data.analyze','report.create','knowledge.search','task.manage'];
+const defaultPermissions=['read_workspace','read_tasks','create_tasks','read_knowledge','write_knowledge'];
+const roleProfile=(role)=>ROLE_PROFILES[role]||[role,'إدارة الإجراءات','قياس الأداء'];
+const isSensitive=(role)=>/مالية|مشتريات|تدقيق|مراجعة|جودة|موارد بشرية|مدير المستشفى|مدير الفندق|CEO|Finance|Procurement|HR/.test(role);
 
-function assertPack(pack) {
-  if (!PACKS[pack]) throw Object.assign(new Error(`Unknown industry pack: ${pack}`), { status: 400 });
-  return PACKS[pack];
-}
+export function listIndustryPacks(){return Object.entries(PACKS).map(([id,p])=>({id,label:p.label,departments:p.departments.length,employees:p.departments.reduce((n,d)=>n+d[2].length,0)}));}
 
-export function listIndustryPacks() {
-  return Object.entries(PACKS).map(([id, pack]) => ({ id, label: pack.label, departments: pack.departments.length, employees: pack.departments.reduce((n, d) => n + d[2].length, 0) }));
-}
-
-export async function provisionIndustryPack({ workspaceId, pack, actorUserId }) {
-  const template = assertPack(pack);
-  return withTransaction(async client => {
-    const existing = await client.query("select id,name,role,policy from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2 order by created_at limit 1", [workspaceId, pack]);
-    if (existing.rowCount) {
-      const count = await client.query("select count(*)::int as employees from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2", [workspaceId, pack]);
-      const departments = await client.query("select count(*)::int as departments from public.departments where workspace_id=$1 and exists (select 1 from public.ai_employees e where e.id=departments.manager_employee_id and e.policy->>'industryPack'=$2)", [workspaceId, pack]);
-      return { created: false, pack, label: template.label, employees: count.rows[0].employees, departments: departments.rows[0].departments, existingEmployeeId: existing.rows[0].id };
+export async function provisionIndustryPack({workspaceId,pack,actorUserId}){
+  const template=PACKS[pack];
+  if(!template) throw Object.assign(new Error(`Unknown industry pack: ${pack}`),{status:400});
+  return withTransaction(async client=>{
+    const existing=await client.query("select id from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2 limit 1",[workspaceId,pack]);
+    if(existing.rowCount){
+      const count=await client.query("select count(*)::int employees from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2",[workspaceId,pack]);
+      const departments=await client.query("select count(*)::int departments from public.departments where workspace_id=$1 and description ilike $2",[workspaceId,`%${template.label}%`]);
+      return {created:false,pack,label:template.label,employees:count.rows[0].employees,departments:departments.rows[0].departments,existingEmployeeId:existing.rows[0].id};
     }
-
-    const createdDepartments = [];
-    const createdEmployees = [];
-    for (const [departmentName, description, employees] of template.departments) {
-      const departmentId = randomUUID();
-      await client.query(`insert into public.departments(id,workspace_id,name,description) values($1,$2,$3,$4)`, [departmentId, workspaceId, departmentName, description]);
-      const deptEmployees = [];
-      for (const [role, goal] of employees) {
-        const employeeId = randomUUID();
-        const policy = { industryPack: pack, departmentId, approvalMode: role.includes('مراجع') || role.includes('موافقة') ? 'required' : 'required', sensitiveActionsRequireApproval: true };
-        const skills = [role, 'تحليل البيانات', 'إدارة المهام', 'التعاون بين الأقسام'];
-        await client.query(`insert into public.ai_employees (id,workspace_id,name,role,goal,skills,tools,permissions,memory_config,model,budget_cents,schedule,status,policy)
-          values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,$9::jsonb,$10,$11,$12::jsonb,$13,$14::jsonb)`, [
-          employeeId, workspaceId, role, role, goal, JSON.stringify(skills), JSON.stringify(DEFAULT_TOOLS), JSON.stringify(DEFAULT_PERMISSIONS), JSON.stringify({ enabled: true, retentionDays: 365 }), 'default', 5000,
-          JSON.stringify({ type: 'always', timezone: 'UTC' }), 'active', JSON.stringify(policy),
-        ]);
-        const goalId = randomUUID();
-        await client.query(`insert into public.employee_goals(id,workspace_id,employee_id,title,target,current_value,unit,period,status) values($1,$2,$3,$4,$5,0,$6,$7,'active')`, [goalId, workspaceId, employeeId, 'تحقيق الهدف التشغيلي للدور', 100, 'نسبة', 'شهري']);
-        await client.query(`insert into public.employee_knowledge(id,workspace_id,employee_id,title,content,source,metadata) values($1,$2,$3,$4,$5,$6,$7::jsonb)`, [randomUUID(), workspaceId, employeeId, 'تعريف الدور', `أنت موظف رقمي في إنجاز. دورك: ${role}. هدفك الأساسي: ${goal}. اعمل ضمن الصلاحيات الممنوحة، واطلب موافقة بشرية قبل أي إجراء حساس أو خارجي.`, 'ENJAZ industry pack', JSON.stringify({ industryPack: pack, departmentId })]);
-        deptEmployees.push(employeeId);
-        createdEmployees.push({ id: employeeId, name: role, departmentId });
+    const createdDepartments=[],createdEmployees=[];
+    for(const [departmentName,description,roles] of template.departments){
+      const departmentId=randomUUID();
+      await client.query('insert into public.departments(id,workspace_id,name,description) values($1,$2,$3,$4)',[departmentId,workspaceId,departmentName,`${template.label} — ${description}`]);
+      const ids=[];
+      for(const role of roles){
+        const id=randomUUID(), sensitive=isSensitive(role), skills=[...new Set([...roleProfile(role),...defaultSkills])];
+        const policy={industryPack:pack,departmentId,readyTemplate:true,autonomy:sensitive?'supervised':'balanced',approvalMode:sensitive?'required':'required',sensitiveActionsRequireApproval:true};
+        await client.query(`insert into public.ai_employees(id,workspace_id,name,role,goal,skills,tools,permissions,memory_config,model,budget_cents,schedule,status,policy) values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,$9::jsonb,$10,$11,$12::jsonb,$13,$14::jsonb)`,[id,workspaceId,role,role,`تشغيل ${role} بكفاءة ووفق سياسات المؤسسة`,JSON.stringify(skills),JSON.stringify(defaultTools),JSON.stringify(defaultPermissions),JSON.stringify({enabled:true,retentionDays:365,contextScope:'workspace'}),'default',5000,JSON.stringify({type:'always',timezone:'UTC'}),'active',JSON.stringify(policy)]);
+        await client.query(`insert into public.employee_goals(id,workspace_id,employee_id,title,target,current_value,unit,period,status) values($1,$2,$3,$4,$5,0,$6,$7,'active')`,[randomUUID(),workspaceId,id,`مؤشر أداء ${role}`,100,'نسبة','شهري']);
+        await client.query(`insert into public.employee_knowledge(id,workspace_id,employee_id,title,content,source,metadata) values($1,$2,$3,$4,$5,$6,$7::jsonb)`,[randomUUID(),workspaceId,id,'ملف الوظيفة',`أنت ${role} رقمي جاهز للعمل ضمن ${template.label}. مسؤولياتك: ${skills.join('، ')}. استخدم الأدوات المسموح بها، تعاون مع الأقسام الأخرى، ولا تنفذ إجراءً حساسًا أو خارجيًا دون الموافقة المطلوبة.`,'ENJAZ ready workforce catalog',JSON.stringify({industryPack:pack,departmentId,readyTemplate:true,role})]);
+        ids.push(id);createdEmployees.push({id,name:role,departmentId});
       }
-      const managerId = deptEmployees[0];
-      await client.query('update public.departments set manager_employee_id=$1,updated_at=now() where id=$2 and workspace_id=$3', [managerId, departmentId, workspaceId]);
-      createdDepartments.push({ id: departmentId, name: departmentName, managerEmployeeId: managerId });
+      await client.query('update public.departments set manager_employee_id=$1,updated_at=now() where id=$2 and workspace_id=$3',[ids[0],departmentId,workspaceId]);
+      createdDepartments.push({id:departmentId,name:departmentName,managerEmployeeId:ids[0]});
     }
-
-    await client.query(`insert into public.audit_events(id,workspace_id,employee_id,event_type,actor_type,action,metadata)
-      values($1,$2,$3,$4,$5,$6,$7::jsonb)`, [randomUUID(), workspaceId, createdEmployees[0]?.id || null, 'industry.pack.provisioned', 'user', 'industry.provision', JSON.stringify({ pack, actorUserId, employees: createdEmployees.length, departments: createdDepartments.length })]);
-
-    return { created: true, pack, label: template.label, employees: createdEmployees.length, departments: createdDepartments.length, createdDepartments, createdEmployees };
+    await client.query(`insert into public.audit_events(id,workspace_id,employee_id,event_type,actor_type,action,metadata) values($1,$2,$3,$4,$5,$6,$7::jsonb)`,[randomUUID(),workspaceId,createdEmployees[0]?.id||null,'industry.pack.provisioned','user','industry.provision',JSON.stringify({pack,actorUserId,employees:createdEmployees.length,departments:createdDepartments.length,readyTemplates:true})]);
+    return {created:true,pack,label:template.label,employees:createdEmployees.length,departments:createdDepartments.length,createdDepartments,createdEmployees};
   });
 }
