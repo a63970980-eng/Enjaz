@@ -27,12 +27,11 @@ export async function advanceGraph({graphId,completedStepKey}){
   if(!['running','succeeded','failed'].includes(completedStep.status))throw new Error(`Execution step is not executable: ${completedStepKey}`);
   if(completedStep.status==='running')await client.query("update execution_steps set status='succeeded',updated_at=now() where id=$1 and graph_id=$2 and status='running'",[completedStep.id,graphId]);
   const refreshed=(await client.query('select * from execution_steps where graph_id=$1 for update',[graphId])).rows;
-  const completed=new Set(refreshed.filter(s=>s.status==='succeeded').map(s=>s.step_key));
-  const ready=refreshed.filter(s=>s.status==='pending'&&(s.depends_on||[]).every(id=>completed.has(id)));const jobs=[];
+  const completed=new Set(refreshed.filter(s=>s.status==='succeeded').map(s=>s.step_key));const ready=refreshed.filter(s=>s.status==='pending'&&(s.depends_on||[]).every(id=>completed.has(id)));const jobs=[];
   for(const step of ready){const job=await enqueueJob({workspaceId:graph.workspace_id,jobType:'employee.step',payload:{graphId,taskId:graph.task_id,employeeId:graph.employee_id,step:{id:step.step_key,intent:step.intent,action:step.action,input:step.input,dependsOn:step.depends_on}},maxAttempts:3,client,idempotencyKey:`${graphId}:${step.step_key}`});jobs.push(job);await client.query("update execution_steps set job_id=$1,status='running',updated_at=now() where id=$2 and status='pending'",[job.id,step.id]);}
   const hasFailure=refreshed.some(s=>s.status==='failed');
-  if(hasFailure)await client.query("update execution_graphs set status='failed',updated_at=now() where id=$1 and workspace_id=$2",[graphId,graph.workspace_id]);
-  else {const remaining=refreshed.filter(s=>!['succeeded','cancelled'].includes(s.status)&&!ready.some(r=>r.id===s.id));if(remaining.length===0&&ready.length===0)await client.query("update execution_graphs set status='succeeded',updated_at=now() where id=$1 and workspace_id=$2",[graphId,graph.workspace_id]);}
+  if(hasFailure){await client.query("update execution_graphs set status='failed',updated_at=now() where id=$1 and workspace_id=$2",[graphId,graph.workspace_id]);await client.query("update tasks set status='failed' where id=$1 and workspace_id=$2 and status<>'cancelled'",[graph.task_id,graph.workspace_id]);}
+  else {const remaining=refreshed.filter(s=>!['succeeded','cancelled'].includes(s.status)&&!ready.some(r=>r.id===s.id));if(remaining.length===0&&ready.length===0){await client.query("update execution_graphs set status='succeeded',updated_at=now() where id=$1 and workspace_id=$2",[graphId,graph.workspace_id]);await client.query("update tasks set status='completed',completed_at=coalesce(completed_at,now()) where id=$1 and workspace_id=$2 and status<>'cancelled'",[graph.task_id,graph.workspace_id]);}else if(ready.length>0){await client.query("update tasks set status='executing',error=null where id=$1 and workspace_id=$2 and status<>'cancelled'",[graph.task_id,graph.workspace_id]);}}
   return {graphId,ready:ready.map(s=>s.step_key),jobs,completed:[...completed]};
  });
 }
