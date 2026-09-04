@@ -8,6 +8,8 @@ export const apiClient={
  runtimeSummary:(workspaceId,token)=>api(`/api/v1/runtime/summary?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ industryPacks:(workspaceId,token)=>api(`/api/v1/industry-packs?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ provisionIndustryPack:(workspaceId,token,pack)=>api(`/api/v1/industry-packs/${encodeURIComponent(pack)}/provision?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body:{}}),
  employees:async(workspaceId,token)=>API_BASE?api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token}):{data:localEmployees(workspaceId)},
  createEmployee:async(workspaceId,token,body)=>{if(API_BASE)return api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body});const employee={id:`local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,name:body.name,role:body.role,goal:body.goal,model:body.model||'auto',autonomy:body.autonomy||'balanced',skills:Array.isArray(body.skills)?body.skills:[],tools:Array.isArray(body.tools)?body.tools:[],budgetCents:body.budgetCents||0,schedule:body.schedule||{type:'always'},policy:body.policy||{approvalMode:'required'},status:'active',created_at:new Date().toISOString()};const data=localEmployees(workspaceId);data.unshift(employee);saveLocalEmployees(workspaceId,data);return{data:employee};},
  departments:(workspaceId,token)=>api(`/api/v1/departments?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
