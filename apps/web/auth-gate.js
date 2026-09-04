@@ -12,6 +12,7 @@ const mount = html => {
   el.innerHTML = html;
   return el;
 };
+const clearGate = () => { document.getElementById('auth-gate')?.remove(); root?.classList.remove('is-auth-locked'); };
 
 const form = ({ signup = false, error = '' } = {}) => mount(`<div class="auth-shell"><div class="auth-card"><div class="auth-brand"><span class="brand-mark"><i></i><i></i><i></i></span><div><strong>إنجاز</strong><small>ENJAZ · DIGITAL WORKFORCE</small></div></div><div class="auth-copy"><div class="eyebrow">${signup ? 'START YOUR WORKFORCE' : 'SECURE WORKSPACE'}</div><h1>${signup ? 'ابنِ قوة العمل الرقمية لشركتك' : 'مرحبًا بعودتك'}</h1><p>${signup ? 'أنشئ حسابك، ثم جهّز مؤسستك وأول مساحة عمل خلال دقائق.' : 'سجّل الدخول للوصول إلى قوة العمل الرقمية وبيانات شركتك.'}</p></div>${error ? `<div class="auth-error">${esc(error)}</div>` : ''}<form id="auth-form">${signup ? '<label>الاسم<input name="name" required autocomplete="name" placeholder="اسمك الكامل"></label>' : ''}<label>البريد الإلكتروني<input name="email" type="email" required autocomplete="email" placeholder="name@company.com"></label><label>كلمة المرور<input name="password" type="password" required minlength="8" autocomplete="${signup ? 'new-password' : 'current-password'}" placeholder="••••••••"></label><button class="primary auth-submit" type="submit">${signup ? 'إنشاء الحساب' : 'تسجيل الدخول'}</button></form><div class="auth-switch">${signup ? 'لديك حساب بالفعل؟' : 'ليس لديك حساب؟'} <button id="auth-switch" class="link-button">${signup ? 'تسجيل الدخول' : 'إنشاء حساب'}</button></div><div class="auth-secure">● جلسة مشفّرة · عزل بيانات المؤسسة · صلاحيات حسب الدور</div></div></div>`);
 
@@ -36,10 +37,10 @@ async function workspaceSetup(profile) {
     btn.disabled = true; btn.textContent = 'جارٍ التجهيز…';
     try {
       const data = await authClient.bootstrap(apiBase, { name: profile.identity.name, organizationName: b.get('organizationName'), workspaceName: b.get('workspaceName') });
-      const ws = data.workspaces?.[0];
+      const ws = data.workspaces?.[0] || data.workspace;
       if (!ws) throw new Error('لم يتم إنشاء مساحة العمل');
       localStorage.setItem('ENJAZ_WORKSPACE_ID', ws.id);
-      sessionStorage.setItem('ENJAZ_WORKSPACES', JSON.stringify(data.workspaces));
+      sessionStorage.setItem('ENJAZ_WORKSPACES', JSON.stringify(data.workspaces || [{...ws,role:data.role||'owner'}]));
       location.reload();
     } catch (err) {
       btn.disabled = false; btn.textContent = 'إنشاء مساحة العمل ←';
@@ -101,9 +102,21 @@ if (!production) {
         window.ENJAZ_WORKSPACE_ID = workspaceId;
         window.ENJAZ_ACCESS_TOKEN = authClient.token();
         location.reload();
+      } else {
+        clearGate();
       }
     } else {
       workspaceSetup(profile);
     }
-  }).catch(err => mount(`<div class="auth-shell"><div class="auth-card"><div class="auth-copy"><div class="eyebrow">SESSION ERROR</div><h1>تعذر تحميل مساحة العمل</h1><p>${esc(err.message)}</p><button class="primary" onclick="location.reload()">إعادة المحاولة</button></div></div></div>`));
+  }).catch(err => {
+    const cachedWorkspace=q.get('workspaceId')||localStorage.getItem('ENJAZ_WORKSPACE_ID')||'';
+    const cachedProfile=sessionStorage.getItem('ENJAZ_USER_PROFILE');
+    if(cachedWorkspace){
+      window.ENJAZ_WORKSPACE_ID=cachedWorkspace;
+      window.ENJAZ_ACCESS_TOKEN=authClient.token();
+      clearGate();
+      return;
+    }
+    mount(`<div class="auth-shell"><div class="auth-card"><div class="auth-copy"><div class="eyebrow">SESSION ERROR</div><h1>تعذر تحميل مساحة العمل</h1><p>${esc(err.message)}</p><button class="primary" onclick="location.reload()">إعادة المحاولة</button></div></div></div>`);
+  });
 }
