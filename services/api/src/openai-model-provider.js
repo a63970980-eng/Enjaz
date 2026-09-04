@@ -1,7 +1,7 @@
 import { registerModelProvider } from './model-provider.js';
 
 const endpoint='https://api.openai.com/v1/responses';
-const schema={type:'object',additionalProperties:false,properties:{goal:{type:'string'},steps:{type:'array',minItems:1,maxItems:12,items:{type:'object',additionalProperties:false,properties:{id:{type:'string'},action:{type:'string'},input:{type:'object'},approval_required:{type:'boolean'},depends_on:{type:'array',items:{type:'string'}}},required:['id','action','input','approval_required','depends_on']}}},required:['goal','steps']};
+const schema={type:'object',additionalProperties:false,properties:{goal:{type:'string'},steps:{type:'array',minItems:1,maxItems:12,items:{type:'object',additionalProperties:false,properties:{id:{type:'string'},intent:{type:'string'},action:{type:'string'},input:{type:'object'},approval_required:{type:'boolean'},depends_on:{type:'array',items:{type:'string'}}},required:['id','intent','action','input','approval_required','depends_on']}}},required:['goal','steps']};
 
 function extractText(response){if(typeof response?.output_text==='string')return response.output_text;for(const item of response?.output||[]){for(const part of item?.content||[]){if(typeof part?.text==='string')return part.text;}}return ''}
 
