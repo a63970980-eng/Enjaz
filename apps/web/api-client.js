@@ -1,4 +1,5 @@
 const API_BASE=window.ENJAZ_API_BASE||'';
+const INDUSTRY_API_BASE=window.ENJAZ_INDUSTRY_API_BASE||`${window.ENJAZ_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co'}/functions/v1/enjaz-industry`;
 const localKey=workspaceId=>`ENJAZ_LOCAL_EMPLOYEES:${workspaceId||'preview'}`;
 const localEmployees=workspaceId=>{try{return JSON.parse(localStorage.getItem(localKey(workspaceId)||'[]'))}catch{return[]}};
 const saveLocalEmployees=(workspaceId,data)=>localStorage.setItem(localKey(workspaceId),JSON.stringify(data));
@@ -9,7 +10,7 @@ export const apiClient={
  runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  industryPacks:(workspaceId,token)=>api(`/api/v1/industry-packs?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
- provisionIndustryPack:(workspaceId,token,pack)=>api(`/api/v1/industry-packs/${encodeURIComponent(pack)}/provision?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body:{}}),
+ provisionIndustryPack:async(workspaceId,token,pack)=>{const r=await fetch(`${INDUSTRY_API_BASE}/industry-packs/${encodeURIComponent(pack)}/provision?workspaceId=${encodeURIComponent(workspaceId)}`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:'{}'});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`Industry provisioning failed (${r.status})`);return data;},
  employees:async(workspaceId,token)=>API_BASE?api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token}):{data:localEmployees(workspaceId)},
  createEmployee:async(workspaceId,token,body)=>{if(API_BASE)return api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body});const employee={id:`local-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,name:body.name,role:body.role,goal:body.goal,model:body.model||'auto',autonomy:body.autonomy||'balanced',skills:Array.isArray(body.skills)?body.skills:[],tools:Array.isArray(body.tools)?body.tools:[],budgetCents:body.budgetCents||0,schedule:body.schedule||{type:'always'},policy:body.policy||{approvalMode:'required'},status:'active',created_at:new Date().toISOString()};const data=localEmployees(workspaceId);data.unshift(employee);saveLocalEmployees(workspaceId,data);return{data:employee};},
  departments:(workspaceId,token)=>api(`/api/v1/departments?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
