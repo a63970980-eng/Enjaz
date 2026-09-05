@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm install --prefix services/api && npm install --prefix apps/web",
-  "buildCommand": "npm run build --prefix apps/web",
+  "buildCommand": "npm run build --prefix apps/web && ./services/api/node_modules/.bin/esbuild services/api/src/index.js --bundle --platform=node --format=cjs --outfile=api/server.cjs",
   "outputDirectory": "apps/web/dist",
   "functions": {
     "api/index.js": {
