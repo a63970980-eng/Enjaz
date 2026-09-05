@@ -3,11 +3,23 @@
   "installCommand": "npm install --prefix services/api && npm install --prefix apps/web",
   "buildCommand": "npm run build --prefix apps/web && ./services/api/node_modules/.bin/esbuild services/api/src/index.js --bundle --platform=node --format=cjs --outfile=api/server.cjs",
   "outputDirectory": "apps/web/dist",
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "/api?__enjaz_path=/api/v1/:path*"
+    }
+  ],
   "functions": {
     "api/index.js": {
       "maxDuration": 30
     },
     "api/[...path].js": {
+      "maxDuration": 30
+    },
+    "api/v1/index.js": {
+      "maxDuration": 30
+    },
+    "api/v1/[...path].js": {
       "maxDuration": 30
     }
   }
