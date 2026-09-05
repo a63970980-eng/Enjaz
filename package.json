@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "ENJAZ AI Workforce SaaS Platform",
   "packageManager": "pnpm@10.34.5",
+  "type": "module",
   "engines": {
     "node": ">=22 <25"
   },
