@@ -12,6 +12,7 @@ function normalizeExecutionPlan(plan){
    dependsOn:Array.isArray(step.dependsOn)?step.dependsOn:(Array.isArray(step.depends_on)?step.depends_on:[])
   }))
  };
+}
 
 export async function planEmployeeTask({employee,workspaceId,employeeId,taskId,goal,provider=process.env.ENJAZ_MODEL_PROVIDER||'deterministic'}){
  const memory=await recall({workspaceId,employeeId,limit:20});
