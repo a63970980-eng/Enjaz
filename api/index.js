@@ -8,7 +8,7 @@ async function getServer() {
   return serverPromise;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const server = await getServer();
   return server.emit('request', req, res);
-}
+};
