@@ -13,13 +13,14 @@ import { requestContext } from './request-context.js';
 import { closeDb, query } from './db.js';
 import { listIndustryPacks, provisionIndustryPack } from './industry-provisioning.js';
 import './integrations/index.js';
-const port=process.env.PORT||4000; const isProduction=process.env.NODE_ENV==='production';
-const supabase=(process.env.SUPABASE_URL&&process.env.SUPABASE_ANON_KEY)?createClient(process.env.SUPABASE_URL,process.env.SUPABASE_ANON_KEY,{auth:{persistSession:false}}):null;
-if(isProduction&&!supabase)throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY are required in production');
+const port=process.env.PORT||4000;
+const supabaseUrl=process.env.SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
+const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||'sb_publishable_U12modLyDRQWV2sNAJHiqg_vJPOSoOz';
+const supabase=createClient(supabaseUrl,supabaseKey,{auth:{persistSession:false}});
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean)); const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
 const json=(res,code,data,origin='',requestId='')=>{const cors=origin&&allowedOrigins.has(origin)?origin:'null';res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':cors,'Vary':'Origin','Access-Control-Allow-Methods':'GET,POST,DELETE,OPTIONS','Access-Control-Allow-Headers':'Authorization,Content-Type,X-Request-Id','X-Request-Id':requestId,'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer','Permissions-Policy':'camera=(),microphone=(),geolocation=()'});res.end(JSON.stringify(data));};
 const body=req=>new Promise((resolve,reject)=>{let raw='';req.on('data',c=>{raw+=c;if(raw.length>1_000_000){reject(Object.assign(new Error('Request body too large'),{status:413}));req.destroy();}});req.on('end',()=>{try{resolve(raw?JSON.parse(raw):{})}catch{reject(Object.assign(new Error('Invalid JSON body'),{status:400}))}});});
-async function authIdentity(req){if(!supabase)return null;const h=req.headers.authorization||'';if(!h.startsWith('Bearer '))return null;const {data,error}=await supabase.auth.getUser(h.slice(7));if(error||!data.user)return null;return {authId:data.user.id,email:data.user.email||'',name:data.user.user_metadata?.full_name||data.user.user_metadata?.name||data.user.email?.split('@')[0]||'Enjaz user'};}
+async function authIdentity(req){const h=req.headers.authorization||'';if(!h.startsWith('Bearer '))return null;const {data,error}=await supabase.auth.getUser(h.slice(7));if(error||!data.user)return null;return {authId:data.user.id,email:data.user.email||'',name:data.user.user_metadata?.full_name||data.user.user_metadata?.name||data.user.email?.split('@')[0]||'Enjaz user'};}
 async function authUser(req){const identity=await authIdentity(req);if(!identity)return null;const profile=await getUserByAuthId(identity.authId);if(!profile)return null;return {authId:identity.authId,id:profile.id,organizationId:profile.organization_id};}
 async function requireWorkspace(req,workspaceId){const user=await authUser(req);if(!user)throw Object.assign(new Error('Authentication required'),{status:401});if(!workspaceId)throw Object.assign(new Error('workspaceId is required'),{status:400});const access=await getWorkspaceAccess(workspaceId,user.id);if(!access)throw Object.assign(new Error('Workspace access denied'),{status:403});return {...user,role:access.role};}
 function requireManager(user){if(!['owner','admin','manager'].includes(user.role))throw Object.assign(new Error('Manager permission required'),{status:403});}
