@@ -1,14 +1,7 @@
-let serverPromise;
+import apiModule from './server.cjs';
 
-async function getServer() {
-  if (!serverPromise) {
-    process.env.ENJAZ_VERCEL = '1';
-    serverPromise = import('../services/api/src/index.js').then(({ server }) => server);
-  }
-  return serverPromise;
-}
+const server = apiModule.server || apiModule.default?.server || apiModule.default || apiModule;
 
-export default async function handler(req, res) {
-  const server = await getServer();
+export default function handler(req, res) {
   return server.emit('request', req, res);
 }
