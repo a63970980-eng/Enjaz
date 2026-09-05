@@ -1,4 +1,4 @@
-import apiModule from '../../api/server.cjs';
+import apiModule from '../server.cjs';
 
 const server = apiModule.server || apiModule.default?.server || apiModule.default || apiModule;
 
