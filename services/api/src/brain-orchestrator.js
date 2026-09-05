@@ -1,6 +1,7 @@
 import { buildBrainContext, createDeterministicPlan, validatePlan } from './ai-brain.js';
 import { recall, remember } from './ai-memory.js';
 import { generatePlan } from './model-provider.js';
+import './openai-model-provider.js';
 import { materializePlan } from './execution-graph.js';
 
 function normalizeExecutionPlan(plan){
