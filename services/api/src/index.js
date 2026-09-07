@@ -37,7 +37,7 @@ if(req.method==='POST'&&url.pathname==='/api/v1/onboarding/bootstrap'){const ide
 const workspaceId=url.searchParams.get('workspaceId');const user=await requireWorkspace(req,workspaceId);
 if(req.method==='GET'&&url.pathname==='/api/v1/billing/subscription')return json(res,200,{data:await getBillingSubscription(workspaceId)},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/billing/usage')return json(res,200,{data:await getBillingUsage(workspaceId)},origin,context.id);
-if(req.method==='GET'&&url.pathname==='/api/v1/ops/health'){requireManager(user);return json(res,200,await getOpsSnapshot({workspaceId}),origin,context.id);}
+if(req.method==='GET'&&url.pathname==='/api/v1/ops/health'){requireManager(user);return json(res,200,await getOpsSnapshot({workspaceId})},origin,context.id);}
 if(req.method==='POST'&&url.pathname==='/api/v1/runtime/process'){requireManager(user);const {processOneJob,recoverQueue}=await import('./queue-worker.js');await recoverQueue(workspaceId);const results=[];const deadline=Date.now()+Math.min(20_000,Number(process.env.ENJAZ_PROCESS_BUDGET_MS||15_000));while(Date.now()<deadline&&results.length<6){const result=await processOneJob({workerId:`vercel-${context.id}`,workspaceId});if(!result)break;results.push({id:result.id,status:result.status,error:result.error||null});}return json(res,200,{data:{processed:results.length,results}},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/industry-packs')return json(res,200,{data:listIndustryPacks()},origin,context.id);
 const industryMatch=url.pathname.match(/^\/api\/v1\/industry-packs\/([^/]+)\/provision$/);if(industryMatch&&req.method==='POST'){requireManager(user);return json(res,201,{data:await provisionIndustryPack({workspaceId,pack:industryMatch[1],actorUserId:user.id})},origin,context.id);}
@@ -64,12 +64,18 @@ if(req.method==='GET'&&url.pathname==='/api/v1/approvals')return json(res,200,{d
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals'){requireManager(user);return json(res,201,{data:await createApproval({...await body(req),workspaceId})},origin,context.id);}
 const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);const approvalId=match[1],status=match[2]==='approve'?'approved':'rejected';return json(res,200,{data:await decideApproval({workspaceId,approvalId,status,decidedBy:user.id})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin,context.id);
+if(req.method==='GET'&&url.pathname==='/api/v1/integrations')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
+if(req.method==='POST'&&url.pathname==='/api/v1/integrations'){requireManager(user);await assertWorkspaceLimit(workspaceId,'integrations');const input=await body(req);return json(res,201,{data:await saveConnection({...input,workspaceId,actorUserId:user.id})},origin,context.id);}
+const integrationMatch=url.pathname.match(/^\/api\/v1\/integrations\/([^/]+)\/revoke$/);if(req.method==='DELETE'&&integrationMatch){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:integrationMatch[1],actorUserId:user.id})},origin,context.id);}
+if(req.method==='GET'&&url.pathname==='/api/v1/handoffs')return json(res,200,{data:await listHandoffs(workspaceId,url.searchParams.get('taskId'))},origin,context.id);
+if(req.method==='POST'&&url.pathname==='/api/v1/handoffs'){requireManager(user);return json(res,201,{data:await createHandoff({...await body(req),workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/connections')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/connections'){requireManager(user);return json(res,201,{data:await saveConnection({...await body(req),workspaceId})},origin,context.id);}
 const connectionMatch=url.pathname.match(/^\/api\/v1\/connections\/([^/]+)$/);if(connectionMatch&&req.method==='DELETE'){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:connectionMatch[1]})},origin,context.id);}
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals/execute'){requireManager(user);const input=await body(req);return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId:input.approvalId,actorUserId:user.id})},origin,context.id);}
 return json(res,404,{error:'Not found',requestId:context.id},origin,context.id);
 }catch(error){const status=Number(error?.status)||500;return json(res,status,{error:publicError(error,status),requestId:context.id},origin,context.id);}});
+server.requestTimeout=30_000;server.headersTimeout=15_000;server.keepAliveTimeout=5_000;server.maxRequestsPerSocket=1000;
 server.on('error',error=>console.error('ENJAZ server error',error));
 process.on('SIGTERM',async()=>{await closeDb();});
 process.on('SIGINT',async()=>{await closeDb();});
