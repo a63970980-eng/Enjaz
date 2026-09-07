@@ -14,8 +14,9 @@ import { listIndustryPacks, provisionIndustryPack } from './industry-provisionin
 import { getAIProviderStatus } from './ai-provider.js';
 import './integrations/index.js';
 const port=process.env.PORT||4000;
-const supabaseUrl=process.env.SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
-const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||'sb_publishable_U12modLyDRQWV2sNAJHiqg_vJPOSoOz';
+const supabaseUrl=process.env.SUPABASE_URL||'';
+const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||'';
+if(process.env.NODE_ENV==='production' && (!supabaseUrl || !supabaseKey)) throw new Error('SUPABASE_URL and Supabase publishable key are required in production');
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean)); const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
 const json=(res,code,data,origin='',requestId='')=>{const cors=origin&&allowedOrigins.has(origin)?origin:'null';res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':cors,'Vary':'Origin','Access-Control-Allow-Methods':'GET,POST,DELETE,OPTIONS','Access-Control-Allow-Headers':'Authorization,Content-Type,X-Request-Id','X-Request-Id':requestId,'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer','Permissions-Policy':'camera=(),microphone=(),geolocation=()'});res.end(JSON.stringify(data));};
 const body=req=>new Promise((resolve,reject)=>{let raw='';req.on('data',c=>{raw+=c;if(raw.length>1_000_000){reject(Object.assign(new Error('Request body too large'),{status:413}));req.destroy();}});req.on('end',()=>{try{resolve(raw?JSON.parse(raw):{})}catch{reject(Object.assign(new Error('Invalid JSON body'),{status:400}))}});});
