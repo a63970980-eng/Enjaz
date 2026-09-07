@@ -1,18 +1,1 @@
-{
-  "name": "@enjaz/api",
-  "private": true,
-  "version": "0.7.0",
-  "type": "module",
-  "scripts": {
-    "dev": "node src/index.js",
-    "start": "node src/index.js",
-    "worker": "node src/worker.js",
-    "migrate": "node db/migrate.js",
-    "test": "node --test"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.57.0",
-    "pg": "^8.16.3",
-    "esbuild": "^0.25.0"
-  }
-}
+{"name":"@enjaz/api","private":true,"type":"module","scripts":{"dev":"node src/server.js","start":"node src/server.js","test":"vitest run","test:watch":"vitest","lint":"eslint src test"},"dependencies":{"@supabase/supabase-js":"^2.57.0","express":"^5.1.0"},"devDependencies":{"eslint":"^9.35.0","vitest":"^3.2.4"}}
