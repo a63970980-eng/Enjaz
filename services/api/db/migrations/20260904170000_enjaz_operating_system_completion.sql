@@ -1,3 +1,29 @@
+-- Keep the operating-system completion migration self-contained so a fresh
+-- PostgreSQL install has every relation required by the command center view.
+create table if not exists public.runtime_metrics (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces(id) on delete cascade,
+  employee_id uuid references public.ai_employees(id) on delete set null,
+  task_id uuid references public.tasks(id) on delete set null,
+  provider text not null default 'deterministic',
+  status text not null default 'succeeded',
+  latency_ms integer,
+  cost_cents integer not null default 0,
+  error_code text,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_runtime_metrics_workspace_created on public.runtime_metrics(workspace_id,created_at desc);
+create index if not exists idx_runtime_metrics_employee_created on public.runtime_metrics(workspace_id,employee_id,created_at desc);
+create index if not exists idx_runtime_metrics_task_created on public.runtime_metrics(workspace_id,task_id,created_at desc);
+alter table public.runtime_metrics enable row level security;
+
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='runtime_metrics' and policyname='runtime_metrics_workspace_member') then
+    execute 'create policy runtime_metrics_workspace_member on public.runtime_metrics for all to authenticated using (private.is_workspace_member(workspace_id)) with check (private.is_workspace_member(workspace_id))';
+  end if;
+end $$;
+
 create table if not exists public.workspace_profiles (workspace_id uuid primary key references public.workspaces(id) on delete cascade, sector text, industry text, operating_model text default 'digital_workforce', onboarding_stage text not null default 'ready', settings jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
 create table if not exists public.task_delegations (id uuid primary key default gen_random_uuid(), workspace_id uuid not null references public.workspaces(id) on delete cascade, parent_task_id uuid not null references public.tasks(id) on delete cascade, child_task_id uuid not null references public.tasks(id) on delete cascade, from_employee_id uuid references public.ai_employees(id) on delete set null, to_employee_id uuid references public.ai_employees(id) on delete set null, reason text not null, status text not null default 'pending' check(status in ('pending','accepted','completed','failed','cancelled')), context jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(), completed_at timestamptz, unique(parent_task_id,child_task_id));
 create table if not exists public.integration_action_logs (id uuid primary key default gen_random_uuid(), workspace_id uuid not null references public.workspaces(id) on delete cascade, task_id uuid references public.tasks(id) on delete set null, employee_id uuid references public.ai_employees(id) on delete set null, connection_id uuid references public.integration_connections(id) on delete set null, provider text not null, action text not null, status text not null default 'started' check(status in ('started','succeeded','failed','blocked')), request_meta jsonb not null default '{}'::jsonb, response_meta jsonb not null default '{}'::jsonb, created_at timestamptz not null default now(), completed_at timestamptz);
