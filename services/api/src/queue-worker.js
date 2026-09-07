@@ -1,17 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { query } from './db.js';
 import { claimJob, completeJob, blockJob, failJob, recoverStaleJobs, renewJobLease } from './job-queue.js';
-import { runWorkflow } from './workflow-engine.js';
-import { runEmployeeTask } from './agent-runtime.js';
 import { heartbeat, markAttemptStarted, markAttemptFinished } from './worker-observability.js';
 
 async function dispatch(job){
  if(job.job_type==='workflow.run'){
+  const {runWorkflow}=await import('./workflow-engine.js');
   const p=job.payload||{};
   if(!p.workflowId)throw new Error('Workflow job requires workflowId');
   return runWorkflow({...p,workspaceId:job.workspace_id});
  }
  if(job.job_type==='employee.step'){
+  const {runEmployeeTask}=await import('./agent-runtime.js');
   const p=job.payload||{},s=p.step||{};
   if(p.graphId&&s.id){
    const r=await query("select s.status,s.output from execution_steps s join execution_graphs g on g.id=s.graph_id where s.graph_id=$1 and s.step_key=$2 and g.workspace_id=$3",[p.graphId,s.id,job.workspace_id]);
