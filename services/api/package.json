@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
+    "migrate": "node db/migrate.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src test"
