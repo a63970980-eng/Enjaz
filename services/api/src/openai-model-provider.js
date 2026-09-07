@@ -5,8 +5,9 @@ const schema={type:'object',additionalProperties:false,properties:{goal:{type:'s
 
 function extractText(response){if(typeof response?.output_text==='string')return response.output_text;for(const item of response?.output||[]){for(const part of item?.content||[]){if(typeof part?.text==='string')return part.text;}}return ''}
 
-export async function generateOpenAIPlan(context,{fetchImpl=globalThis.fetch,apiKey=process.env.OPENAI_API_KEY,model=process.env.OPENAI_MODEL||'gpt-5.6-luna'}={}){
+export async function generateOpenAIPlan(context,{fetchImpl=globalThis.fetch,apiKey=process.env.OPENAI_API_KEY,model=process.env.OPENAI_MODEL}={}){
  if(!apiKey)throw new Error('OPENAI_API_KEY is not configured');
+ if(!model)throw new Error('OPENAI_MODEL is not configured');
  if(typeof fetchImpl!=='function')throw new Error('Fetch implementation is unavailable');
  const response=await fetchImpl(endpoint,{method:'POST',headers:{Authorization:`Bearer ${apiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model,input:[{role:'developer',content:context.system},{role:'user',content:JSON.stringify(context)}],text:{format:{type:'json_schema',name:'enjaz_plan',strict:true,schema}},store:false})});
  const payload=await response.json().catch(()=>({}));
