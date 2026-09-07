@@ -16,8 +16,8 @@ import { listBillingPlans, getBillingSubscription, getBillingUsage, assertWorksp
 import './integrations/index.js';
 const port=process.env.PORT||4000;
 const supabaseUrl=process.env.SUPABASE_URL||'';
-const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||'';
-if(process.env.NODE_ENV==='production' && (!supabaseUrl || !supabaseKey)) throw new Error('SUPABASE_URL and Supabase publishable key are required in production');
+const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY||'';
+if(process.env.NODE_ENV==='production' && !supabaseUrl) throw new Error('SUPABASE_URL is required in production');
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean)); const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
 const json=(res,code,data,origin='',requestId='')=>{const cors=origin&&allowedOrigins.has(origin)?origin:'null';res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':cors,'Vary':'Origin','Access-Control-Allow-Methods':'GET,POST,PATCH,DELETE,OPTIONS','Access-Control-Allow-Headers':'Authorization,Content-Type,X-Request-Id','X-Request-Id':requestId,'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer','Permissions-Policy':'camera=(),microphone=(),geolocation=()'});res.end(JSON.stringify(data));};
 const body=req=>new Promise((resolve,reject)=>{let raw='';req.on('data',c=>{raw+=c;if(raw.length>1_000_000){reject(Object.assign(new Error('Request body too large'),{status:413}));req.destroy();}});req.on('end',()=>{try{resolve(raw?JSON.parse(raw):{})}catch{reject(Object.assign(new Error('Invalid JSON body'),{status:400}))}});});
@@ -63,13 +63,17 @@ const handoffs=url.pathname==='/api/v1/handoffs';if(handoffs&&req.method==='GET'
 if(req.method==='GET'&&url.pathname==='/api/v1/workflows')return json(res,200,{data:await listWorkflows(workspaceId)},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/approvals')return json(res,200,{data:await listApprovals(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals'){requireManager(user);return json(res,201,{data:await createApproval({...await body(req),workspaceId})},origin,context.id);}
-const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);const approvalId=match[1],status=match[2]==='approve'?'approved':'rejected';const approval=await decideApproval(approvalId,workspaceId,status,user.id);if(status==='approved')return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId,actorUserId:user.id})},origin,context.id);return json(res,200,{data:approval},origin,context.id);}
-if(req.method==='GET'&&url.pathname==='/api/v1/integrations')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
-if(req.method==='POST'&&url.pathname==='/api/v1/integrations'){requireManager(user);await assertWorkspaceLimit(workspaceId,'integrations');const input=await body(req);return json(res,201,{data:await saveConnection({...input,workspaceId,actorUserId:user.id})},origin,context.id);}
-const integrationMatch=url.pathname.match(/^\/api\/v1\/integrations\/([^/]+)\/revoke$/);if(req.method==='DELETE'&&integrationMatch){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:integrationMatch[1],actorUserId:user.id})},origin,context.id);}
+const match=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&match){requireManager(user);const approvalId=match[1],status=match[2]==='approve'?'approved':'rejected';return json(res,200,{data:await decideApproval({workspaceId,approvalId,status,decidedBy:user.id})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin,context.id);
-return json(res,404,{error:'Not Found',requestId:context.id},origin,context.id);
-}catch(e){const status=e.status||400;return json(res,status,{error:publicError(e,status),requestId:context.id,code:e.code||undefined},origin,context.id);}});
-server.requestTimeout=30_000;server.headersTimeout=15_000;server.keepAliveTimeout=5_000;server.maxRequestsPerSocket=1000;
-let shuttingDown=false;async function shutdown(signal){if(shuttingDown)return;shuttingDown=true;console.log(`ENJAZ API shutting down (${signal})`);server.close(async()=>{try{await closeDb();process.exit(0);}catch(error){console.error('Database shutdown failed',error);process.exit(1);}});setTimeout(()=>process.exit(1),10_000).unref();}process.once('SIGTERM',()=>void shutdown('SIGTERM'));process.once('SIGINT',()=>void shutdown('SIGINT'));
-if(process.env.ENJAZ_VERCEL!=='1' && process.env.VERCEL!=='1')server.listen(port,()=>console.log(`ENJAZ API listening on ${port}`));
+if(req.method==='GET'&&url.pathname==='/api/v1/handoffs')return json(res,200,{data:await listHandoffs(workspaceId,url.searchParams.get('taskId'))},origin,context.id);
+if(req.method==='POST'&&url.pathname==='/api/v1/handoffs'){requireManager(user);return json(res,201,{data:await createHandoff({...await body(req),workspaceId})},origin,context.id);}
+if(req.method==='GET'&&url.pathname==='/api/v1/connections')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
+if(req.method==='POST'&&url.pathname==='/api/v1/connections'){requireManager(user);return json(res,201,{data:await saveConnection({...await body(req),workspaceId})},origin,context.id);}
+const connectionMatch=url.pathname.match(/^\/api\/v1\/connections\/([^/]+)$/);if(connectionMatch&&req.method==='DELETE'){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:connectionMatch[1]})},origin,context.id);}
+if(req.method==='POST'&&url.pathname==='/api/v1/approvals/execute'){requireManager(user);const input=await body(req);return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId:input.approvalId,actorUserId:user.id})},origin,context.id);}
+return json(res,404,{error:'Not found',requestId:context.id},origin,context.id);
+}catch(error){const status=Number(error?.status)||500;return json(res,status,{error:publicError(error,status),requestId:context.id},origin,context.id);}});
+server.on('error',error=>console.error('ENJAZ server error',error));
+process.on('SIGTERM',async()=>{await closeDb();});
+process.on('SIGINT',async()=>{await closeDb();});
+export default server;
