@@ -8,7 +8,7 @@ describe('AI provider router', () => {
     delete process.env.AI_PROVIDER;
   });
 
-  it('reports provider configuration without exposing secrets', () => {
+  it('reports configured providers without exposing secrets', () => {
     process.env.GEMINI_API_KEY = 'secret-gemini';
     process.env.OPENROUTER_API_KEY = 'secret-router';
     const status = getAIProviderStatus();
