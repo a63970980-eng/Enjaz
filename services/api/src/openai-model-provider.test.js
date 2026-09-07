@@ -20,6 +20,6 @@ test('OpenAI planner sends structured output and parses the plan',async()=>{
 
 test('OpenAI planner fails clearly when API key is missing',async()=>assert.rejects(()=>generateOpenAIPlan(context,{fetchImpl:async()=>{throw new Error('should not call fetch')},apiKey:''}),/OPENAI_API_KEY/));
 
-test('OpenAI planner surfaces provider errors',async()=>{const fetchImpl=async()=>({ok:false,status:401,json:async()=>({error:{message:'Invalid API key'}})});await assert.rejects(()=>generateOpenAIPlan(context,{fetchImpl,apiKey:'bad'}),/Invalid API key/);});
+test('OpenAI planner surfaces provider errors',async()=>{const fetchImpl=async()=>({ok:false,status:401,json:async()=>({error:{message:'Invalid API key'}})});await assert.rejects(()=>generateOpenAIPlan(context,{fetchImpl,apiKey:'bad',model:'gpt-5.6-luna'}),/Invalid API key/);});
 
-test('OpenAI planner rejects malformed model output',async()=>{const fetchImpl=async()=>({ok:true,status:200,json:async()=>({output_text:'not-json'})});await assert.rejects(()=>generateOpenAIPlan(context,{fetchImpl,apiKey:'test-key'}),/invalid plan payload/);});
+test('OpenAI planner rejects malformed model output',async()=>{const fetchImpl=async()=>({ok:true,status:200,json:async()=>({output_text:'not-json'})});await assert.rejects(()=>generateOpenAIPlan(context,{fetchImpl,apiKey:'test-key',model:'gpt-5.6-luna'}),/invalid plan payload/);});
