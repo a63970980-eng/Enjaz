@@ -1,5 +1,10 @@
 begin;
 
+-- These columns are part of the workforce extension but this migration sorts before
+-- the timestamped completion migration, so make the index migration self-contained.
+alter table public.tasks add column if not exists assigned_by_employee_id uuid references public.ai_employees(id) on delete set null;
+alter table public.tasks add column if not exists parent_task_id uuid references public.tasks(id) on delete set null;
+
 -- Keep high-cardinality foreign-key lookups tenant-friendly and aligned with production.
 create index if not exists tasks_assigned_by_employee_id_idx on public.tasks(assigned_by_employee_id);
 create index if not exists tasks_parent_task_id_idx on public.tasks(parent_task_id);
