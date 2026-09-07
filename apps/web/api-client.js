@@ -1,17 +1,13 @@
 const env=typeof import.meta!=='undefined'&&import.meta.env?import.meta.env:{};
 const API_BASE=window.ENJAZ_API_BASE||env.VITE_ENJAZ_API_BASE||'';
-const SUPABASE_URL=window.ENJAZ_SUPABASE_URL||env.VITE_ENJAZ_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
-const SUPABASE_ANON_KEY=window.ENJAZ_SUPABASE_ANON_KEY||env.VITE_ENJAZ_SUPABASE_ANON_KEY||'';
-const INDUSTRY_API_BASE=window.ENJAZ_INDUSTRY_API_BASE||env.VITE_ENJAZ_INDUSTRY_API_BASE||`${SUPABASE_URL}/functions/v1/enjaz-industry`;
 export async function api(path,{token,method='GET',body}={}){const r=await fetch(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(data.error||`Request failed (${r.status})`);if(data.code)error.code=data.code;if(r.headers.get('X-Request-Id'))error.requestId=r.headers.get('X-Request-Id');throw error;}return data}
-async function supabaseCatalog(){if(!SUPABASE_ANON_KEY)return null;const url=`${SUPABASE_URL}/rest/v1/employee_role_templates?select=*&order=sector,name`;const r=await fetch(url,{headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});if(!r.ok)throw new Error(`Catalog request failed (${r.status})`);const rows=await r.json();return{data:{templates:rows}}}
 export const apiClient={
  health:()=>api('/api/v1'),
  runtimeSummary:(workspaceId,token)=>api(`/api/v1/runtime/summary?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
- industryPacks:async(workspaceId,token)=>{if(API_BASE)return api(`/api/v1/industry-packs?workspaceId=${encodeURIComponent(workspaceId)}`,{token});return supabaseCatalog()},
- provisionIndustryPack:async(workspaceId,token,pack)=>api(`/api/v1/industry-packs/${encodeURIComponent(pack)}/provision?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body:{}}),
+ industryPacks:(workspaceId,token)=>api(`/api/v1/industry-packs?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
+ provisionIndustryPack:(workspaceId,token,pack)=>api(`/api/v1/industry-packs/${encodeURIComponent(pack)}/provision?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body:{}}),
  employees:(workspaceId,token)=>api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createEmployee:(workspaceId,token,body)=>api(`/api/v1/employees?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  getEmployee:(workspaceId,token,employeeId)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
