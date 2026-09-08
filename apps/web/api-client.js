@@ -1,9 +1,12 @@
 const env=typeof import.meta!=='undefined'&&import.meta.env?import.meta.env:{};
 const API_BASE=window.ENJAZ_API_BASE||env.VITE_ENJAZ_API_BASE||'';
+const SUPABASE_URL=window.ENJAZ_SUPABASE_URL||env.VITE_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
+const AUTH_BRIDGE=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-auth-bridge`;
 export async function api(path,{token,method='GET',body}={}){const r=await fetch(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(data.error||`Request failed (${r.status})`);if(data.code)error.code=data.code;if(r.headers.get('X-Request-Id'))error.requestId=r.headers.get('X-Request-Id');throw error;}return data}
+async function authBridge(action,token,body={}){const r=await fetch(AUTH_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر تهيئة مساحة العمل.');return data}
 export const apiClient={
  health:()=>api('/api/v1'),
- onboardingBootstrap:(token,body)=>api('/api/v1/onboarding/bootstrap',{token,method:'POST',body}),
+ onboardingBootstrap:(token,body)=>authBridge('bootstrap',token,body),
  runtimeSummary:(workspaceId,token)=>api(`/api/v1/runtime/summary?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
