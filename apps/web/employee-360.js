@@ -1,0 +1,30 @@
+import {apiClient} from './api-client.js';
+
+const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
+const list=v=>Array.isArray(v)?v:[];
+const text=v=>typeof v==='string'?v:(v&&typeof v==='object'?JSON.stringify(v):String(v??''));
+
+export async function openEmployee360(employeeId,{token,workspaceId,onClose}={}){
+  if(!employeeId)return;
+  const host=document.querySelector('#employee360-root')||document.body.appendChild(Object.assign(document.createElement('div'),{id:'employee360-root'}));
+  host.innerHTML='<div class="e360-backdrop"><section class="e360-drawer"><div class="e360-loading">جاري تحميل ملف الموظف الرقمي…</div></section></div>';
+  try{
+    const r=await apiClient.getEmployee(workspaceId,token,employeeId); const e=r?.data||r?.employee||r;
+    const goals=list(e.goals), memory=list(e.memory||e.memories), knowledge=list(e.knowledge), usage=list(e.usage), activity=list(e.activity||e.recent_activity);
+    host.innerHTML=`<div class="e360-backdrop" data-close><section class="e360-drawer" onclick="event.stopPropagation()">
+      <header class="e360-header"><button class="e360-close" data-e360-close>×</button><div class="e360-identity"><div class="e360-avatar">${esc((e.name||'م').slice(0,1))}</div><div><div class="e360-eyebrow">EMPLOYEE 360 · DIGITAL WORKFORCE</div><h2>${esc(e.name||'موظف رقمي')}</h2><p>${esc(e.role||'—')} · ${esc(e.status||'active')}</p></div></div><div class="e360-actions"><button data-e360-action="pause">إيقاف</button><button data-e360-action="resume">تشغيل</button><button data-e360-action="edit">إدارة الموظف</button></div></header>
+      <div class="e360-summary"><div><span>الهدف</span><strong>${esc(e.goal||'غير محدد')}</strong></div><div><span>النموذج</span><strong>${esc(e.model||'—')}</strong></div><div><span>الميزانية</span><strong>${e.budget_cents!=null?((Number(e.budget_cents)/100).toFixed(2)+' $'):'—'}</strong></div><div><span>الصلاحية</span><strong>${esc((e.permissions?.autonomy||e.policy?.autonomy)||'محكومة')}</strong></div></div>
+      <nav class="e360-tabs"><button class="active">نظرة عامة</button><button>المهارات والأدوات</button><button>الذاكرة والمعرفة</button><button>الأهداف</button><button>النشاط والاستخدام</button><button>الحوكمة</button></nav>
+      <main class="e360-grid"><article class="e360-card e360-wide"><div class="e360-card-head"><h3>Mandate</h3><span>التفويض التشغيلي</span></div><p>${esc(e.goal||'هذا الموظف مسؤول عن تنفيذ المهام الموكلة إليه ضمن صلاحياته وسياسات مساحة العمل.')}</p><div class="e360-chips">${list(e.skills).map(x=>`<span>${esc(text(x))}</span>`).join('')||'<span>لا توجد مهارات مسجلة</span>'}</div></article>
+      <article class="e360-card"><div class="e360-card-head"><h3>Tools</h3><span>${list(e.tools).length} أدوات</span></div><ul>${list(e.tools).map(x=>`<li>${esc(text(x))}<b>مسموح</b></li>`).join('')||'<li>لا توجد أدوات</li>'}</ul></article>
+      <article class="e360-card"><div class="e360-card-head"><h3>Goals</h3><span>${goals.length} أهداف</span></div><ul>${goals.map(g=>`<li><span>${esc(g.title||'هدف')}</span><b>${esc(g.current_value??0)} / ${esc(g.target??0)} ${esc(g.unit||'')}</b></li>`).join('')||'<li>لا توجد أهداف</li>'}</ul></article>
+      <article class="e360-card"><div class="e360-card-head"><h3>Memory</h3><span>${memory.length} سجلات</span></div><ul>${memory.slice(0,5).map(m=>`<li><span>${esc(m.memory_type||'سياق')}</span><b>${esc((m.content||'').slice(0,70))}</b></li>`).join('')||'<li>لا توجد ذاكرة بعد</li>'}</ul></article>
+      <article class="e360-card"><div class="e360-card-head"><h3>Knowledge</h3><span>${knowledge.length} مصادر</span></div><ul>${knowledge.slice(0,5).map(k=>`<li><span>${esc(k.title||'معرفة')}</span><b>${esc(k.source||'داخلي')}</b></li>`).join('')||'<li>لا توجد معرفة مرتبطة</li>'}</ul></article>
+      <article class="e360-card e360-wide"><div class="e360-card-head"><h3>Activity & Usage</h3><span>${usage.length} سجلات استخدام</span></div><div class="e360-timeline">${activity.slice(0,8).map(a=>`<div><i></i><span>${esc(a.title||a.action||a.event||'نشاط')}</span><small>${esc(a.created_at||'')}</small></div>`).join('')||'<div class="e360-muted">النشاط سيظهر هنا مع بدء التنفيذ.</div>'}</div></article>
+      <article class="e360-card e360-wide"><div class="e360-card-head"><h3>Governance</h3><span>Human-in-the-loop</span></div><div class="e360-policy"><div><b>Permissions</b><span>${esc(JSON.stringify(e.permissions||{}))}</span></div><div><b>Policy</b><span>${esc(JSON.stringify(e.policy||{}))}</span></div><div><b>Schedule</b><span>${esc(JSON.stringify(e.schedule||{}))}</span></div></div></article></main>
+    </section></div>`;
+    const close=()=>{host.innerHTML='';onClose?.()}; host.querySelector('[data-close]').onclick=close; host.querySelector('[data-e360-close]').onclick=close;
+    host.querySelectorAll('[data-e360-action]').forEach(b=>b.onclick=async()=>{try{await apiClient.employeeStatus(workspaceId,token,employeeId,b.dataset.e360Action);close();window.dispatchEvent(new CustomEvent('enjaz:employee-updated',{detail:{employeeId}}));}catch(err){alert(err.message||'تعذر تحديث حالة الموظف.')}});
+  }catch(err){host.innerHTML=`<div class="e360-backdrop"><section class="e360-drawer"><button class="e360-close" onclick="this.closest('#employee360-root').innerHTML=''">×</button><div class="e360-error">تعذر تحميل Employee 360<br><small>${esc(err.message)}</small></div></section></div>`;}
+}
+if(typeof window!=='undefined')window.openEmployee360=openEmployee360;
