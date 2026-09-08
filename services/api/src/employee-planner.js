@@ -1,15 +1,28 @@
 const MAX_STEPS=12;
 const SAFE_INTENTS=new Set(['analyze','create_report','notify','lookup','request_approval']);
 
-export function validatePlan(plan){
- if(!plan||!Array.isArray(plan.steps)||plan.steps.length===0) throw new Error('Plan must contain at least one step');
+function allowedToolNames(availableTools){
+ if(!Array.isArray(availableTools)) return null;
+ return new Set(availableTools.map(tool=>typeof tool==='string'?tool:tool?.name).filter(Boolean));
+}
+
+export function validatePlan(plan,{availableTools=null}={}){
+ if(!plan||typeof plan!=='object') throw new Error('Plan must be an object');
+ if(typeof plan.goal!=='string'||plan.goal.trim().length<3||plan.goal.length>4000) throw new Error('Invalid plan goal');
+ if(!Array.isArray(plan.steps)||plan.steps.length===0) throw new Error('Plan must contain at least one step');
  if(plan.steps.length>MAX_STEPS) throw new Error('Plan exceeds maximum step limit');
  const ids=new Set();
+ const tools=allowedToolNames(availableTools);
  for(const step of plan.steps){
-  if(!step.id||ids.has(step.id)) throw new Error('Plan contains duplicate or missing step id');
+  if(!step||typeof step!=='object'||!step.id||ids.has(step.id)) throw new Error('Plan contains duplicate or missing step id');
   ids.add(step.id);
   if(!SAFE_INTENTS.has(step.intent)) throw new Error(`Unsupported planning intent: ${step.intent}`);
-  if(step.dependsOn&&!step.dependsOn.every(id=>ids.has(id))) throw new Error(`Step dependency must reference an earlier step: ${step.id}`);
+  if(typeof step.action!=='string'||!step.action.trim()) throw new Error(`Executable action is required: ${step.id}`);
+  if(tools&&!tools.has(step.action)) throw new Error(`Plan action is not available to this employee: ${step.action}`);
+  if(step.input!==undefined&&(step.input===null||typeof step.input!=='object'||Array.isArray(step.input))) throw new Error(`Invalid step input: ${step.id}`);
+  const deps=step.dependsOn??step.depends_on??[];
+  if(!Array.isArray(deps)||!deps.every(id=>typeof id==='string')) throw new Error(`Invalid step dependencies: ${step.id}`);
+  if(deps.includes(step.id)||!deps.every(id=>ids.has(id))) throw new Error(`Step dependency must reference an earlier step: ${step.id}`);
  }
  return plan;
 }
