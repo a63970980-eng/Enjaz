@@ -1,8 +1,8 @@
 const env=typeof import.meta!=='undefined'&&import.meta.env?import.meta.env:{};
 const SUPABASE_URL=window.ENJAZ_SUPABASE_URL||env.VITE_SUPABASE_URL||'';
-const SUPABASE_ANON_KEY=window.ENJAZ_SUPABASE_ANON_KEY||env.VITE_SUPABASE_ANON_KEY||env.VITE_SUPABASE_PUBLISHABLE_KEY||'';
+const SUPABASE_ANON_KEY=window.ENJAZ_SUPABASE_ANON_KEY||window.ENJAZ_SUPABASE_KEY||env.VITE_SUPABASE_ANON_KEY||env.VITE_SUPABASE_PUBLISHABLE_KEY||'';
 const STORAGE_KEY='enjaz.auth.session.v1';
-const cfg=()=>({url:String(SUPABASE_URL||'').replace(/\/$/,''),key:SUPABASE_ANON_KEY});
+const cfg=()=>({url:String(SUPABASE_URL||'').replace(/\/$/,''),key:String(SUPABASE_ANON_KEY||'')});
 export function getSession(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch{return null}}
 export function clearSession(){localStorage.removeItem(STORAGE_KEY)}
 export function configured(){const c=cfg();return Boolean(c.url&&c.key)}
