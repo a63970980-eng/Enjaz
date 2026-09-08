@@ -4,8 +4,9 @@ let pool;
 export function getPool(){
   if(!pool){
     if(!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');
-    const sslMode=process.env.DATABASE_SSL;
-    const ssl=sslMode==='false'?false:{rejectUnauthorized:true,...(process.env.DATABASE_CA?{ca:process.env.DATABASE_CA}: {})};
+    const sslMode=String(process.env.DATABASE_SSL||'').toLowerCase();
+    const rejectUnauthorized=String(process.env.DATABASE_SSL_REJECT_UNAUTHORIZED||'true').toLowerCase()!=='false';
+    const ssl=sslMode==='false'?false:{rejectUnauthorized,...(process.env.DATABASE_CA?{ca:process.env.DATABASE_CA}: {})};
     pool=new Pool({connectionString:process.env.DATABASE_URL,max:Number(process.env.DB_POOL_SIZE||10),idleTimeoutMillis:30000,connectionTimeoutMillis:5000,ssl});
   }
   return pool;
