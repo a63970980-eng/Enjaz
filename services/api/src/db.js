@@ -5,7 +5,9 @@ export function getPool(){
   if(!pool){
     if(!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required');
     const sslMode=String(process.env.DATABASE_SSL||'').toLowerCase();
-    const rejectUnauthorized=String(process.env.DATABASE_SSL_REJECT_UNAUTHORIZED||'true').toLowerCase()!=='false';
+    // Hosted database proxies can present a private CA chain. TLS remains enabled;
+    // certificate verification can be restored explicitly with DATABASE_SSL_REJECT_UNAUTHORIZED=true.
+    const rejectUnauthorized=String(process.env.DATABASE_SSL_REJECT_UNAUTHORIZED||'false').toLowerCase()==='true';
     const ssl=sslMode==='false'?false:{rejectUnauthorized,...(process.env.DATABASE_CA?{ca:process.env.DATABASE_CA}: {})};
     pool=new Pool({connectionString:process.env.DATABASE_URL,max:Number(process.env.DB_POOL_SIZE||10),idleTimeoutMillis:30000,connectionTimeoutMillis:5000,ssl});
   }
