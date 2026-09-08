@@ -1,4 +1,5 @@
 import { generateAI } from './ai-provider.js';
+import { validatePlan } from './employee-planner.js';
 
 const providers = new Map();
 
@@ -22,10 +23,24 @@ function parsePlan(text) {
   }
 }
 
-async function generateAIPlan(context) {
+function normalizePlan(plan, context) {
+  const steps = Array.isArray(plan.steps) ? plan.steps.map((step, index) => ({
+    id: String(step?.id || `step_${index + 1}`),
+    intent: step?.intent,
+    action: step?.action,
+    input: step?.input && typeof step.input === 'object' && !Array.isArray(step.input) ? step.input : {},
+    dependsOn: Array.isArray(step?.dependsOn) ? step.dependsOn : (Array.isArray(step?.depends_on) ? step.depends_on : []),
+    requiresApproval: Boolean(step?.requiresApproval ?? step?.approval_required),
+  })) : [];
+  const normalized = { goal: String(plan.goal || context.goal || '').trim(), version: 1, steps };
+  validatePlan(normalized, { availableTools: context.availableTools });
+  return normalized;
+}
+
+async function generateAIPlan(context, provider = process.env.AI_PROVIDER || 'auto') {
   const response = await generateAI({
-    provider: process.env.AI_PROVIDER || 'auto',
-    model: process.env.AI_MODEL || undefined,
+    provider,
+    model: provider === 'gemini' ? process.env.GEMINI_MODEL : provider === 'openrouter' ? process.env.OPENROUTER_MODEL : undefined,
     messages: [
       { role: 'system', content: context.system },
       {
@@ -35,34 +50,22 @@ async function generateAIPlan(context) {
           goal: context.goal,
           memory: context.memory,
           availableTools: context.availableTools,
-          instructions: 'Return JSON only: {goal:string,steps:[{id,intent,action,input,approval_required,depends_on}]}. Use only availableTools. Keep 1-12 steps.',
+          instructions: 'Return JSON only: {goal:string,steps:[{id,intent,action,input,approval_required,depends_on}]}. Use only availableTools. Keep 1-12 steps. Dependencies must reference earlier step ids.',
         }),
       },
     ],
   });
-  const plan = parsePlan(response.text);
+  const plan = normalizePlan(parsePlan(response.text), context);
   return { ...plan, provider: response.provider, model: response.model };
 }
 
 registerModelProvider('deterministic', {
-  generate: async (context) => ({ goal: context.goal, steps: [] }),
+  generate: async (context) => ({ goal: context.goal, version: 1, steps: [] }),
 });
 
-registerModelProvider('auto', { generate: generateAIPlan });
-registerModelProvider('gemini', { generate: (context) => generateAIPlanWithProvider(context, 'gemini') });
-registerModelProvider('openrouter', { generate: (context) => generateAIPlanWithProvider(context, 'openrouter') });
-
-async function generateAIPlanWithProvider(context, provider) {
-  const response = await generateAI({
-    provider,
-    model: provider === 'gemini' ? process.env.GEMINI_MODEL : process.env.OPENROUTER_MODEL,
-    messages: [
-      { role: 'system', content: context.system },
-      { role: 'user', content: JSON.stringify({ employee: context.employee, goal: context.goal, memory: context.memory, availableTools: context.availableTools, instructions: 'Return JSON only with goal and 1-12 executable steps using only availableTools.' }) },
-    ],
-  });
-  return { ...parsePlan(response.text), provider: response.provider, model: response.model };
-}
+registerModelProvider('auto', { generate: (context) => generateAIPlan(context, 'auto') });
+registerModelProvider('gemini', { generate: (context) => generateAIPlan(context, 'gemini') });
+registerModelProvider('openrouter', { generate: (context) => generateAIPlan(context, 'openrouter') });
 
 export async function generatePlan({ provider = process.env.AI_PROVIDER || 'auto', context }) {
   const p = getModelProvider(provider);
