@@ -18,7 +18,7 @@ export const apiClient={
  employeeGoals:(workspaceId,token,employeeId)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}/goals?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createEmployeeGoal:(workspaceId,token,employeeId,body)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}/goals?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  employeeKnowledge:(workspaceId,token,employeeId)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}/knowledge?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
- createEmployeeKnowledge:(workspaceId,token,employeeId,body)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}/knowledge?workspaceId=${encodeURIComponent(employeeId)}`,{token,method:'POST',body}),
+ createEmployeeKnowledge:(workspaceId,token,employeeId,body)=>api(`/api/v1/employees/${encodeURIComponent(employeeId)}/knowledge?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  tasks:(workspaceId,token)=>api(`/api/v1/tasks?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
  createTask:(workspaceId,token,body)=>api(`/api/v1/tasks?workspaceId=${encodeURIComponent(workspaceId)}`,{token,method:'POST',body}),
  getTask:(workspaceId,token,taskId)=>api(`/api/v1/tasks/${encodeURIComponent(taskId)}?workspaceId=${encodeURIComponent(workspaceId)}`,{token}),
