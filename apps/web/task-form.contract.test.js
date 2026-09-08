@@ -11,5 +11,5 @@ test('task creation form validates and sends workspace-scoped task fields',()=>{
   assert.match(form,/name=\"objective\"/);
   assert.match(form,/apiClient\.createTask\(workspaceId,token/);
   assert.match(app,/data-action=\"create-task\"/);
-  assert.match(app,/x\.status==='queued'/);
+  assert.match(app,/const taskQueued=x=>\['queued','pending'\]/);
 });
