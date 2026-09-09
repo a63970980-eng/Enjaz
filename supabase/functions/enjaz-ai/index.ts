@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 const ORIGINS=new Set(["https://enjaz-workforce.netlify.app","https://storied-babka-115bba.netlify.app","https://enjaz-eight.vercel.app"]);
-const cors=(o:string|null)=>({"Access-Control-Allow-Origin":o&&ORIGINS.has(o)?o:"null","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST,OPTIONS","Vary:"Origin","content-type":"application/json; charset=utf-8"});
+const cors=(o:string|null)=>({"Access-Control-Allow-Origin":o&&ORIGINS.has(o)?o:"null","Access-Control-Allow-Headers":"authorization, x-client-info, apikey, content-type","Access-Control-Allow-Methods":"POST,OPTIONS","Vary":"Origin","content-type":"application/json; charset=utf-8"});
 const out=(x:unknown,s:number,o:string|null)=>new Response(JSON.stringify(x),{status:s,headers:{...cors(o),"x-content-type-options":"nosniff","x-frame-options":"DENY"}});
 const deterministic=(goal:string)=>({goal,steps:[{id:"analyze",tool:"data.analyze",objective:`حلل البيانات المرتبطة بالهدف: ${goal}`,dependsOn:[]},{id:"report",tool:"report.create",objective:"أنشئ تقريرًا تنفيذيًا بالنتائج والتوصيات",dependsOn:["analyze"]}],provider:"deterministic"});
 const jsonFromText=(text:string)=>{const clean=text.replace(/```json|```/g,"").trim();try{return JSON.parse(clean)}catch{return null}};
