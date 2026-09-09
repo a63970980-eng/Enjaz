@@ -1,4 +1,4 @@
-import './auth-gate.js';
+import './auth-gate-v2.js';
 
 const start=()=>{
   if(window.__ENJAZ_APP_STARTED__) return;
