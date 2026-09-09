@@ -6,7 +6,10 @@ const start=()=>{
     window.__ENJAZ_APP_STARTED__=true;
     import('./app.js').catch(error=>{
       const root=document.getElementById('content');
-      if(root) root.innerHTML=`<div class="boot-error"><strong>تعذر تشغيل مساحة العمل</strong><span>${String(error?.message||error)}</span><button onclick="location.reload()">إعادة المحاولة</button></div>`;
+      if(root){
+        root.innerHTML=`<div class="boot-error"><strong>تعذر تشغيل مساحة العمل</strong><span>${String(error?.message||error).replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}</span><button type="button" data-retry>إعادة المحاولة</button></div>`;
+        root.querySelector('[data-retry]')?.addEventListener('click',()=>location.reload());
+      }
       console.error(error);
     });
     return;
