@@ -3,9 +3,11 @@ const API_BASE=window.ENJAZ_API_BASE||env.VITE_ENJAZ_API_BASE||'';
 const SUPABASE_URL=window.ENJAZ_SUPABASE_URL||env.VITE_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
 const AUTH_BRIDGE=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-auth-bridge`;
 const INDUSTRY_API=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-industry`;
+const AI_API=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-ai`;
 export async function api(path,{token,method='GET',body}={}){const r=await fetch(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(data.error||`Request failed (${r.status})`);if(data.code)error.code=data.code;if(r.headers.get('X-Request-Id'))error.requestId=r.headers.get('X-Request-Id');throw error;}return data}
 async function authBridge(action,token,body={}){const r=await fetch(AUTH_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر تهيئة مساحة العمل.');return data}
 async function industry(path,{token,method='GET',body}={}){const r=await fetch(`${INDUSTRY_API}${path}`,{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},...(body!==undefined?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);return data}
+async function ai(action,token,body){const r=await fetch(AI_API,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`AI request failed (${r.status})`);return data}
 const q=v=>encodeURIComponent(v||'');
 export const apiClient={
  health:()=>api('/api/v1'),
@@ -28,7 +30,7 @@ export const apiClient={
  createTask:(workspaceId,token,body)=>api(`/api/v1/tasks?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
  getTask:(workspaceId,token,taskId)=>api(`/api/v1/tasks/${q(taskId)}?workspaceId=${q(workspaceId)}`,{token}),
  cancelTask:(workspaceId,token,taskId)=>api(`/api/v1/tasks/${q(taskId)}?workspaceId=${q(workspaceId)}`,{token,method:'DELETE'}),
- planTask:(workspaceId,token,taskId,body={})=>api(`/api/v1/tasks/${q(taskId)}/plan?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
+ planTask:(workspaceId,token,taskId,body={})=>ai('plan',token,{workspaceId,taskId,...body}),
  runTask:async(workspaceId,token,taskId,body={})=>{const input={...(body||{})};if(!input.employeeId){const task=await apiClient.getTask(workspaceId,token,taskId);input.employeeId=task?.data?.employee_id||task?.employee_id;}if(!input.employeeId)throw new Error('المهمة غير مرتبطة بموظف رقمي.');return api(`/api/v1/tasks/${q(taskId)}/run?workspaceId=${q(workspaceId)}`,{token,method:'POST',body:input});},
  taskComments:(workspaceId,token,taskId)=>api(`/api/v1/tasks/${q(taskId)}/comments?workspaceId=${q(workspaceId)}`,{token}),
  createTaskComment:(workspaceId,token,taskId,body)=>api(`/api/v1/tasks/${q(taskId)}/comments?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
