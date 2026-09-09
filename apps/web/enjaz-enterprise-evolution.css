@@ -1,0 +1,22 @@
+/* ENJAZ — Enterprise evolution layer. Additive only: preserves existing UI and components. */
+#enjaz-public .evolution-section{padding:104px 0;background:#fff;border-top:1px solid #e5eaf0}
+#enjaz-public .evolution-inner{max-width:1440px;margin:0 auto;padding:0 clamp(20px,6vw,92px)}
+#enjaz-public .evolution-head{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:42px}
+#enjaz-public .evolution-head h2{font-size:clamp(32px,4vw,54px);letter-spacing:-.045em;color:#07152f;margin:12px 0 10px;line-height:1.15}
+#enjaz-public .evolution-head p{max-width:720px;color:#718096;line-height:1.9;font-size:15px;margin:0}
+#enjaz-public .evolution-eyebrow{font-size:9px;letter-spacing:.12em;color:#1769e8;font-weight:900}
+#enjaz-public .evolution-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+#enjaz-public .evolution-card{border:1px solid #dfe6ef;border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 18px 50px rgba(7,21,47,.06)}
+#enjaz-public .evolution-card.dark{background:linear-gradient(145deg,#07152f,#102e55);color:#fff;border-color:#16385f}
+#enjaz-public .evolution-card-head{padding:24px 26px 16px;border-bottom:1px solid #edf1f5;display:flex;justify-content:space-between;gap:20px;align-items:center}
+#enjaz-public .evolution-card.dark .evolution-card-head{border-color:rgba(255,255,255,.1)}
+#enjaz-public .evolution-card-head strong{font-size:15px}.evolution-card-head span{font-size:8px;color:#8b98aa;font-weight:800;letter-spacing:.08em}
+#enjaz-public .evolution-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:24px}
+#enjaz-public .evolution-node{position:relative;border:1px solid #e4eaf1;border-radius:13px;padding:15px;min-height:128px;background:#f9fbfd}
+#enjaz-public .evolution-node:not(:last-child):after{content:'←';position:absolute;left:-11px;top:50%;transform:translateY(-50%);color:#b3bfce;font-weight:800;z-index:2}
+#enjaz-public .evolution-node b{font-size:8px;color:#1769e8}.evolution-node strong{display:block;color:#1b2d48;font-size:12px;margin:12px 0 6px}.evolution-node span{display:block;color:#8491a3;font-size:8px;line-height:1.7}
+#enjaz-public .workforce-map{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px}
+#enjaz-public .workforce-role{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.055);border-radius:13px;padding:15px}.workforce-role b{display:block;color:#8fdde1;font-size:8px;letter-spacing:.08em}.workforce-role strong{display:block;font-size:12px;margin:7px 0}.workforce-role span{display:block;color:#aebdd0;font-size:8px;line-height:1.7}
+#enjaz-public .evolution-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#dfe6ef;margin-top:18px}.evolution-stat{background:#fff;padding:18px}.evolution-stat strong{display:block;color:#07152f;font-size:25px;letter-spacing:-.04em}.evolution-stat span{display:block;color:#8290a2;font-size:8px;margin-top:4px}
+@media(max-width:900px){#enjaz-public .evolution-head{display:block}.evolution-grid{grid-template-columns:1fr!important}.evolution-flow{grid-template-columns:1fr 1fr!important}.evolution-node:not(:last-child):after{content:''}.workforce-map{grid-template-columns:1fr!important}}
+@media(max-width:560px){#enjaz-public .evolution-section{padding:72px 0}.evolution-flow{grid-template-columns:1fr!important}.evolution-stats{grid-template-columns:1fr}.evolution-card-head{padding:18px}.evolution-flow,.workforce-map{padding:15px}}
