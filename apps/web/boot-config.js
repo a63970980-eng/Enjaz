@@ -1,6 +1,6 @@
 (()=>{
   const q=new URLSearchParams(location.search);
-  const apiDefault='https://cqmwwrrmmqmgpnhnuxyu.supabase.co/functions/v1/enjaz-api';
+  const apiDefault='https://cqmwwrrmmqmgpnhnuxyu.supabase.co/functions/v1/enjaz-gateway';
   const sbDefault='https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
   const keyDefault='sb_publishable_U12modLyDRQWV2sNAJHiqg_vJPOSoOz';
   window.ENJAZ_API_BASE=localStorage.getItem('ENJAZ_API_BASE')||apiDefault;
