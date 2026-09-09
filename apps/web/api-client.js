@@ -2,8 +2,10 @@ const env=typeof import.meta!=='undefined'&&import.meta.env?import.meta.env:{};
 const API_BASE=window.ENJAZ_API_BASE||env.VITE_ENJAZ_API_BASE||'';
 const SUPABASE_URL=window.ENJAZ_SUPABASE_URL||env.VITE_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
 const AUTH_BRIDGE=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-auth-bridge`;
+const INDUSTRY_API=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-industry`;
 export async function api(path,{token,method='GET',body}={}){const r=await fetch(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(data.error||`Request failed (${r.status})`);if(data.code)error.code=data.code;if(r.headers.get('X-Request-Id'))error.requestId=r.headers.get('X-Request-Id');throw error;}return data}
 async function authBridge(action,token,body={}){const r=await fetch(AUTH_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر تهيئة مساحة العمل.');return data}
+async function industry(path,{token,method='GET',body}={}){const r=await fetch(`${INDUSTRY_API}${path}`,{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},...(body!==undefined?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);return data}
 const q=v=>encodeURIComponent(v||'');
 export const apiClient={
  health:()=>api('/api/v1'),
@@ -11,8 +13,8 @@ export const apiClient={
  runtimeSummary:(workspaceId,token)=>api(`/api/v1/runtime/summary?workspaceId=${q(workspaceId)}`,{token}),
  runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${q(workspaceId)}`,{token}),
  tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${q(workspaceId)}`,{token}),
- industryPacks:(workspaceId,token)=>api(`/api/v1/industry-packs?workspaceId=${q(workspaceId)}`,{token}),
- provisionIndustryPack:(workspaceId,token,pack)=>api(`/api/v1/industry-packs/${q(pack)}/provision?workspaceId=${q(workspaceId)}`,{token,method:'POST',body:{}}),
+ industryPacks:(workspaceId,token)=>industry(`/industry-packs?workspaceId=${q(workspaceId)}`,{token}),
+ provisionIndustryPack:(workspaceId,token,pack)=>industry(`/industry-packs/${q(pack)}/provision?workspaceId=${q(workspaceId)}`,{token,method:'POST',body:{}}),
  employees:(workspaceId,token)=>api(`/api/v1/employees?workspaceId=${q(workspaceId)}`,{token}),
  createEmployee:(workspaceId,token,body)=>api(`/api/v1/employees?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
  getEmployee:(workspaceId,token,employeeId)=>api(`/api/v1/employees/${q(employeeId)}?workspaceId=${q(workspaceId)}`,{token}),
