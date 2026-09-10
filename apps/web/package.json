@@ -1,1 +1,1 @@
-{"name":"@enjaz/web","private":true,"version":"0.1.0","description":"ENJAZ AI Workforce web application","scripts":{"dev":"vite","build":"vite build","test":"node --test *.contract.test.js"},"dependencies":{"vite":"latest"}}
+{"name":"@enjaz/web","private":true,"version":"0.1.0","description":"ENJAZ AI Workforce web application","scripts":{"dev":"vite","build":"vite build","test":"node --test *.contract.test.js"},"dependencies":{"vite":"7.1.12"}}
