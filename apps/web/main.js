@@ -17,6 +17,7 @@ const deferredModules = [
   './enjaz-world-class-ui.js',
   './app-entry-v2.js',
   './enjaz-workforce-entry.js',
+  './enjaz-workflow-polish.js',
 ];
 
 for (const modulePath of deferredModules) {
