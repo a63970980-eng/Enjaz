@@ -24,8 +24,31 @@
 <link rel="stylesheet" href="./enjaz-auth.css?v=20260909-01">
 <link rel="stylesheet" href="./enjaz-world-class-ui.css?v=20260910-01">
 <link rel="stylesheet" href="./enjaz-enterprise-polish.css?v=20260910-01">
+<style>
+#enjaz-boot-fallback{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#f5f8fc;color:#07152f;font-family:Cairo,'IBM Plex Sans Arabic',sans-serif;padding:24px;box-sizing:border-box}
+#enjaz-boot-fallback .boot-card{width:min(560px,100%);background:#fff;border:1px solid #dfe7f1;border-radius:22px;padding:34px;box-shadow:0 25px 80px rgba(7,21,47,.12);text-align:right}
+#enjaz-boot-fallback .boot-brand{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+#enjaz-boot-fallback .boot-mark{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#07152f,#123761);color:#fff;font-size:20px;font-weight:800}
+#enjaz-boot-fallback strong{font-size:21px}
+#enjaz-boot-fallback small{display:block;color:#8290a5;font-size:9px;margin-top:3px;letter-spacing:.08em;direction:ltr}
+#enjaz-boot-fallback h1{font-size:28px;margin:0 0 9px;letter-spacing:-.04em}
+#enjaz-boot-fallback p{margin:0 0 22px;color:#6d7b90;font-size:12px;line-height:1.9}
+#enjaz-boot-fallback .boot-actions{display:flex;gap:9px;flex-wrap:wrap}
+#enjaz-boot-fallback a{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:10px;padding:11px 17px;font:800 11px Cairo,sans-serif}
+#enjaz-boot-fallback .primary{background:#1769e8;color:#fff}
+#enjaz-boot-fallback .secondary{border:1px solid #d9e2ed;color:#253957;background:#fff}
+@media(max-width:600px){#enjaz-boot-fallback .boot-card{padding:26px 20px;border-radius:18px}#enjaz-boot-fallback h1{font-size:24px}}
+</style>
 </head>
 <body>
+<div id="enjaz-boot-fallback" role="status" aria-live="polite">
+  <div class="boot-card">
+    <div class="boot-brand"><span class="boot-mark">إ</span><div><strong>إنجاز</strong><small>ENJAZ · DIGITAL WORKFORCE OS</small></div></div>
+    <h1>تشغيل مساحة العمل…</h1>
+    <p>إنجاز يهيّئ مساحة العمل. إذا بقيت هذه الشاشة، يمكنك الدخول مباشرة أو إعادة تحميل المنصة بدل بقاء الصفحة فارغة.</p>
+    <div class="boot-actions"><a class="primary" href="?auth=1">تسجيل الدخول</a><a class="secondary" href="?signup=1&auth=1">إنشاء حساب</a><a class="secondary" href="./?refresh=1">إعادة تحميل</a></div>
+  </div>
+</div>
 <div class="app enjaz-root">
   <aside class="enjaz-sidebar">
     <div class="enjaz-brand"><span class="enjaz-mark">إ</span><div><strong>إنجاز</strong><small>AI WORKFORCE OS</small></div></div>
@@ -57,7 +80,7 @@
 <script type="module" src="./enjaz-shell-data.js?v=20260909-02"></script>
 <script type="module" src="./enjaz-employee-360.js?v=20260908-01"></script>
 <script type="module" src="./enjaz-industry-library.js?v=20260909-01"></script>
-<script type="module" src="./enjaz-public.js?v=20260909-02"></script>
+<script type="module" src="./enjaz-public.js?v=20260909-03"></script>
 <script type="module" src="./enjaz-global-experience.js?v=20260909-02"></script>
 <script type="module" src="./enjaz-enterprise-evolution.js?v=20260909-01"></script>
 <script type="module" src="./enjaz-command-center.js?v=20260909-01"></script>
@@ -65,7 +88,7 @@
 <script type="module" src="./enjaz-executive-intelligence.js?v=20260909-01"></script>
 <script type="module" src="./enjaz-auth-enhancements.js?v=20260909-01"></script>
 <script type="module" src="./enjaz-world-class-ui.js?v=20260910-01"></script>
-<script type="module" src="./app-entry-v2.js?v=20260910-01"></script>
+<script type="module" src="./app-entry-v2.js?v=20260910-02"></script>
 <script type="module" src="./enjaz-workforce-entry.js?v=20260910-01"></script>
 </body>
 </html>
