@@ -4,10 +4,12 @@ const SUPABASE_URL=window.ENJAZ_SUPABASE_URL||env.VITE_SUPABASE_URL||'https://cq
 const AUTH_BRIDGE=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-auth-bridge`;
 const INDUSTRY_API=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-industry`;
 const AI_API=`${SUPABASE_URL.replace(/\/$/,'')}/functions/v1/enjaz-ai`;
-export async function api(path,{token,method='GET',body}={}){const r=await fetch(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(data.error||`Request failed (${r.status})`);if(data.code)error.code=data.code;if(r.headers.get('X-Request-Id'))error.requestId=r.headers.get('X-Request-Id');throw error;}return data}
-async function authBridge(action,token,body={}){const r=await fetch(AUTH_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر تهيئة مساحة العمل.');return data}
-async function industry(path,{token,method='GET',body}={}){const r=await fetch(`${INDUSTRY_API}${path}`,{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},...(body!==undefined?{body:JSON.stringify(body)}:{})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);return data}
-async function ai(action,token,body){const r=await fetch(AI_API,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`AI request failed (${r.status})`);return data}
+const REQUEST_TIMEOUT=12000;
+async function request(url,options={}){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),REQUEST_TIMEOUT);try{return await fetch(url,{...options,signal:controller.signal})}catch(error){if(error?.name==='AbortError')throw new Error('انتهت مهلة الاتصال بالخدمة. حاول مرة أخرى.');throw error}finally{clearTimeout(timer)}}
+export async function api(path,{token,method='GET',body}={}){let r;try{r=await request(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},...(body!==undefined?{body:JSON.stringify(body)}:{})})}catch(error){throw new Error(error?.message||'تعذر الاتصال بخدمة إنجاز. تحقق من اتصال الإنترنت ثم حاول مرة أخرى.')}const data=await r.json().catch(()=>({}));if(!r.ok){const error=new Error(data.error||`Request failed (${r.status})`);if(data.code)error.code=data.code;if(r.headers.get('X-Request-Id'))error.requestId=r.headers.get('X-Request-Id');error.status=r.status;throw error}return data}
+async function authBridge(action,token,body={}){let r;try{r=await request(AUTH_BRIDGE,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})})}catch(error){throw new Error(error?.message||'تعذر الاتصال بخدمة تهيئة مساحة العمل.')}const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||'تعذر تهيئة مساحة العمل.');return data}
+async function industry(path,{token,method='GET',body}={}){let r;try{r=await request(`${INDUSTRY_API}${path}`,{method,headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},...(body!==undefined?{body:JSON.stringify(body)}:{})})}catch(error){throw new Error(error?.message||'تعذر الاتصال بخدمة القطاعات.')}const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);return data}
+async function ai(action,token,body){let r;try{r=await request(AI_API,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({action,...body})})}catch(error){throw new Error(error?.message||'تعذر الاتصال بخدمة الذكاء الاصطناعي.')}const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||`AI request failed (${r.status})`);return data}
 const q=v=>encodeURIComponent(v||'');
 export const apiClient={
  health:()=>api('/api/v1'),
@@ -19,7 +21,7 @@ export const apiClient={
  provisionIndustryPack:(workspaceId,token,pack)=>industry(`/industry-packs/${q(pack)}/provision?workspaceId=${q(workspaceId)}`,{token,method:'POST',body:{}}),
  employees:(workspaceId,token)=>api(`/api/v1/employees?workspaceId=${q(workspaceId)}`,{token}),
  createEmployee:(workspaceId,token,body)=>api(`/api/v1/employees?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
- getEmployee:(workspaceId,token,employeeId)=>api(`/api/v1/employees/${q(employeeId)}?workspaceId=${q(workspaceId)}`,{token}),
+ async getEmployee(workspaceId,token,employeeId){const result=await this.employees(workspaceId,token);const employee=(result.data||[]).find(item=>String(item.id)===String(employeeId));if(!employee){const error=new Error('الموظف الرقمي غير موجود في مساحة العمل.');error.status=404;throw error}return {data:employee};},
  updateEmployee:(workspaceId,token,employeeId,body)=>api(`/api/v1/employees/${q(employeeId)}?workspaceId=${q(workspaceId)}`,{token,method:'PATCH',body}),
  employeeStatus:(workspaceId,token,employeeId,action)=>api(`/api/v1/employees/${q(employeeId)}/${q(action)}?workspaceId=${q(workspaceId)}`,{token,method:'POST',body:{}}),
  employeeGoals:(workspaceId,token,employeeId)=>api(`/api/v1/employees/${q(employeeId)}/goals?workspaceId=${q(workspaceId)}`,{token}),
@@ -39,7 +41,7 @@ export const apiClient={
  decideApproval:(workspaceId,token,approvalId,decision)=>api(`/api/v1/approvals/${q(approvalId)}/${q(decision)}?workspaceId=${q(workspaceId)}`,{token,method:'POST',body:{}}),
  integrations:(workspaceId,token)=>api(`/api/v1/integrations?workspaceId=${q(workspaceId)}`,{token}),
  createIntegration:(workspaceId,token,body)=>api(`/api/v1/integrations?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
- revokeIntegration:(workspaceId,token,integrationId)=>api(`/api/v1/integrations/${q(integrationId)}?workspaceId=${q(workspaceId)}`,{token,method:'DELETE'}),
+ revokeIntegration:(workspaceId,token,integrationId)=>api(`/api/v1/integrations/${q(integrationId)}/revoke?workspaceId=${q(workspaceId)}`,{token,method:'DELETE'}),
  audit:(workspaceId,token)=>api(`/api/v1/audit?workspaceId=${q(workspaceId)}`,{token}),
  billingPlans:(workspaceId,token)=>api('/api/v1/billing/plans',{token}),
  billingSubscription:(workspaceId,token)=>api(`/api/v1/billing/subscription?workspaceId=${q(workspaceId)}`,{token}),
