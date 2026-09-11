@@ -1,14 +1,13 @@
 /* Enjaz Workforce Entry
- * The primary workforce action is the ready digital workforce catalog.
+ * The primary workforce action is the canonical sector-based ready workforce library.
  * Manual employee creation is intentionally not exposed from the product UI.
  */
 function openLibrary(){
+  const library=document.querySelector('[data-enjaz-library]');
+  if(library){library.click();return;}
   const nav=document.querySelector('[data-nav="employees"]');
   if(nav){nav.click();return;}
-  const url=new URL(location.href);
-  url.search='';
-  url.searchParams.set('workspace','employees');
-  location.assign(url.toString());
+  location.assign(`${location.origin}${location.pathname}`);
 }
 
 function normalizeEntryButtons(){
