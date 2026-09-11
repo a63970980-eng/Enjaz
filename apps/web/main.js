@@ -2,9 +2,6 @@ import './boot-config.js';
 
 const authRoute = new URLSearchParams(window.location.search).has('auth');
 
-// Authentication is a first-class application route, not an enhancement of the
-// workspace. Boot it before the public shell/workspace so a slow or failed
-// workspace module can never leave the login route looking blank.
 if (authRoute) {
   document.documentElement.classList.add('enjaz-auth-route');
   import('./auth-gate-v2.js').catch((error) => {
@@ -29,7 +26,6 @@ if (authRoute) {
     window.location.assign(url.toString());
   }, true);
 
-  // Boot the authenticated workspace only on the workspace route.
   const coreModule = './app-entry-v2.js';
   const enhancementModules = [
     './enjaz-workspace-shell.js',
@@ -44,7 +40,6 @@ if (authRoute) {
     './enjaz-auth-enhancements.js',
     './enjaz-world-class-ui.js',
     './enjaz-workforce-entry.js',
-    './ready-workforce-catalog.js',
     './enjaz-workflow-polish.js',
   ];
 
