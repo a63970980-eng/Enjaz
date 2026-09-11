@@ -12,4 +12,11 @@
   if(q.get('workspaceId'))localStorage.setItem('ENJAZ_WORKSPACE_ID',workspace);
   window.ENJAZ_WORKSPACE_ID=workspace;
   window.ENJAZ_ACCESS_TOKEN=sessionStorage.getItem('ENJAZ_ACCESS_TOKEN')||'';
+
+  const dismissFallback=()=>document.getElementById('enjaz-boot-fallback')?.remove();
+  const syncFallback=()=>{
+    if(document.getElementById('auth-gate')||document.getElementById('enjaz-public')||window.__ENJAZ_APP_STARTED__)dismissFallback();
+  };
+  new MutationObserver(syncFallback).observe(document.documentElement,{subtree:true,childList:true});
+  queueMicrotask(syncFallback);
 })();
