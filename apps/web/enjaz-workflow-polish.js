@@ -9,28 +9,38 @@ const sectionMeta={
   audit:{label:'الحوكمة والتدقيق',step:8}
 };
 
+const readyCopy=(button)=>{
+  const text=button.textContent.trim();
+  if(text.includes('إنشاء موظف')) button.textContent=text.replace(/إنشاء موظف/g,'إضافة موظف جاهز');
+  if(button.textContent.trim()==='+ موظف رقمي') button.textContent='+ إضافة موظف جاهز';
+  button.setAttribute('aria-label','إضافة موظف رقمي جاهز من كتالوج إنجاز');
+};
+
 function polish(){
   const content=document.getElementById('content');
   if(!content)return;
 
-  document.querySelectorAll('[data-action="create-employee"]').forEach(button=>{
-    if(button.textContent.includes('إنشاء موظف')){
-      button.textContent=button.textContent.replace('إنشاء موظف','إضافة موظف جاهز');
-    }
-    if(button.textContent.trim()==='+ موظف رقمي') button.textContent='+ إضافة موظف جاهز';
-    button.setAttribute('aria-label','إضافة موظف رقمي جاهز من كتالوج إنجاز');
+  // The workforce is catalog-first. Keep every employee entry point consistent,
+  // including buttons rendered by older page templates.
+  document.querySelectorAll('[data-action="create-employee"]').forEach(readyCopy);
+  document.querySelectorAll('button,a').forEach(button=>{
+    const text=button.textContent?.trim()||'';
+    if(/^(\+\s*)?إنشاء موظف$/.test(text)) readyCopy(button);
   });
 
   const modal=document.querySelector('.modal');
-  const title=modal?.querySelector('header h2');
-  if(title && title.textContent.trim()==='إنشاء موظف رقمي') title.textContent='اختيار موظف رقمي جاهز';
+  const title=modal?.querySelector('header h2,.modal-header h2,h2');
+  if(title && /إنشاء موظف رقمي/.test(title.textContent||'')){
+    title.textContent='اختيار موظف رقمي جاهز';
+  }
 
   document.querySelectorAll('.employee-card').forEach(card=>{
-    card.setAttribute('aria-label',`${card.getAttribute('aria-label')||'فتح ملف الموظف الرقمي'} — ملف تشغيلي 360`);
+    const label=card.getAttribute('aria-label')||'فتح ملف الموظف الرقمي';
+    if(!label.includes('ملف تشغيلي 360')) card.setAttribute('aria-label',`${label} — ملف تشغيلي 360`);
   });
 
-  const section=document.querySelector('.pagehead .eyebrow')?.textContent?.trim();
-  const key=Object.entries(sectionMeta).find(([,meta])=>meta.label===section)?.[0];
+  const eyebrow=document.querySelector('.pagehead .eyebrow')?.textContent?.trim()||'';
+  const key=Object.entries(sectionMeta).find(([,meta])=>meta.label===eyebrow)?.[0];
   if(key && !content.querySelector('.enjaz-flow-rail')){
     const meta=sectionMeta[key];
     const rail=document.createElement('div');
