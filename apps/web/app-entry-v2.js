@@ -13,6 +13,13 @@ const showBootError=error=>{
 };
 
 const start=async()=>{
+  const authReady=window.__ENJAZ_AUTH_READY__;
+  if(authReady){
+    const authState=await authReady;
+    if(authState!=='authenticated')return;
+  }else if(window.__ENJAZ_AUTH_STATE__!=='authenticated'){
+    return;
+  }
   const started=Date.now();
   while(true){
     if(window.__ENJAZ_APP_STARTED__)return;
