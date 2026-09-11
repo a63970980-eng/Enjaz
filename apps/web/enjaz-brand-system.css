@@ -1,0 +1,28 @@
+:root{--enjaz-ink:#081a35;--enjaz-ink-2:#102b50;--enjaz-blue:#1677ff;--enjaz-cyan:#21c4d4;--enjaz-mint:#4fe0b1;--enjaz-paper:#f6f8fc;--enjaz-border:#dfe6f0;--enjaz-text:#182a43;--enjaz-muted:#718198}
+/* Enjaz Brand System — distinctive enterprise shell, not a Salesforce clone. */
+.enjaz-root{background:linear-gradient(135deg,#f7f9fc 0%,#eef3f9 100%)}
+.enjaz-sidebar{background:linear-gradient(180deg,#07172f 0%,#0a2343 58%,#092b49 100%);border:0;padding:22px 15px;color:#fff;box-shadow:14px 0 40px rgba(4,18,39,.12)}
+.enjaz-brand{padding:2px 8px 17px;gap:12px;border-bottom:1px solid rgba(255,255,255,.1)}
+.enjaz-mark{position:relative;width:46px;height:46px;border-radius:15px;background:linear-gradient(145deg,#1b82ff,#20c8d5);box-shadow:0 10px 28px rgba(22,119,255,.3);font-size:0;overflow:hidden}
+.enjaz-mark:before,.enjaz-mark:after{content:"";position:absolute;left:11px;border-radius:5px;background:#fff;transform:skewX(-12deg)}
+.enjaz-mark:before{top:11px;width:25px;height:7px;box-shadow:0 9px 0 rgba(255,255,255,.9),0 18px 0 rgba(255,255,255,.78)}
+.enjaz-mark:after{top:11px;width:7px;height:25px;left:11px}
+.enjaz-brand strong{color:#fff;font-size:21px;letter-spacing:-.05em}.enjaz-brand small{color:#8fa9c9;font-size:8px;letter-spacing:.14em;font-weight:700}
+.enjaz-workspace{border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.055);border-radius:14px;padding:14px;box-shadow:inset 0 1px rgba(255,255,255,.04)}
+.enjaz-workspace small{color:#8199b8}.enjaz-workspace strong{color:#fff;font-size:12px}.enjaz-workspace span{color:#55dfae}
+.enjaz-nav-label{color:#6f89aa;font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:13px 10px 6px}
+.enjaz-nav button{color:#a9bad0;border-radius:11px;padding:11px 11px;font-size:11px;position:relative}.enjaz-nav button:hover{background:rgba(255,255,255,.07);color:#fff}.enjaz-nav button.active{background:linear-gradient(90deg,rgba(22,119,255,.28),rgba(22,119,255,.08));color:#fff;box-shadow:inset 3px 0 #27c9d7,0 6px 18px rgba(0,0,0,.08)}.enjaz-nav i{color:#7e9abb}.enjaz-nav button.active i{color:#59dbe3}
+.enjaz-sidebar-footer{border-top:1px solid rgba(255,255,255,.1);color:#6f89aa}.enjaz-sidebar-footer strong{color:#9db3cf}
+.enjaz-topbar{height:76px;background:rgba(255,255,255,.9);border-bottom:1px solid #dce4ef;padding:0 34px;box-shadow:0 4px 20px rgba(13,35,63,.035)}
+.top-search{height:44px;background:#f7f9fc;border-color:#dce5ef;border-radius:13px}.top-search:focus-within{border-color:#8fb7ee;box-shadow:0 0 0 4px rgba(22,119,255,.08)}
+.icon-btn{border-color:#dce4ef;border-radius:11px}.avatar{background:linear-gradient(145deg,#e8f3ff,#d8f8fa);color:#0867c8;border-color:#c9e1f4}
+.pagehead h1{font-size:32px;color:#071a35}.eyebrow{color:#64809f;letter-spacing:.16em}
+.primary{background:linear-gradient(135deg,#0b2b53,#1268c9);border-color:#0b2b53;box-shadow:0 9px 22px rgba(10,55,105,.18)}
+.primary:hover{background:linear-gradient(135deg,#0d3565,#1677ff)}
+.hero{border-radius:28px;background:radial-gradient(circle at 88% 12%,rgba(33,196,212,.28),transparent 28%),radial-gradient(circle at 18% 90%,rgba(22,119,255,.2),transparent 35%),linear-gradient(135deg,#06152e 0%,#0a315a 58%,#0a5362 100%);box-shadow:0 25px 65px rgba(7,27,54,.18)}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 55%,rgba(255,255,255,.045));pointer-events:none}
+.stats>div,.panel,.employee-card,.team-card,.integration-card{border-color:#dce4ee;box-shadow:0 5px 20px rgba(16,38,67,.035)}
+.stats>div{border-radius:17px}.stats b{color:#071a35}.employee-card:hover,.team-card:hover,.integration-card:hover{border-color:#b9d0ec;box-shadow:0 15px 35px rgba(17,53,91,.08)}
+.employee-card-action{margin-top:15px;padding-top:12px;border-top:1px solid #edf1f5;color:#1769e8;font-size:9px;font-weight:800}
+.modal{background:rgba(3,14,31,.62)}.modal-card{border:1px solid #dbe4ef;box-shadow:0 35px 100px rgba(3,17,39,.3)}
+@media(max-width:900px){.enjaz-root{grid-template-columns:76px minmax(0,1fr)}.enjaz-sidebar{padding:16px 8px}.enjaz-brand{justify-content:center}.enjaz-brand>div,.enjaz-workspace,.enjaz-nav-label,.enjaz-sidebar-footer{display:none}.enjaz-nav button{justify-content:center}.enjaz-nav button span{display:none}.enjaz-nav i{width:34px}.enjaz-topbar{padding:0 16px}.top-search{width:45vw}.pagehead,.hero{margin-left:16px;margin-right:16px}.pagehead{padding-left:0;padding-right:0}.stats,.dashboard-grid,.employee-grid,.team-grid,.integration-grid,.task-list,.workflow-list,.approval-list,.audit-list{padding-left:16px;padding-right:16px}}
