@@ -44,6 +44,7 @@ if (authRoute) {
     './enjaz-auth-enhancements.js',
     './enjaz-world-class-ui.js',
     './enjaz-workforce-entry.js',
+    './ready-workforce-catalog.js',
     './enjaz-workflow-polish.js',
   ];
 
