@@ -2,7 +2,9 @@ import './auth-gate-v2.js';
 
 const BOOT_TIMEOUT=15000;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const dismissFallback=()=>document.getElementById('enjaz-boot-fallback')?.remove();
 const showBootError=error=>{
+  dismissFallback();
   const root=document.getElementById('content');
   if(!root)return;
   const safe=String(error?.message||error||'تعذر تشغيل التطبيق').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
@@ -18,6 +20,7 @@ const start=async()=>{
     if(window.__ENJAZ_APP_STARTED__)return;
     if(window.ENJAZ_ACCESS_TOKEN && window.ENJAZ_WORKSPACE_ID){
       window.__ENJAZ_APP_STARTED__=true;
+      dismissFallback();
       try{await import('./app.js');}
       catch(error){showBootError(error);}
       return;
