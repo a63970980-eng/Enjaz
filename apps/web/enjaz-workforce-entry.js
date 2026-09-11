@@ -1,21 +1,8 @@
-/* Enjaz Workforce Entry Guard
- * The primary workforce action is the ready digital employee library.
- * Manual employee creation remains intact in the codebase for backward compatibility,
- * but it is no longer the default product path.
+/* Enjaz Workforce Entry
+ * The primary workforce action is the ready digital workforce catalog.
+ * The application still uses the existing provisioning flow underneath,
+ * but every entry point presents it as a curated Enjaz workforce experience.
  */
-const libraryButton=()=>document.querySelector('[data-enjaz-library]');
-
-function openReadyLibrary(event){
-  const target=event.target?.closest?.('[data-action="create-employee"], [data-workforce-library-entry]');
-  if(!target)return;
-  const library=libraryButton();
-  if(!library)return;
-  event.preventDefault();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-  library.click();
-}
-
 function normalizeEntryButtons(){
   document.querySelectorAll('[data-action="create-employee"]').forEach(button=>{
     button.dataset.workforceLibraryEntry='1';
@@ -26,7 +13,6 @@ function normalizeEntryButtons(){
 }
 
 function boot(){
-  document.addEventListener('click',openReadyLibrary,true);
   normalizeEntryButtons();
   new MutationObserver(normalizeEntryButtons).observe(document.body,{subtree:true,childList:true});
 }
