@@ -1,6 +1,21 @@
 import './boot-config.js';
 import './enjaz-public.js';
 
+// Public authentication entry must remain deterministic even if an optional
+// enhancement layer adds click handlers or fails to initialize. Use a capture
+// listener and a real URL navigation so the login CTA cannot become a dead
+// button on mobile or after a partial client boot.
+document.addEventListener('click', (event) => {
+  const trigger = event.target?.closest?.('[data-auth="login"]');
+  if (!trigger) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const url = new URL(window.location.href);
+  url.search = '';
+  url.searchParams.set('auth', '1');
+  window.location.assign(url.toString());
+}, true);
+
 // Boot the authenticated workspace first. Optional enhancement modules are
 // loaded only after the core app entry has been scheduled, preventing race
 // conditions between the workspace renderer and visual enhancements.
