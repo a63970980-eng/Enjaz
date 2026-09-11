@@ -1,4 +1,5 @@
 #auth-gate{position:fixed!important;inset:0!important;z-index:2147483000!important;background:#f5f8fc;overflow:auto;font-family:Cairo,IBM Plex Sans Arabic,sans-serif;color:#13233d}
+html.enjaz-auth-route body>.enjaz-root{visibility:hidden!important;pointer-events:none!important}
 .enjaz-root.is-auth-locked{visibility:hidden!important;pointer-events:none!important}
 .auth-shell{min-height:100%;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(460px,620px);direction:ltr;background:#f5f8fc}
 .auth-shell:before{content:"";grid-column:1;min-height:100vh;background:radial-gradient(circle at 20% 18%,rgba(43,126,235,.34),transparent 25%),radial-gradient(circle at 78% 76%,rgba(22,169,183,.23),transparent 28%),linear-gradient(145deg,#061329 0%,#092343 48%,#0b4654 100%);position:relative}
