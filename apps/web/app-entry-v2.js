@@ -21,7 +21,7 @@ const start=async()=>{
     if(window.__ENJAZ_APP_STARTED__)return;
     if(window.ENJAZ_ACCESS_TOKEN&&window.ENJAZ_WORKSPACE_ID){
       window.__ENJAZ_APP_STARTED__=true;
-      try{await import('./enjaz-workspace-v4.css');await import('./workspace-app-v4.js')}
+      try{await import('./workspace-app-v4.js')}
       catch(error){showBootError(error)}
       return;
     }
