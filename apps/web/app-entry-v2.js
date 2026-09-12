@@ -14,27 +14,19 @@ const showBootError=error=>{
 
 const start=async()=>{
   const authReady=window.__ENJAZ_AUTH_READY__;
-  if(authReady){
-    const authState=await authReady;
-    if(authState!=='authenticated')return;
-  }else if(window.__ENJAZ_AUTH_STATE__!=='authenticated'){
-    return;
-  }
+  if(authReady){const authState=await authReady;if(authState!=='authenticated')return}
+  else if(window.__ENJAZ_AUTH_STATE__!=='authenticated')return;
   const started=Date.now();
   while(true){
     if(window.__ENJAZ_APP_STARTED__)return;
-    if(window.ENJAZ_ACCESS_TOKEN && window.ENJAZ_WORKSPACE_ID){
+    if(window.ENJAZ_ACCESS_TOKEN&&window.ENJAZ_WORKSPACE_ID){
       window.__ENJAZ_APP_STARTED__=true;
-      try{await import('./workspace-app-v3.js');}
-      catch(error){showBootError(error);}
+      try{await import('./enjaz-workspace-v4.css');await import('./workspace-app-v4.js')}
+      catch(error){showBootError(error)}
       return;
     }
-    if(Date.now()-started>=BOOT_TIMEOUT){
-      showBootError(new Error('انتهت مهلة تهيئة إنجاز. أعد تحميل الصفحة أو أعد ضبط الجلسة.'));
-      return;
-    }
+    if(Date.now()-started>=BOOT_TIMEOUT){showBootError(new Error('انتهت مهلة تهيئة إنجاز. أعد تحميل الصفحة أو أعد ضبط الجلسة.'));return}
     await wait(150);
   }
 };
-
 start().catch(showBootError);
