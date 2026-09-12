@@ -1,0 +1,2 @@
+/* The legacy shell remains in the repository for rollback compatibility; the v4 application owns the authenticated workspace surface. */
+.enjaz-root>.enjaz-sidebar,.enjaz-root>.enjaz-main>.enjaz-topbar{display:none!important}.enjaz-root>.enjaz-main{width:100%!important;min-width:0!important;margin:0!important}.enjaz-root>.enjaz-main>#content{width:100%!important;min-height:100vh!important;margin:0!important;padding:0!important}.enjaz-root{display:block!important;min-height:100vh!important;background:#f5f7fb!important}.ev4-layout{width:100%;min-height:100vh}
