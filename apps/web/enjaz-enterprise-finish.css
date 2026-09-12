@@ -16,19 +16,33 @@
 #enjaz-public .public-primary:after{content:"";position:absolute;inset:0;transform:translateX(-120%);background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);animation:enjaz-shine 4.5s ease-in-out infinite}
 #enjaz-public .public-secondary:hover{border-color:#bfd0e6;background:#fff;transform:translateY(-2px)}
 #enjaz-public .public-hero .hero-copy{animation:enjaz-copy-in .75s cubic-bezier(.2,.8,.2,1) both}
-#enjaz-public .workforce-stage{animation:enjaz-stage-in .8s .08s cubic-bezier(.2,.8,.2,1) both;position:relative;isolation:isolate;overflow:hidden}
-#enjaz-public .workforce-stage:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:8%;top:12%;background:rgba(40,170,220,.14);filter:blur(38px);z-index:-1;animation:enjaz-orbit 8s ease-in-out infinite}
-#enjaz-public .workforce-stage:after{content:"إ\A ENJAZ\A DIGITAL WORKFORCE";white-space:pre;position:absolute;left:8%;bottom:7%;width:92px;height:92px;border:1px solid rgba(21,94,239,.16);border-radius:50%;display:grid;place-items:center;text-align:center;font-size:9px;line-height:1.35;font-weight:800;letter-spacing:.08em;color:rgba(21,94,239,.56);background:rgba(255,255,255,.42);box-shadow:0 0 0 10px rgba(21,94,239,.025),0 0 0 20px rgba(21,94,239,.018);animation:enjaz-network-core 4.8s ease-in-out infinite;z-index:0}
-#enjaz-public .stage-glow{animation:enjaz-glow 5s ease-in-out infinite}
-#enjaz-public .stage-glow.glow-two{animation-delay:-2s}
-#enjaz-public .pulse{animation:enjaz-pulse 1.7s ease-in-out infinite}
-#enjaz-public .live{animation:enjaz-live 1.8s ease-in-out infinite}
-#enjaz-public .employee-panel{transition:transform .22s,box-shadow .22s,border-color .22s;animation:enjaz-panel-float 6s ease-in-out infinite}
+
+/* ENJAZ LIVE VISUAL — a video-like operating scene built from CSS, not a static image. */
+#enjaz-public .workforce-stage{animation:enjaz-stage-in .8s .08s cubic-bezier(.2,.8,.2,1) both;position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(135deg,#061b3d 0%,#0b2e66 48%,#0b78c9 100%)!important;border:1px solid rgba(91,190,255,.38)!important;box-shadow:0 28px 70px rgba(5,39,88,.24),inset 0 1px 0 rgba(255,255,255,.16)!important}
+#enjaz-public .workforce-stage{background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(135deg,#061b3d 0%,#0b2e66 48%,#0b78c9 100%)!important;background-size:36px 36px,36px 36px,100% 100%;animation:enjaz-stage-in .8s .08s cubic-bezier(.2,.8,.2,1) both,enjaz-grid-drift 12s linear infinite}
+#enjaz-public .workforce-stage:before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-70px;top:-95px;background:radial-gradient(circle,rgba(95,218,255,.42) 0,rgba(44,154,255,.17) 32%,transparent 68%);filter:blur(2px);z-index:-1;animation:enjaz-orbit 7s ease-in-out infinite}
+#enjaz-public .workforce-stage:after{content:"";position:absolute;width:210px;height:210px;left:-58px;bottom:-74px;border:1px solid rgba(118,220,255,.35);border-radius:50%;background:radial-gradient(circle,rgba(73,191,255,.24),transparent 62%);box-shadow:0 0 0 22px rgba(73,191,255,.035),0 0 0 46px rgba(73,191,255,.025),inset 0 0 38px rgba(73,191,255,.12);animation:enjaz-network-core 4.8s ease-in-out infinite;z-index:-1}
+#enjaz-public .stage-top{position:relative;z-index:2;color:#fff!important}
+#enjaz-public .stage-title{color:#fff!important}
+#enjaz-public .stage-title .pulse{background:#59e4bd!important;box-shadow:0 0 0 5px rgba(89,228,189,.12),0 0 18px rgba(89,228,189,.55)}
+#enjaz-public .live{color:#8fe8ff!important;text-shadow:0 0 12px rgba(143,232,255,.45)}
+#enjaz-public .stage-command{position:relative;z-index:3;background:rgba(255,255,255,.96)!important;border-color:rgba(255,255,255,.72)!important;box-shadow:0 18px 38px rgba(1,23,54,.22)!important;animation:enjaz-command-breathe 3.8s ease-in-out infinite}
+#enjaz-public .employee-panel{position:relative;z-index:3;background:rgba(255,255,255,.96)!important;border-color:rgba(173,221,247,.85)!important;box-shadow:0 18px 40px rgba(1,23,54,.20)!important;transition:transform .22s,box-shadow .22s,border-color .22s;animation:enjaz-panel-float 6s ease-in-out infinite}
 #enjaz-public .employee-panel.compact{animation-delay:-2s}
-#enjaz-public .employee-panel:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(7,21,47,.10)}
+#enjaz-public .employee-panel:hover{transform:translateY(-4px);box-shadow:0 24px 48px rgba(1,23,54,.28)!important}
+#enjaz-public .command-icon{box-shadow:0 0 22px rgba(21,94,239,.32)!important}
 #enjaz-public .task-flow .active{animation:enjaz-active 1.8s ease-in-out infinite}
-#enjaz-public .stage-command{animation:enjaz-command-breathe 3.8s ease-in-out infinite}
-#enjaz-public .stage-metrics strong{animation:enjaz-number-in .8s both}
+#enjaz-public .stage-metrics{position:relative;z-index:3;color:#fff!important}
+#enjaz-public .stage-metrics span{color:rgba(255,255,255,.72)!important}
+#enjaz-public .stage-metrics strong{color:#fff!important;text-shadow:0 0 18px rgba(126,226,255,.32);animation:enjaz-number-in .8s both}
+#enjaz-public .stage-glow{animation:enjaz-glow 5s ease-in-out infinite;opacity:.9}
+#enjaz-public .stage-glow.glow-two{animation-delay:-2s}
+
+/* Moving light lanes create the impression of a live operations feed. */
+#enjaz-public .workforce-stage .stage-top:after,#enjaz-public .workforce-stage .stage-top:before{content:"";position:absolute;top:50%;height:1px;width:34%;background:linear-gradient(90deg,transparent,rgba(104,218,255,.75),transparent);filter:blur(.2px);animation:enjaz-data-lane 4.2s ease-in-out infinite}
+#enjaz-public .workforce-stage .stage-top:after{left:0}
+#enjaz-public .workforce-stage .stage-top:before{right:0;animation-delay:-2.1s}
+
 #enjaz-public .employee-catalog-preview article{transition:transform .2s,border-color .2s,box-shadow .2s}
 #enjaz-public .employee-catalog-preview article:hover{transform:translateY(-5px);border-color:#cbd8e8;box-shadow:0 16px 34px rgba(16,33,63,.09)}
 #enjaz-public .employee-catalog-preview article:nth-child(2){animation:enjaz-float 5s ease-in-out infinite}
@@ -58,5 +72,7 @@
 @keyframes enjaz-panel-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes enjaz-command-breathe{0%,100%{transform:translateY(0);box-shadow:0 0 0 rgba(21,94,239,0)}50%{transform:translateY(-2px);box-shadow:0 10px 26px rgba(21,94,239,.07)}}
 @keyframes enjaz-network-core{0%,100%{transform:scale(1);opacity:.62}50%{transform:scale(1.07);opacity:.95;box-shadow:0 0 0 13px rgba(21,94,239,.025),0 0 0 26px rgba(21,94,239,.015)}}
-@media(max-width:760px){.enjaz-auth-route .auth-shell{padding:16px 12px!important}.enjaz-auth-route .auth-card{border-radius:16px!important}.ev4-layout .ev4-panel{overflow-x:auto}#enjaz-public .public-primary:after{animation-duration:6s}#enjaz-public .workforce-stage:after{left:4%;bottom:5%;transform:scale(.78)}}
+@keyframes enjaz-grid-drift{0%{background-position:0 0,0 0,0 0}100%{background-position:36px 36px,-36px 36px,0 0}}
+@keyframes enjaz-data-lane{0%,100%{opacity:.25;transform:scaleX(.65)}50%{opacity:1;transform:scaleX(1)}}
+@media(max-width:760px){.enjaz-auth-route .auth-shell{padding:16px 12px!important}.enjaz-auth-route .auth-card{border-radius:16px!important}.ev4-layout .ev4-panel{overflow-x:auto}#enjaz-public .public-primary:after{animation-duration:6s}#enjaz-public .workforce-stage:after{left:4%;bottom:5%;transform:scale(.78)}#enjaz-public .workforce-stage{background-size:28px 28px,28px 28px,100% 100%!important}.workforce-stage .stage-top:after,.workforce-stage .stage-top:before{width:20%}}
 @media(prefers-reduced-motion:reduce){#enjaz-public *, .enjaz-auth-route *, .ev4-layout *{transition:none!important;animation:none!important}}
