@@ -12,8 +12,6 @@ if (authRoute) {
 } else {
   import('./enjaz-public.js').catch((error) => console.error('[ENJAZ_PUBLIC_BOOT]', error));
 
-  // Public authentication entry must remain deterministic even if an optional
-  // enhancement layer adds click handlers or fails to initialize.
   document.addEventListener('click', (event) => {
     const trigger = event.target?.closest?.('[data-auth]');
     if (!trigger) return;
@@ -26,11 +24,14 @@ if (authRoute) {
     window.location.assign(url.toString());
   }, true);
 
-  const reportModuleError = (modulePath, error) => console.error('[ENJAZ_MODULE]', modulePath, error);
+  const reportModuleError = (modulePath, error) => {
+    console.error('[ENJAZ_MODULE]', modulePath, error);
+    const content = document.getElementById('content');
+    if (content && !content.children.length && !document.getElementById('auth-gate')) {
+      content.innerHTML = `<div class="boot-error" role="alert"><strong>تعذر تشغيل مساحة العمل</strong><span>${String(error?.message||error||'خطأ غير متوقع').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}</span><button type="button" onclick="location.reload()">إعادة المحاولة</button></div>`;
+    }
+  };
 
-  // Use statically analyzable dynamic imports. A variable-based dynamic import
-  // such as import(coreModule) is not emitted by Vite into the production dist,
-  // leaving the authenticated shell with an empty #content area after login.
   import('./app-entry-v2.js').catch((error) => reportModuleError('./app-entry-v2.js', error));
 
   const enhancementModules = [
@@ -49,16 +50,16 @@ if (authRoute) {
     ['./enjaz-workflow-polish.js', () => import('./enjaz-workflow-polish.js')],
   ];
 
-  // Each enhancement is isolated so an optional layer can never block the core
-  // workspace from booting.
-  for (const [modulePath, loader] of enhancementModules) {
-    loader().catch((error) => reportModuleError(modulePath, error));
-  }
+  for (const [modulePath, loader] of enhancementModules) loader().catch((error) => console.error('[ENJAZ_MODULE]', modulePath, error));
 
   window.addEventListener('error', (event) => {
     const content = document.getElementById('content');
     if (!content || content.children.length || document.getElementById('auth-gate')) return;
-    const message = String(event?.error?.message || event?.message || 'تعذر تشغيل مساحة العمل.');
-    content.innerHTML = `<div class="boot-error" role="alert"><strong>تعذر تشغيل مساحة العمل</strong><span>${message.replace(/[&<>\"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}</span><button type="button" onclick="location.reload()">إعادة المحاولة</button></div>`;
+    reportModuleError('window.error', event.error || event.message);
+  });
+  window.addEventListener('unhandledrejection', (event) => {
+    const content = document.getElementById('content');
+    if (!content || content.children.length || document.getElementById('auth-gate')) return;
+    reportModuleError('window.unhandledrejection', event.reason);
   });
 }
