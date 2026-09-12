@@ -12,7 +12,33 @@ if(authRoute){
   });
 }else{
   import('./enjaz-public.js').catch(error=>console.error('[ENJAZ_PUBLIC_BOOT]',error));
-  document.addEventListener('click',event=>{const trigger=event.target?.closest?.('[data-auth]');if(!trigger)return;event.preventDefault();event.stopPropagation();const url=new URL(window.location.href);url.search='';url.searchParams.set('auth','1');if(trigger.dataset.auth==='signup')url.searchParams.set('signup','1');window.location.assign(url.toString())},true);
+  const navigateToAuth=(trigger)=>{
+    const url=new URL(window.location.href);
+    url.search='';
+    url.searchParams.set('auth','1');
+    if(trigger?.dataset?.auth==='signup')url.searchParams.set('signup','1');
+    window.location.assign(url.toString());
+  };
+  const authGuard=event=>{
+    const trigger=event.target?.closest?.('[data-auth]');
+    if(!trigger)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    navigateToAuth(trigger);
+  };
+  document.addEventListener('click',authGuard,true);
+  document.addEventListener('pointerup',event=>{
+    const trigger=event.target?.closest?.('[data-auth="login"]');
+    if(!trigger)return;
+    navigateToAuth(trigger);
+  },true);
+  document.addEventListener('keydown',event=>{
+    if(event.key!=='Enter'&&event.key!==' ')return;
+    const trigger=document.activeElement?.closest?.('[data-auth="login"]');
+    if(!trigger)return;
+    event.preventDefault();
+    navigateToAuth(trigger);
+  },true);
   const reportModuleError=(modulePath,error)=>{console.error('[ENJAZ_MODULE]',modulePath,error);const content=document.getElementById('content');if(content&&!content.children.length&&!document.getElementById('auth-gate')){const safe=String(error?.message||error||'خطأ غير متوقع').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));content.innerHTML=`<div class="boot-error" role="alert"><strong>تعذر تشغيل مساحة العمل</strong><span>${safe}</span><button type="button" onclick="location.reload()">إعادة المحاولة</button></div>`}};
   import('./app-entry-v2.js').catch(error=>reportModuleError('./app-entry-v2.js',error));
   const capabilityModules=[
