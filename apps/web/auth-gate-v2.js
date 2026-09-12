@@ -21,4 +21,16 @@ const workspaceSetup=async profile=>{const safeProfile=profile&&typeof profile==
 
 async function recover(){try{const profile=await authClient.me(apiBase);if(!profile){authClient.signOut();setAuthState('public');window.location.href=location.origin+location.pathname;return}const memberships=Array.isArray(profile.workspaces)?profile.workspaces:[];if(!memberships.length){setAuthState('auth');await workspaceSetup(profile);return}const requested=q.get('workspaceId')||localStorage.getItem('ENJAZ_WORKSPACE_ID')||'';const selected=requested&&memberships.some(w=>String(w.id)===String(requested))?memberships.find(w=>String(w.id)===String(requested)):memberships[0];localStorage.setItem('ENJAZ_WORKSPACE_ID',selected.id);sessionStorage.setItem('ENJAZ_WORKSPACES',JSON.stringify(memberships));sessionStorage.setItem('ENJAZ_USER_PROFILE',JSON.stringify(profile));window.ENJAZ_WORKSPACE_ID=selected.id;window.ENJAZ_ACCESS_TOKEN=authClient.token();if(q.has('auth')||q.has('signup')||q.has('workspaceId')){const url=new URL(location.href);url.search='';history.replaceState({},'',url.toString())}setAuthState('authenticated');clearGate();window.dispatchEvent(new CustomEvent('enjaz:authenticated'));}catch(err){setAuthState('error');const el=mount(`<div class="auth-shell"><div class="auth-card session-recovery"><div class="auth-brand"><span class="brand-mark">إ</span><div><strong>إنجاز</strong><small>ENJAZ · SESSION RECOVERY</small></div></div><div class="auth-copy"><div class="eyebrow">SESSION RECOVERY</div><h1>تعذر تحميل مساحة العمل</h1><p>لم نفقد حسابك. حاول استعادة الجلسة أو ابدأ من جديد.</p></div><div class="auth-error" role="alert">${esc(err?.message||'تعذر قراءة جلسة المستخدم.')}</div><div class="auth-recovery-actions"><button class="primary" id="retry-session" type="button">إعادة المحاولة</button><button class="ghost" id="reset-session" type="button">إعادة ضبط الجلسة</button></div></div></div>`);el.querySelector('#retry-session')?.addEventListener('click',()=>location.reload());el.querySelector('#reset-session')?.addEventListener('click',()=>{authClient.signOut();location.href=location.origin+location.pathname})}}
 
-if(authClient.token())recover();else if(q.has('auth')){root?.classList.add('is-auth-locked');setAuthState('auth');renderForm()}else{window.__ENJAZ_PUBLIC_SHOWN__=true;setAuthState('public')}
+// Explicit authentication navigation is authoritative: always render the login
+// form first. A stale/partial token must never bypass the form and strand the
+// user on the workspace shell. Successful submit calls recover() explicitly.
+if(q.has('auth')){
+  root?.classList.add('is-auth-locked');
+  setAuthState('auth');
+  renderForm();
+}else if(authClient.token()){
+  recover();
+}else{
+  window.__ENJAZ_PUBLIC_SHOWN__=true;
+  setAuthState('public');
+}
