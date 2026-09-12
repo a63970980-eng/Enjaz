@@ -26,32 +26,34 @@ if (authRoute) {
     window.location.assign(url.toString());
   }, true);
 
-  const coreModule = './app-entry-v2.js';
-  const enhancementModules = [
-    './enjaz-workspace-shell.js',
-    './enjaz-shell-data.js',
-    './enjaz-employee-360.js',
-    './enjaz-industry-library.js',
-    './enjaz-global-experience.js',
-    './enjaz-enterprise-evolution.js',
-    './enjaz-command-center.js',
-    './enjaz-notifications.js',
-    './enjaz-executive-intelligence.js',
-    './enjaz-auth-enhancements.js',
-    './enjaz-world-class-ui.js',
-    './enjaz-workforce-entry.js',
-    './enjaz-workflow-polish.js',
-  ];
-
   const reportModuleError = (modulePath, error) => console.error('[ENJAZ_MODULE]', modulePath, error);
 
-  import(coreModule)
-    .catch((error) => reportModuleError(coreModule, error))
-    .finally(() => {
-      for (const modulePath of enhancementModules) {
-        import(modulePath).catch((error) => reportModuleError(modulePath, error));
-      }
-    });
+  // Use statically analyzable dynamic imports. A variable-based dynamic import
+  // such as import(coreModule) is not emitted by Vite into the production dist,
+  // leaving the authenticated shell with an empty #content area after login.
+  import('./app-entry-v2.js').catch((error) => reportModuleError('./app-entry-v2.js', error));
+
+  const enhancementModules = [
+    ['./enjaz-workspace-shell.js', () => import('./enjaz-workspace-shell.js')],
+    ['./enjaz-shell-data.js', () => import('./enjaz-shell-data.js')],
+    ['./enjaz-employee-360.js', () => import('./enjaz-employee-360.js')],
+    ['./enjaz-industry-library.js', () => import('./enjaz-industry-library.js')],
+    ['./enjaz-global-experience.js', () => import('./enjaz-global-experience.js')],
+    ['./enjaz-enterprise-evolution.js', () => import('./enjaz-enterprise-evolution.js')],
+    ['./enjaz-command-center.js', () => import('./enjaz-command-center.js')],
+    ['./enjaz-notifications.js', () => import('./enjaz-notifications.js')],
+    ['./enjaz-executive-intelligence.js', () => import('./enjaz-executive-intelligence.js')],
+    ['./enjaz-auth-enhancements.js', () => import('./enjaz-auth-enhancements.js')],
+    ['./enjaz-world-class-ui.js', () => import('./enjaz-world-class-ui.js')],
+    ['./enjaz-workforce-entry.js', () => import('./enjaz-workforce-entry.js')],
+    ['./enjaz-workflow-polish.js', () => import('./enjaz-workflow-polish.js')],
+  ];
+
+  // Each enhancement is isolated so an optional layer can never block the core
+  // workspace from booting.
+  for (const [modulePath, loader] of enhancementModules) {
+    loader().catch((error) => reportModuleError(modulePath, error));
+  }
 
   window.addEventListener('error', (event) => {
     const content = document.getElementById('content');
