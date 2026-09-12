@@ -1,0 +1,81 @@
+/* ENJAZ LIVE VISUAL — cinematic, CSS-driven digital workforce scene. Additive only. */
+#enjaz-public .workforce-stage{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(57,185,255,.26) 0 2%,transparent 3%),
+    radial-gradient(circle at 18% 28%,rgba(92,214,255,.18) 0 1%,transparent 2%),
+    radial-gradient(circle at 82% 25%,rgba(34,120,255,.22) 0 1%,transparent 2%),
+    linear-gradient(135deg,#031431 0%,#06265c 48%,#087ac8 100%)!important;
+  border:1px solid rgba(102,211,255,.48)!important;
+  box-shadow:0 30px 90px rgba(1,30,76,.32),inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+#enjaz-public .workforce-stage:before{
+  content:"";
+  position:absolute!important;
+  inset:-45%!important;
+  z-index:0!important;
+  background:
+    conic-gradient(from 0deg at 50% 50%,transparent 0 8%,rgba(83,216,255,.34) 10%,transparent 13% 25%,rgba(39,129,255,.25) 28%,transparent 31% 100%);
+  animation:enjaz-live-spin 14s linear infinite!important;
+  filter:blur(2px)!important;
+  opacity:.9!important;
+  pointer-events:none!important;
+}
+#enjaz-public .workforce-stage:after{
+  content:"";
+  position:absolute!important;
+  left:0!important;right:0!important;top:-15%!important;height:2px!important;
+  z-index:1!important;
+  background:linear-gradient(90deg,transparent,rgba(130,235,255,.95),rgba(255,255,255,.8),rgba(130,235,255,.95),transparent)!important;
+  box-shadow:0 0 18px rgba(75,210,255,.85),0 0 55px rgba(20,130,255,.5)!important;
+  animation:enjaz-live-scan 5.5s ease-in-out infinite!important;
+  pointer-events:none!important;
+}
+#enjaz-public .workforce-stage > *{position:relative;z-index:3}
+#enjaz-public .workforce-stage .stage-glow{z-index:1!important;filter:blur(2px);}
+#enjaz-public .workforce-stage .stage-glow.glow-one{background:#48d8ff!important;box-shadow:0 0 90px 30px rgba(72,216,255,.35)!important;animation:enjaz-live-glow 4s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .stage-glow.glow-two{background:#2d78ff!important;box-shadow:0 0 100px 35px rgba(45,120,255,.3)!important;animation:enjaz-live-glow 5.5s -2s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .stage-top{z-index:5!important}
+#enjaz-public .workforce-stage .stage-top:before,
+#enjaz-public .workforce-stage .stage-top:after{
+  content:""!important;position:absolute!important;top:50%!important;width:27%!important;height:1px!important;
+  background:linear-gradient(90deg,transparent,rgba(112,229,255,.95),transparent)!important;
+  box-shadow:0 0 10px rgba(87,216,255,.65)!important;
+  animation:enjaz-live-lane 2.8s ease-in-out infinite!important;
+}
+#enjaz-public .workforce-stage .stage-top:before{right:0!important}
+#enjaz-public .workforce-stage .stage-top:after{left:0!important;animation-delay:-1.4s!important}
+#enjaz-public .workforce-stage .stage-title:after{
+  content:"";display:block;position:absolute;width:9px;height:9px;border-radius:50%;right:43%;top:50%;
+  background:#b9f7ff;box-shadow:0 0 0 5px rgba(89,228,255,.12),0 0 24px 7px rgba(63,207,255,.65);
+  animation:enjaz-live-node 1.9s ease-in-out infinite;
+}
+#enjaz-public .workforce-stage .stage-command,
+#enjaz-public .workforce-stage .employee-panel{
+  backdrop-filter:blur(10px)!important;-webkit-backdrop-filter:blur(10px)!important;
+  box-shadow:0 16px 40px rgba(0,22,55,.28),0 0 0 1px rgba(255,255,255,.2) inset!important;
+}
+#enjaz-public .workforce-stage .stage-command{animation:enjaz-live-command 3.2s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .employee-panel{animation:enjaz-live-card 5s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .employee-panel.compact{animation-delay:-2.3s!important}
+#enjaz-public .workforce-stage .command-icon{background:linear-gradient(145deg,#0c62e8,#12cbd3)!important;color:#fff!important;box-shadow:0 0 26px rgba(33,151,255,.42)!important;animation:enjaz-live-icon 2.2s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .employee-avatar{box-shadow:0 0 0 3px rgba(51,179,255,.08),0 8px 22px rgba(10,70,150,.18)!important}
+#enjaz-public .workforce-stage .mini-dot{animation:enjaz-live-node 1.5s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .task-flow .active{background:#0d6df2!important;color:#fff!important;box-shadow:0 0 0 4px rgba(13,109,242,.12),0 0 20px rgba(13,109,242,.24)!important;animation:enjaz-live-active 1.6s ease-in-out infinite!important}
+#enjaz-public .workforce-stage .stage-metrics{z-index:5!important}
+#enjaz-public .workforce-stage .stage-metrics strong{text-shadow:0 0 22px rgba(110,225,255,.5)!important}
+#enjaz-public .workforce-stage .stage-metrics div{position:relative}
+#enjaz-public .workforce-stage .stage-metrics div:before{content:"";position:absolute;right:50%;top:-7px;width:4px;height:4px;border-radius:50%;background:#75e9ff;box-shadow:0 0 12px #55d9ff;animation:enjaz-live-node 2s ease-in-out infinite}
+@keyframes enjaz-live-spin{to{transform:rotate(360deg)}}
+@keyframes enjaz-live-scan{0%,100%{top:-12% ;opacity:0}12%{opacity:1}58%{opacity:.9}100%{top:112%;opacity:0}}
+@keyframes enjaz-live-glow{0%,100%{opacity:.28;transform:scale(.92)}50%{opacity:.82;transform:scale(1.12)}}
+@keyframes enjaz-live-lane{0%,100%{opacity:.2;transform:scaleX(.55)}50%{opacity:1;transform:scaleX(1)}}
+@keyframes enjaz-live-node{0%,100%{opacity:.45;transform:scale(.78)}50%{opacity:1;transform:scale(1.18)}}
+@keyframes enjaz-live-command{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes enjaz-live-card{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes enjaz-live-icon{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(8deg) scale(1.06)}}
+@keyframes enjaz-live-active{0%,100%{box-shadow:0 0 0 0 rgba(13,109,242,.18),0 0 18px rgba(13,109,242,.18)}50%{box-shadow:0 0 0 7px rgba(13,109,242,.05),0 0 30px rgba(13,109,242,.34)}}
+@media(max-width:760px){#enjaz-public .workforce-stage{min-height:390px!important;background-size:auto!important}#enjaz-public .workforce-stage .stage-top:before,#enjaz-public .workforce-stage .stage-top:after{width:18%!important}#enjaz-public .workforce-stage .stage-title:after{right:38%!important}}
+@media(prefers-reduced-motion:reduce){#enjaz-public .workforce-stage:before,#enjaz-public .workforce-stage:after,#enjaz-public .workforce-stage *{animation:none!important}}
