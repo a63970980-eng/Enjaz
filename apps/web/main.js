@@ -1,4 +1,5 @@
 import './boot-config.js';
+import './enjaz-enterprise-finish.css';
 
 const authRoute=new URLSearchParams(window.location.search).has('auth');
 
