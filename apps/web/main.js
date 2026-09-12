@@ -12,19 +12,16 @@ if(authRoute){
 }else{
   import('./enjaz-public.js').catch(error=>console.error('[ENJAZ_PUBLIC_BOOT]',error));
   document.addEventListener('click',event=>{const trigger=event.target?.closest?.('[data-auth]');if(!trigger)return;event.preventDefault();event.stopPropagation();const url=new URL(window.location.href);url.search='';url.searchParams.set('auth','1');if(trigger.dataset.auth==='signup')url.searchParams.set('signup','1');window.location.assign(url.toString())},true);
-
   const reportModuleError=(modulePath,error)=>{console.error('[ENJAZ_MODULE]',modulePath,error);const content=document.getElementById('content');if(content&&!content.children.length&&!document.getElementById('auth-gate')){const safe=String(error?.message||error||'خطأ غير متوقع').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));content.innerHTML=`<div class="boot-error" role="alert"><strong>تعذر تشغيل مساحة العمل</strong><span>${safe}</span><button type="button" onclick="location.reload()">إعادة المحاولة</button></div>`}};
   import('./app-entry-v2.js').catch(error=>reportModuleError('./app-entry-v2.js',error));
-
-  // Only extensions that provide capabilities to the new workspace are loaded here.
-  // The old shell enhancements stay in the repository but no longer compete for the active DOM.
   const capabilityModules=[
     ['./enjaz-industry-library.js',()=>import('./enjaz-industry-library.js')],
     ['./enjaz-employee-360.js',()=>import('./enjaz-employee-360.js')],
-    ['./enjaz-workforce-entry.js',()=>import('./enjaz-workforce-entry.js')]
+    ['./task-360.js',()=>import('./task-360.js')],
+    ['./enjaz-workforce-entry.js',()=>import('./enjaz-workforce-entry.js')],
+    ['./enjaz-v4-compatibility.js',()=>import('./enjaz-v4-compatibility.js')]
   ];
   for(const [modulePath,loader] of capabilityModules)loader().catch(error=>console.error('[ENJAZ_CAPABILITY]',modulePath,error));
-
   window.addEventListener('error',event=>{const content=document.getElementById('content');if(!content||content.children.length||document.getElementById('auth-gate'))return;reportModuleError('window.error',event.error||event.message)});
   window.addEventListener('unhandledrejection',event=>{const content=document.getElementById('content');if(!content||content.children.length||document.getElementById('auth-gate'))return;reportModuleError('window.unhandledrejection',event.reason)});
 }
