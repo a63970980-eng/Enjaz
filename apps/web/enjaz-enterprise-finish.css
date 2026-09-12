@@ -1,0 +1,26 @@
+/* Enjaz Enterprise Finish — additive visual layer. No layout or behavior overrides beyond presentation. */
+:root{--enjaz-focus:#155eef;--enjaz-navy-deep:#071a36;--enjaz-surface:#fff;--enjaz-border:#e5e9f0}
+/* Authentication: premium enterprise surface, while preserving the existing auth DOM and behavior. */
+.enjaz-auth-route{background:#f6f8fb!important}
+.enjaz-auth-route #auth-gate{min-height:100vh;background:radial-gradient(circle at 15% 10%,rgba(21,94,239,.07),transparent 30%),radial-gradient(circle at 85% 85%,rgba(22,169,183,.06),transparent 28%),#f6f8fb}
+.enjaz-auth-route .auth-shell{min-height:100vh;padding:28px 18px!important}
+.enjaz-auth-route .auth-card{border:1px solid #e2e7ef!important;box-shadow:0 24px 70px rgba(7,21,47,.10)!important;border-radius:20px!important}
+.enjaz-auth-route .auth-card input,.enjaz-auth-route .auth-card select{border-color:#d9e0ea!important;border-radius:10px!important;min-height:44px!important;transition:border-color .15s,box-shadow .15s}
+.enjaz-auth-route .auth-card input:focus,.enjaz-auth-route .auth-card select:focus{border-color:#9bb9ea!important;box-shadow:0 0 0 3px rgba(21,94,239,.08)!important;outline:none}
+.enjaz-auth-route .auth-card button.primary{border-radius:10px!important;min-height:44px!important;box-shadow:0 7px 18px rgba(21,94,239,.15)!important}
+.enjaz-auth-route .auth-brand .brand-mark{box-shadow:0 8px 20px rgba(7,21,47,.12)!important}
+/* Public page: sharpen hierarchy and remove the last traces of generic template styling. */
+#enjaz-public .public-nav{box-shadow:0 1px 0 rgba(16,24,40,.02)}
+#enjaz-public .public-links button{transition:color .15s,background .15s,border-color .15s,transform .15s}
+#enjaz-public .public-nav-cta:hover,#enjaz-public .public-primary:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(23,105,232,.20)}
+#enjaz-public .public-secondary:hover{border-color:#bfd0e6;background:#fff}
+#enjaz-public .employee-catalog-preview article{transition:transform .16s,border-color .16s,box-shadow .16s}
+#enjaz-public .employee-catalog-preview article:hover{transform:translateY(-2px);border-color:#cbd8e8;box-shadow:0 12px 28px rgba(16,33,63,.06)}
+#enjaz-public button:focus-visible,#enjaz-public a:focus-visible{outline:3px solid rgba(21,94,239,.20);outline-offset:3px}
+/* Workspace: unify keyboard focus and dense enterprise controls. */
+.ev4-layout button:focus-visible,.ev4-layout [role=button]:focus-visible{outline:3px solid rgba(21,94,239,.22)!important;outline-offset:2px!important}
+.ev4-layout .ev4-status{white-space:nowrap}
+.ev4-layout .ev4-panel,.ev4-layout .ev4-kpis article,.ev4-layout .ev4-generic-card,.ev4-layout .ev4-operation,.ev4-layout .ev4-integration{border-color:#e5e9f0}
+.ev4-layout .ev4-panel-head button{font-weight:700}
+@media(max-width:760px){.enjaz-auth-route .auth-shell{padding:16px 12px!important}.enjaz-auth-route .auth-card{border-radius:16px!important}.ev4-layout .ev4-panel{overflow-x:auto}}
+@media(prefers-reduced-motion:reduce){#enjaz-public *, .enjaz-auth-route *, .ev4-layout *{transition:none!important;animation:none!important}}
