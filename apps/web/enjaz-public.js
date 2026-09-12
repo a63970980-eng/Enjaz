@@ -28,7 +28,7 @@ if(!hasSession()&&!query.has('auth')){
       <button data-scroll="workforce">القوى العاملة</button>
       <button data-scroll="solutions">الحلول</button>
       <button data-scroll="trust">الأمان والتحكم</button>
-      <button class="public-login" data-auth="login">تسجيل الدخول</button>
+      <a class="public-login" data-auth="login" href="?auth=1">تسجيل الدخول</a>
       <button class="public-nav-cta" data-auth="signup">ابدأ مجانًا</button>
     </div>
     <button class="public-mobile-cta" data-auth="signup">ابدأ</button>
@@ -95,7 +95,7 @@ if(!hasSession()&&!query.has('auth')){
     <section class="final-cta"><div><span class="section-eyebrow">THE NEXT WORKFORCE</span><h2>ابدأ بناء فريقك الرقمي اليوم.</h2><p>موظفون جاهزون. منصة واحدة. تحكم كامل.</p></div><button data-auth="signup">ابدأ مع إنجاز <span>←</span></button></section>
     <div class="trust-strip"><span><strong>إنجاز</strong> · Digital Workforce Operating System</span><span>ابنِ فريقك الرقمي، ثم دع الفريق يعمل.</span></div>
   </main>
-  <footer class="public-footer"><div><strong>إنجاز</strong><span>© 2026 Enjaz. Digital Workforce Operating System.</span></div><div><button data-scroll="platform">المنصة</button><button data-auth="login">تسجيل الدخول</button></div></footer>`;
+  <footer class="public-footer"><div><strong>إنجاز</strong><span>© 2026 Enjaz. Digital Workforce Operating System.</span></div><div><button data-scroll="platform">المنصة</button><a class="public-login" data-auth="login" href="?auth=1">تسجيل الدخول</a></div></footer>`;
 
   mount.querySelectorAll('[data-auth]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.auth)));
   mount.querySelectorAll('[data-scroll]').forEach(button=>button.addEventListener('click',()=>document.getElementById(button.dataset.scroll)?.scrollIntoView({behavior:'smooth',block:'start'})));
