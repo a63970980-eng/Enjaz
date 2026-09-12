@@ -50,6 +50,25 @@ if(!hasSession()&&!query.has('auth')){
       <div class="workforce-stage" aria-label="عرض حي للقوة العاملة الرقمية">
         <div class="stage-glow glow-one"></div><div class="stage-glow glow-two"></div>
         <div class="stage-top"><span class="stage-title"><i class="pulse"></i> Digital Workforce</span><span class="live">● LIVE</span></div>
+        <div class="enjaz-operating-scene" aria-hidden="true">
+          <div class="scene-grid"></div>
+          <div class="scene-ring ring-outer"></div><div class="scene-ring ring-mid"></div><div class="scene-ring ring-inner"></div>
+          <div class="scene-route route-a"></div><div class="scene-route route-b"></div><div class="scene-route route-c"></div><div class="scene-route route-d"></div>
+          <div class="scene-node node-manager"><span>ع</span><b>مدير العمليات</b><small>تشغيل</small></div>
+          <div class="scene-node node-service"><span>س</span><b>خدمة العملاء</b><small>استجابة</small></div>
+          <div class="scene-node node-inventory"><span>م</span><b>المخزون</b><small>متابعة</small></div>
+          <div class="scene-node node-finance"><span>ر</span><b>المالية</b><small>تحليل</small></div>
+          <div class="scene-node node-quality"><span>ج</span><b>الجودة</b><small>مراجعة</small></div>
+          <div class="scene-core">
+            <div class="core-aura"></div><span class="core-mark">إ</span><strong>إنجاز</strong><small>WORKFORCE OS</small>
+            <i class="core-signal"></i>
+          </div>
+          <div class="scene-event event-one"><i></i>مهمة جديدة <b>✓</b></div>
+          <div class="scene-event event-two"><i></i>قرار جاهز <b>↗</b></div>
+          <div class="scene-event event-three"><i></i>بيانات محدثة <b>●</b></div>
+          <div class="scene-packet packet-one"></div><div class="scene-packet packet-two"></div><div class="scene-packet packet-three"></div>
+        </div>
+        <div class="scene-caption"><span><i></i>قوة عاملة رقمية متصلة</span><small>المهام تتحرك بين الأدوار، والقرارات تبقى تحت سيطرتك.</small></div>
         <div class="stage-command"><span class="command-icon">✦</span><div><small>إنجاز الآن</small><strong>إدارة عمليات الشركة</strong></div><span class="command-status">يعمل</span></div>
         <div class="employee-panel featured">
           <div class="employee-row"><span class="employee-avatar avatar-s">س</span><div><strong>سارة</strong><small>مديرة خدمة العملاء · تعمل الآن</small></div><span class="mini-dot"></span></div>
