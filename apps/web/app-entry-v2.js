@@ -25,14 +25,12 @@ const start=async()=>{
     if(window.__ENJAZ_APP_STARTED__)return;
     if(window.ENJAZ_ACCESS_TOKEN && window.ENJAZ_WORKSPACE_ID){
       window.__ENJAZ_APP_STARTED__=true;
-      try{await import('./app.js');}
+      try{await import('./workspace-app-v3.js');}
       catch(error){showBootError(error);}
       return;
     }
     if(Date.now()-started>=BOOT_TIMEOUT){
-      if(!window.__ENJAZ_PUBLIC_SHOWN__ && !document.getElementById('auth-gate')){
-        showBootError(new Error('انتهت مهلة تهيئة إنجاز. أعد تحميل الصفحة أو أعد ضبط الجلسة.'));
-      }
+      showBootError(new Error('انتهت مهلة تهيئة إنجاز. أعد تحميل الصفحة أو أعد ضبط الجلسة.'));
       return;
     }
     await wait(150);
