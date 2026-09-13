@@ -17,10 +17,10 @@ const goAuth=signup=>{const url=new URL(location.href);url.search='';url.searchP
 const form=({signup=isSignup(),error='' }={})=>mount(`<div class="auth-shell"><div class="auth-card"><div class="auth-brand"><span class="brand-mark"><i></i><i></i><i></i></span><div><strong>إنجاز</strong><small>ENJAZ · DIGITAL WORKFORCE</small></div></div><div class="auth-copy"><div class="eyebrow">${signup?'START YOUR WORKFORCE':'SECURE WORKSPACE'}</div><h1>${signup?'ابنِ قوة العمل الرقمية لشركتك':'مرحبًا بعودتك'}</h1><p>${signup?'أنشئ حسابك ثم سنقودك خطوة بخطوة لتأسيس مؤسستك وتفعيل قوة العمل المناسبة لقطاعك.':'سجّل الدخول للوصول إلى قوة العمل الرقمية وبيانات شركتك.'}</p></div>${error?`<div class="auth-error" role="alert">${esc(error)}</div>`:''}<form id="auth-form">${signup?'<label>الاسم<input name="name" required autocomplete="name" placeholder="اسمك الكامل"></label>':''}<label>البريد الإلكتروني<input name="email" type="email" required autocomplete="email" placeholder="name@company.com"></label><label>كلمة المرور<input name="password" type="password" required minlength="8" autocomplete="${signup?'new-password':'current-password'}" placeholder="••••••••"></label><button class="primary auth-submit" type="submit">${signup?'إنشاء الحساب':'تسجيل الدخول'}</button></form><div class="auth-switch">${signup?'لديك حساب بالفعل؟':'ليس لديك حساب؟'} <button id="auth-switch" class="link-button" type="button">${signup?'تسجيل الدخول':'إنشاء حساب'}</button></div><div class="auth-secure">● جلسة آمنة · عزل بيانات المؤسسة · صلاحيات حسب الدور</div></div></div>`);
 
 const sectorOptions=[
- ['restaurants','المطاعم','تشغيل الفروع، الطلبات، المخزون، المشتريات، الجودة وخدمة العملاء.','مطاعم'],
- ['hospitals','المستشفيات','إدارة المواعيد، التنسيق التشغيلي، الجودة، المرضى والعمليات.','مستشفيات'],
- ['hotels','الفنادق','الضيافة، الحجوزات، التشغيل، خدمة النزلاء والجودة.','فنادق'],
- ['companies','الشركات','المبيعات، العمليات، الموارد، خدمة العملاء، المالية والتقارير.','شركات'],
+ ['restaurant','المطاعم','تشغيل الفروع، الطلبات، المخزون، المشتريات، الجودة وخدمة العملاء.','مطاعم'],
+ ['hospital','المستشفيات','إدارة المواعيد، التنسيق التشغيلي، الجودة، المرضى والعمليات.','مستشفيات'],
+ ['hotel','الفنادق','الضيافة، الحجوزات، التشغيل، خدمة النزلاء والجودة.','فنادق'],
+ ['enterprise','الشركات','المبيعات، العمليات، الموارد، خدمة العملاء، المالية والتقارير.','شركات'],
  ['government','الجهات الحكومية','الخدمات، المعاملات، الامتثال، المتابعة، الجودة والتقارير.','جهات حكومية']
 ];
 
@@ -32,7 +32,7 @@ const workspaceSetup=async profile=>{
   const b=new FormData(e.currentTarget),btn=e.currentTarget.querySelector('button');
   btn.disabled=true;btn.textContent='جارٍ تأسيس بيئة المؤسسة…';
   try{
-   const sector=String(b.get('sector')||'restaurants');
+   const sector=String(b.get('sector')||'enterprise');
    const data=await authClient.bootstrap(apiBase,{name:safeProfile.identity?.name||safeProfile.user?.name||'',organizationName:b.get('organizationName'),workspaceName:b.get('workspaceName'),sector});
    const workspaces=Array.isArray(data?.workspaces)?data.workspaces:[];
    const workspace=workspaces[0]||data?.workspace;
@@ -42,7 +42,7 @@ const workspaceSetup=async profile=>{
    sessionStorage.setItem('ENJAZ_ONBOARDING_SECTOR',sector);
    window.ENJAZ_WORKSPACE_ID=workspace.id;window.ENJAZ_ACCESS_TOKEN=authClient.token();
    let provisioningError='';
-   try{await apiClient.provisionIndustryPack(workspace.id,authClient.token(),sector);}
+   try{await apiClient.provisionIndustryPack(workspace.id,authClient.token(),sector)}
    catch(error){provisioningError=error?.message||'تعذر تفعيل حزمة القطاع تلقائيًا.';console.warn('[ENJAZ_ONBOARDING_PROVISION]',error)}
    setAuthState('authenticated');clearGate();
    if(provisioningError)sessionStorage.setItem('ENJAZ_ONBOARDING_NOTICE',provisioningError);
