@@ -1,5 +1,6 @@
 import './boot-config.js';
 import './enjaz-production-hardening.js';
+import './enjaz-production-hardening.css';
 import './enjaz-enterprise-finish.css';
 import './enjaz-product-visuals.js';
 
