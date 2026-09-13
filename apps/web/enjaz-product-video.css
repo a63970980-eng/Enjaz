@@ -1,0 +1,62 @@
+/* ENJAZ PRODUCT VIDEO — royal-blue product demonstration */
+#enjaz-public{background:linear-gradient(180deg,#032b73 0%,#0757c9 42%,#0b69dc 100%)!important;color:#fff!important}
+#enjaz-public .public-hero{position:relative!important;max-width:none!important;min-height:calc(100dvh - 74px)!important;padding:64px clamp(24px,6vw,110px) 90px!important;grid-template-columns:minmax(0,.78fr) minmax(620px,1.22fr)!important;gap:70px!important;background:transparent!important}
+#enjaz-public .public-hero:before{content:""!important;position:absolute!important;inset:0!important;pointer-events:none!important;background:radial-gradient(circle at 75% 28%,rgba(81,190,255,.24),transparent 32%),radial-gradient(circle at 12% 80%,rgba(0,219,255,.13),transparent 30%)!important}
+#enjaz-public .hero-copy{position:relative!important;z-index:3!important;align-self:center!important}
+#enjaz-public .public-hero h1{font-size:clamp(46px,5.3vw,78px)!important;line-height:1.02!important;letter-spacing:-.065em!important;color:#fff!important}
+#enjaz-public .public-hero h1 span{background:linear-gradient(90deg,#fff,#9fe9ff,#6fb7ff)!important;-webkit-background-clip:text!important;background-clip:text!important}
+#enjaz-public .public-hero p{font-size:17px!important;line-height:1.95!important;color:rgba(240,249,255,.76)!important}
+/* Product-video canvas, not a decorative scene */
+#enjaz-public .workforce-stage{position:relative!important;overflow:hidden!important;min-height:650px!important;border-radius:24px!important;background:#03183d!important;border:1px solid rgba(255,255,255,.22)!important;box-shadow:0 40px 100px rgba(0,12,50,.36),0 0 80px rgba(45,164,255,.13)!important}
+#enjaz-public .workforce-stage:before{content:""!important;position:absolute!important;inset:74px 0 0!important;z-index:0!important;background:linear-gradient(90deg,rgba(8,75,164,.7),rgba(2,25,64,.95) 48%,rgba(7,91,188,.75)),radial-gradient(circle at 72% 35%,rgba(41,170,255,.25),transparent 35%)!important}
+#enjaz-public .workforce-stage:after{content:""!important;position:absolute!important;z-index:8!important;left:0!important;right:0!important;height:1px!important;top:74px!important;background:linear-gradient(90deg,transparent,rgba(112,222,255,.8),transparent)!important;animation:videoScan 5s ease-in-out infinite!important}
+#enjaz-public .stage-top{position:relative!important;z-index:12!important;height:74px!important;padding:0 22px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;background:rgba(1,16,42,.72)!important;border-bottom:1px solid rgba(255,255,255,.1)!important}
+#enjaz-public .stage-title{font-size:0!important;letter-spacing:.12em!important;color:#fff!important;text-transform:uppercase!important}
+#enjaz-public .stage-title:before{content:"PRODUCT VIDEO  /  ENJAZ WORKFORCE"!important;font-size:10px!important}
+#enjaz-public .stage-title i{display:none!important}
+#enjaz-public .live{font-size:9px!important;color:#8ff0c2!important;letter-spacing:.12em!important}
+#enjaz-public .enjaz-operating-scene{position:absolute!important;inset:74px 0 52px!important;z-index:4!important;opacity:1!important;overflow:hidden!important;background:linear-gradient(135deg,rgba(3,25,65,.98),rgba(5,65,142,.86))!important}
+#enjaz-public .scene-grid{opacity:.08!important;background-size:32px 32px!important}
+#enjaz-public .scene-ring,#enjaz-public .scene-route,#enjaz-public .scene-packet{display:none!important}
+#enjaz-public .scene-core{left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:255px!important;height:170px!important;border-radius:14px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;padding:20px!important;background:linear-gradient(145deg,#0b6fe0,#063b91)!important;border:1px solid rgba(255,255,255,.2)!important;box-shadow:0 25px 70px rgba(0,10,40,.42)!important;animation:videoHub 5s ease-in-out infinite!important}
+#enjaz-public .scene-core:before{content:"مؤسسة إنجاز"!important;display:block!important;color:#fff!important;font-size:14px!important;font-weight:800!important;margin-bottom:14px!important}
+#enjaz-public .scene-core:after{content:"8 موظفين رقميين  ·  24 مهمة  ·  6 تكاملات"!important;color:#a9d8ff!important;font-size:9px!important}
+#enjaz-public .scene-core .core-mark{position:absolute!important;right:18px!important;top:18px!important;width:34px!important;height:34px!important;font-size:18px!important;border-radius:9px!important}
+#enjaz-public .scene-core strong,#enjaz-public .scene-core small,#enjaz-public .scene-core .core-signal{display:none!important}
+#enjaz-public .scene-node{display:grid!important;grid-template-columns:34px 1fr!important;grid-template-rows:1fr 1fr!important;width:178px!important;padding:11px!important;border-radius:12px!important;background:rgba(1,20,50,.82)!important;border:1px solid rgba(137,213,255,.2)!important;box-shadow:0 15px 35px rgba(0,0,0,.25)!important;backdrop-filter:blur(10px)!important}
+#enjaz-public .scene-node:after{content:"متصل  •  يعمل الآن"!important;grid-column:2!important;font-size:7px!important;color:#7ce6b1!important;align-self:end!important;margin-right:8px!important}
+#enjaz-public .scene-node span{width:34px!important;height:34px!important;background:linear-gradient(145deg,#1598ff,#0ad6dd)!important}
+#enjaz-public .scene-node b{font-size:9px!important;color:#fff!important;margin-right:8px!important;align-self:end!important}
+#enjaz-public .scene-node small{font-size:0!important}
+#enjaz-public .node-manager{right:4%!important;top:9%!important;animation:videoFloat 5s ease-in-out infinite!important}
+#enjaz-public .node-service{left:4%!important;top:12%!important;animation:videoFloat 5s 1s ease-in-out infinite!important}
+#enjaz-public .node-inventory{right:4%!important;bottom:10%!important;animation:videoFloat 5s 2s ease-in-out infinite!important}
+#enjaz-public .node-finance{left:4%!important;bottom:12%!important;animation:videoFloat 5s 3s ease-in-out infinite!important}
+#enjaz-public .node-quality{display:grid!important;right:50%!important;top:7%!important;transform:translateX(50%)!important;animation:videoFloat 5s 4s ease-in-out infinite!important}
+#enjaz-public .scene-event{z-index:7!important;background:rgba(5,31,72,.9)!important;border:1px solid rgba(101,209,255,.22)!important;color:#dff5ff!important;font-size:8px!important}
+#enjaz-public .event-one{left:26%!important;top:21%!important}
+#enjaz-public .event-two{right:25%!important;top:68%!important}
+#enjaz-public .event-three{left:28%!important;top:73%!important}
+#enjaz-public .scene-caption{bottom:15px!important;left:16px!important;right:16px!important;background:rgba(0,14,37,.72)!important;border-color:rgba(255,255,255,.1)!important;z-index:11!important}
+#enjaz-public .scene-caption span{font-size:9px!important}.scene-caption small{font-size:8px!important}
+#enjaz-public .stage-command,#enjaz-public .employee-panel,#enjaz-public .stage-metrics{opacity:1!important;pointer-events:auto!important;z-index:10!important}
+#enjaz-public .stage-command{top:96px!important;left:22px!important;background:rgba(1,19,49,.8)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:10px!important;padding:9px!important;backdrop-filter:blur(12px)!important}
+#enjaz-public .stage-command strong{color:#fff!important;font-size:9px!important}.stage-command small{color:#80c8ff!important}
+#enjaz-public .employee-panel.featured{top:auto!important;bottom:76px!important;left:50%!important;transform:translateX(-50%)!important;width:310px!important;background:rgba(1,17,44,.9)!important;border:1px solid rgba(105,213,255,.25)!important;box-shadow:0 18px 45px rgba(0,0,0,.3)!important;z-index:9!important}
+#enjaz-public .employee-panel.compact{display:none!important}
+#enjaz-public .employee-row strong{color:#fff!important;font-size:9px!important}.employee-row small{color:#8fb9df!important;font-size:7px!important}
+#enjaz-public .task-line{border-top:1px solid rgba(255,255,255,.08)!important;margin-top:9px!important;padding-top:8px!important}.task-line b{font-size:7px!important;color:#7ddcff!important}.task-line span{font-size:7px!important;color:#c2d9ee!important}
+#enjaz-public .task-flow{font-size:7px!important;color:#93b8dc!important}
+#enjaz-public .stage-metrics{right:18px!important;top:96px!important;display:flex!important;gap:6px!important}
+#enjaz-public .stage-metrics div{padding:7px 9px!important;background:rgba(1,18,47,.76)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:8px!important}.stage-metrics strong{font-size:10px!important;color:#fff!important}.stage-metrics span{font-size:6px!important;color:#83b2da!important}
+#enjaz-public .logo-strip,#enjaz-public .public-section,#enjaz-public .flow-section,#enjaz-public .trust-section{background:linear-gradient(180deg,#0757c9,#0a68d7)!important;border-top:1px solid rgba(255,255,255,.1)!important}
+#enjaz-public .public-section{padding:110px clamp(22px,6vw,110px)!important}
+#enjaz-public .employee-catalog-preview article,#enjaz-public .cap-card,#enjaz-public .trust-grid div,#enjaz-public .flow-step{background:rgba(1,31,79,.27)!important;border:1px solid rgba(255,255,255,.16)!important;box-shadow:0 20px 50px rgba(0,18,70,.16)!important}
+#enjaz-public .final-cta{background:linear-gradient(120deg,#021d50,#0757c9)!important;border-radius:0!important}
+#enjaz-public .public-footer{background:#021a43!important}
+@keyframes videoScan{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:.85;transform:translateY(520px)}}
+@keyframes videoHub{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.025)}}
+@keyframes videoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(max-width:1150px){#enjaz-public .public-hero{grid-template-columns:1fr!important}.workforce-stage{min-height:600px!important}}
+@media(max-width:700px){#enjaz-public .public-hero{padding:42px 18px 60px!important}.workforce-stage{min-height:570px!important}.stage-metrics{display:none!important}.employee-panel.featured{width:260px!important}.scene-node{width:145px!important}.node-quality{display:none!important}.scene-core{width:210px!important}.stage-command{display:none!important}}
+@media(prefers-reduced-motion:reduce){#enjaz-public .workforce-stage:after,#enjaz-public .scene-core,#enjaz-public .scene-node{animation:none!important}}
