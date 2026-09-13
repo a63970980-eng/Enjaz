@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { query, withTransaction } from './db.js';
 
+const ALLOWED_SECTORS=new Set(['restaurants','hospitals','hotels','companies','government']);
+const normalizeSector=value=>{const sector=String(value||'').trim().toLowerCase();return ALLOWED_SECTORS.has(sector)?sector:'companies'};
 const slugify=value=>String(value||'').trim().toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,48)||'workspace';
 
 async function uniqueSlug(client,base,table,scopeColumn,scopeValue){
@@ -18,17 +20,18 @@ export async function getUserByAuthId(authUserId){
 }
 
 export async function listUserWorkspaces(userId){
-  const r=await query(`select w.id,w.name,w.slug,w.organization_id,o.name as organization_name,wm.role as workspace_role from workspace_members wm join workspaces w on w.id=wm.workspace_id join organizations o on o.id=w.organization_id where wm.user_id=$1 order by wm.created_at asc`,[userId]);
+  const r=await query(`select w.id,w.name,w.slug,w.organization_id,o.name as organization_name,wm.role as workspace_role,wp.sector from workspace_members wm join workspaces w on w.id=wm.workspace_id join organizations o on o.id=w.organization_id left join workspace_profiles wp on wp.workspace_id=w.id where wm.user_id=$1 order by wm.created_at asc`,[userId]);
   return r.rows;
 }
 
-export async function bootstrapWorkspace({authUserId,email,name,organizationName,workspaceName}){
+export async function bootstrapWorkspace({authUserId,email,name,organizationName,workspaceName,sector}){
   return withTransaction(async client=>{
     let user=(await client.query('select * from users where auth_user_id=$1 limit 1',[authUserId])).rows[0];
     if(user){
-      const memberships=(await client.query(`select w.id,w.name,w.slug,w.organization_id,o.name as organization_name,wm.role as workspace_role from workspace_members wm join workspaces w on w.id=wm.workspace_id join organizations o on o.id=w.organization_id where wm.user_id=$1 order by wm.created_at asc`,[user.id])).rows;
+      const memberships=(await client.query(`select w.id,w.name,w.slug,w.organization_id,o.name as organization_name,wm.role as workspace_role,wp.sector from workspace_members wm join workspaces w on w.id=wm.workspace_id join organizations o on o.id=w.organization_id left join workspace_profiles wp on wp.workspace_id=w.id where wm.user_id=$1 order by wm.created_at asc`,[user.id])).rows;
       return {user,workspaces:memberships,created:false};
     }
+    const selectedSector=normalizeSector(sector);
     const orgId=randomUUID();
     const orgSlug=await uniqueSlug(client,organizationName||name||'Enjaz workspace','organizations');
     await client.query('insert into organizations(id,name,slug) values($1,$2,$3)',[orgId,organizationName||name||'My Organization',orgSlug]);
@@ -37,10 +40,11 @@ export async function bootstrapWorkspace({authUserId,email,name,organizationName
     const workspaceId=randomUUID();
     const wsSlug=await uniqueSlug(client,workspaceName||'Main Workspace','workspaces','organization_id',orgId);
     await client.query('insert into workspaces(id,organization_id,name,slug) values($1,$2,$3,$4)',[workspaceId,orgId,workspaceName||'Main Workspace',wsSlug]);
+    await client.query('insert into workspace_profiles(workspace_id,sector,industry,operating_model,onboarding_stage) values($1,$2,$2,$3,$4)',[workspaceId,selectedSector,'digital-workforce','active']);
     await client.query("insert into workspace_members(workspace_id,user_id,role) values($1,$2,'manager')",[workspaceId,userId]);
-    await client.query(`insert into audit_events(id,workspace_id,event_type,actor_type,action,metadata) values($1,$2,$3,$4,$5,$6::jsonb)`,[randomUUID(),workspaceId,'workspace.created','user','onboarding.bootstrap',JSON.stringify({organizationId:orgId,userId})]);
+    await client.query(`insert into audit_events(id,workspace_id,event_type,actor_type,action,metadata) values($1,$2,$3,$4,$5,$6::jsonb)`,[randomUUID(),workspaceId,'workspace.created','user','onboarding.bootstrap',JSON.stringify({organizationId:orgId,userId,sector:selectedSector})]);
     const createdUser=(await client.query('select id,auth_user_id,organization_id,email,name,role,platform_role from users where id=$1',[userId])).rows[0];
-    const workspace={id:workspaceId,name:workspaceName||'Main Workspace',slug:wsSlug,organization_id:orgId,organization_name:organizationName||name||'My Organization',workspace_role:'manager'};
+    const workspace={id:workspaceId,name:workspaceName||'Main Workspace',slug:wsSlug,organization_id:orgId,organization_name:organizationName||name||'My Organization',workspace_role:'manager',sector:selectedSector};
     return {user:createdUser,workspaces:[workspace],created:true};
   });
 }
