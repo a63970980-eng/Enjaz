@@ -16,7 +16,8 @@ import { listBillingPlans,getBillingSubscription,getBillingUsage,assertWorkspace
 import './integrations/index.js';
 const port=process.env.PORT||4000;
 const supabaseUrl=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL||'';
-const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY||process.env.VITE_SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY||'';
+// Public Supabase keys are sufficient for /auth/v1/user token verification. Never use a service-role key on this request path.
+const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY||'';
 // Supabase configuration is required in production; the health/version routes remain boot-safe when it is not provisioned.
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean));
 const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
@@ -72,7 +73,7 @@ if(req.method==='GET'&&url.pathname==='/api/v1/handoffs')return json(res,200,{da
 if(req.method==='POST'&&url.pathname==='/api/v1/handoffs'){requireManager(user);return json(res,201,{data:await createHandoff({...await body(req),workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/connections')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/connections'){requireManager(user);return json(res,201,{data:await saveConnection({...await body(req),workspaceId,actorUserId:user.id})},origin,context.id);}
-const connectionMatch=url.pathname.match(/^\/api\/v1\/connections\/([^/]+)$/);if(req.method==='DELETE'&&connectionMatch){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:connectionMatch[1],actorUserId:user.id})},origin,context.id);}
+const connectionMatch=url.pathname.match(/^\/api\/v1\/connections\/([^/]+)$/);if(connectionMatch&&req.method==='DELETE'){requireManager(user);return json(res,200,{data:await revokeConnection({workspaceId,connectionId:connectionMatch[1],actorUserId:user.id})},origin,context.id);}
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals/execute'){requireManager(user);const input=await body(req);return json(res,200,{data:await executeApprovedTask({workspaceId,approvalId:input.approvalId,actorUserId:user.id})},origin,context.id);}
 return json(res,404,{error:'Not found',requestId:context.id},origin,context.id);
 }catch(error){const status=Number(error?.status)||500;return json(res,status,{error:publicError(error,status),requestId:context.id},origin,context.id);}});
