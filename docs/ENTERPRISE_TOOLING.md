@@ -1,29 +1,39 @@
 # ENJAZ Enterprise Tooling Strategy
 
-Enjaz should adopt mature open-source infrastructure selectively. The rule is **capability first, dependency second**: no library is added merely because it is popular.
+Enjaz adopts mature infrastructure selectively. The rule is **capability first, dependency second**: no library is added merely because it is popular.
 
 ## Capability map
 
-| Capability | Preferred tool | Adoption rule |
+| Capability | Preferred tool | Status / adoption rule |
 |---|---|---|
-| Application telemetry | OpenTelemetry | Instrument API/runtime boundaries first; remain vendor-neutral. |
-| Metrics | Prometheus | Add when production metrics need a durable time-series backend. |
-| Dashboards | Grafana | Operational dashboards; never replace the product UI. |
-| Distributed tracing | Grafana Tempo / OTEL-compatible backend | Add with meaningful service boundaries. |
-| Authorization | OpenFGA | Introduce when role/resource relationships exceed simple workspace roles. |
-| Durable workflows | Temporal | Introduce for long-running/retryable workflows that cannot safely live inside HTTP requests. |
-| Event transport | NATS | Introduce when asynchronous service/event traffic becomes material. |
-| AI observability | Langfuse | Add when multi-model/agent execution becomes customer-facing and requires trace/evaluation controls. |
-| Model gateway | LiteLLM | Use when provider routing, fallback, budgets, and model policy need a single control plane. |
-| Semantic retrieval | Qdrant | Add only for customer knowledge/memory workloads that justify vector search. |
-| Product analytics | PostHog | Use for activation, retention, funnels, experiments, and product diagnostics. |
-| Feature control | Unleash | Use for progressive delivery and safe kill switches. |
-| Visualization | Apache ECharts | Use for operational/business analytics inside Enjaz. |
-| Browser QA | Playwright | Required for critical user journeys before production promotion. |
-| Accessibility | axe-core | Required in browser quality gates. |
-| Static security | CodeQL / Semgrep | Run continuously; production code must pass security gates. |
-| Secrets | Gitleaks | Block accidental credential commits. |
-| Dependency/container scan | Dependency Review / Trivy | Block high-severity known vulnerabilities where practical. |
+| Application telemetry | OpenTelemetry | Planned after an OTLP destination is configured; keep vendor-neutral. |
+| Metrics | Prometheus | Planned when production metrics need a durable time-series backend. |
+| Dashboards | Grafana | Planned for operations; never replace the product UI. |
+| Distributed tracing | Grafana Tempo / OTEL-compatible backend | Planned with meaningful service boundaries. |
+| Authorization | OpenFGA | Staged; current Supabase RLS remains the primary tenant boundary until resource relationships require ReBAC/FGA. |
+| Durable workflows | Temporal | Staged; introduce only for long-running workflows that cannot safely live inside HTTP/queue execution. |
+| Event transport | NATS | Staged; introduce when asynchronous service/event traffic becomes material. |
+| AI observability | Langfuse | Staged; introduce when customer-facing agent execution requires trace/evaluation controls. |
+| Model gateway | LiteLLM | Staged; use when provider routing, fallback, budgets, and model policy need a single control plane. |
+| Semantic retrieval | Qdrant | Staged; add only for customer knowledge/memory workloads that justify vector search. |
+| Product analytics | PostHog | Staged; define Enjaz event taxonomy before deployment. |
+| Feature control | Unleash | Staged; use for progressive delivery and safe kill switches. |
+| Visualization | Apache ECharts | Staged; use for operational/business analytics inside Enjaz. |
+| Browser QA | Playwright | **Implemented** for critical public experience checks. |
+| Accessibility | axe-core | **Implemented** in Playwright quality gates. |
+| Static security | CodeQL / Semgrep | **Implemented** in GitHub security CI. |
+| Secrets | Gitleaks | **Implemented** in GitHub security CI. |
+| Dependency/container scan | Dependency Review / Trivy | **Implemented** in GitHub security CI. |
+
+## Current hardening baseline
+
+- Tenant isolation is enforced through Supabase RLS and server-side workspace access checks.
+- Client-side authenticated requests cannot change protected identity, workspace, or privileged membership fields.
+- Request authentication never falls back to a Supabase service-role key.
+- API requests have rate limiting, request IDs, bounded request bodies, security response headers, and explicit CORS allowlisting.
+- Critical browser journeys have automated E2E and accessibility coverage.
+- Security gates run Semgrep, CodeQL, Gitleaks, and Trivy.
+- Vite and esbuild are kept above the currently affected security releases rather than using forced audit fixes.
 
 ## Non-negotiable architecture rules
 
@@ -34,7 +44,3 @@ Enjaz should adopt mature open-source infrastructure selectively. The rule is **
 5. Sensitive tool execution must be policy-controlled independently of model output.
 6. Observability must correlate user/workspace, request, task, workflow, execution, and provider identifiers without logging secrets.
 7. New infrastructure must be removable without rewriting the core product domain.
-
-## Current implementation status
-
-The repository now has security quality gates and automated dependency update configuration. Runtime observability, fine-grained authorization, durable workflows, AI observability, and event infrastructure will be introduced only after their exact integration boundaries are audited and tested.
