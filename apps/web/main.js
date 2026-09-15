@@ -1,4 +1,5 @@
 import './boot-config.js';
+import '@tabler/icons-webfont/dist/tabler-icons.min.css';
 import './enjaz-production-hardening.js';
 import './enjaz-production-hardening.css';
 import './enjaz-enterprise-finish.css';
