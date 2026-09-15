@@ -4,6 +4,7 @@ import './enjaz-production-hardening.js';
 import './enjaz-production-hardening.css';
 import './enjaz-enterprise-finish.css';
 import './enjaz-product-visuals.js';
+import './enjaz-motion.js';
 
 const authRoute=new URLSearchParams(window.location.search).has('auth');
 
