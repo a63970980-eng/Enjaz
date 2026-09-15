@@ -1,0 +1,86 @@
+/* ENJAZ WORLD-CLASS UI V2
+   Product-owned visual system inspired by the best open-code enterprise patterns.
+   No vendor visual language is copied. Existing DOM and application behavior stay intact.
+*/
+:root{
+  --e2-blue-950:#03112f;--e2-blue-900:#061b4f;--e2-blue-800:#082d73;--e2-blue-700:#0648a7;
+  --e2-blue-600:#0a63d1;--e2-blue-500:#1785ef;--e2-cyan:#56d6ff;
+  --e2-white:#fff;--e2-surface:#f7faff;--e2-ink:#0a1833;--e2-muted:#63738c;
+  --e2-line:rgba(8,38,87,.11);--e2-line-strong:rgba(8,38,87,.18);
+  --e2-r1:12px;--e2-r2:16px;--e2-r3:22px;--e2-r4:30px;
+  --e2-shadow-1:0 8px 30px rgba(3,20,55,.07);--e2-shadow-2:0 22px 65px rgba(3,20,55,.12);
+  --e2-shadow-3:0 42px 110px rgba(2,16,48,.23);
+  --e2-ease:cubic-bezier(.16,1,.3,1);
+}
+
+/* PUBLIC EXPERIENCE — premium SaaS hierarchy */
+#enjaz-public{font-family:"IBM Plex Sans Arabic","Cairo",system-ui,sans-serif;color:var(--e2-ink);background:#fff;overflow:clip}
+#enjaz-public .public-nav{height:78px;padding:0 clamp(18px,5vw,76px);background:rgba(3,17,47,.86);border-bottom:1px solid rgba(255,255,255,.1);backdrop-filter:blur(18px);z-index:100;box-shadow:0 1px 0 rgba(255,255,255,.04)}
+#enjaz-public .public-brand strong{font-size:20px;letter-spacing:-.03em}
+#enjaz-public .public-brand small{opacity:.68;letter-spacing:.11em;font-size:8px}
+#enjaz-public .public-mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#fff,#d9edff);color:#063c91;box-shadow:0 8px 24px rgba(0,0,0,.2);font-weight:900}
+#enjaz-public .public-links button,#enjaz-public .public-links a{font-family:inherit;font-weight:600}
+#enjaz-public .public-hero{position:relative;min-height:calc(100vh - 78px);padding:clamp(58px,8vw,110px) clamp(18px,6vw,92px) 90px;grid-template-columns:minmax(0,.88fr) minmax(480px,1.12fr);gap:clamp(36px,5vw,84px);align-items:center;background:radial-gradient(900px 500px at 82% 15%,rgba(47,139,255,.2),transparent 60%),radial-gradient(700px 500px at 5% 95%,rgba(0,184,255,.11),transparent 65%),linear-gradient(145deg,#031536 0%,#052d72 58%,#0758bd 100%);overflow:hidden}
+#enjaz-public .public-hero:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+#enjaz-public .hero-copy{position:relative;z-index:2;max-width:700px}
+#enjaz-public .public-kicker{display:inline-flex;align-items:center;gap:9px;padding:7px 11px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.07);box-shadow:0 10px 35px rgba(0,0,0,.1);font-size:11px;color:#dceeff;backdrop-filter:blur(10px)}
+#enjaz-public .public-kicker i{width:7px;height:7px;border-radius:50%;background:#69e3ff;box-shadow:0 0 0 5px rgba(105,227,255,.1),0 0 18px #69e3ff}
+#enjaz-public .public-kicker b{padding:3px 6px;border-radius:5px;background:#fff;color:#0751ae;font-size:8px}
+#enjaz-public .public-hero h1{font-size:clamp(46px,6vw,78px);line-height:1.08;letter-spacing:-.055em;font-weight:800;color:#fff;margin:25px 0 22px;max-width:780px}
+#enjaz-public .public-hero h1 span{color:#8fe4ff;background:linear-gradient(90deg,#fff,#79dcff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#enjaz-public .public-hero p{max-width:650px;color:rgba(239,247,255,.78);font-size:17px;line-height:1.95}
+#enjaz-public .public-actions{gap:12px;margin-top:30px}
+#enjaz-public .public-primary{min-height:54px;padding:0 20px;border-radius:14px;background:#fff;color:#073d8f;box-shadow:0 18px 50px rgba(0,0,0,.22);font-weight:800}
+#enjaz-public .public-secondary{min-height:54px;padding:0 18px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;backdrop-filter:blur(10px);font-weight:700}
+#enjaz-public .public-trust-line{display:flex;flex-wrap:wrap;gap:18px;margin-top:24px;color:rgba(255,255,255,.62);font-size:11px}
+
+/* PRODUCT VIDEO FRAME — unmistakably a product, not a decorative scene */
+#enjaz-public .workforce-stage{position:relative!important;min-height:620px!important;padding:14px!important;background:#fff!important;border:1px solid rgba(255,255,255,.95)!important;border-radius:32px!important;box-shadow:0 48px 120px rgba(0,10,42,.35),0 0 0 1px rgba(5,42,100,.1)!important;overflow:hidden!important;z-index:3!important}
+#enjaz-public .workforce-stage:after{content:"";position:absolute;inset:0;border-radius:32px;pointer-events:none;background:linear-gradient(120deg,transparent 0 42%,rgba(255,255,255,.7) 50%,transparent 58%);transform:translateX(-130%);animation:e2Sweep 7.5s var(--e2-ease) infinite;z-index:30;mix-blend-mode:overlay}
+#enjaz-public .workforce-stage .stage-top{top:14px!important;left:18px!important;right:18px!important;color:#102443!important;z-index:40!important}
+#enjaz-public .workforce-stage .stage-title{color:#15335d!important;font-size:11px!important;font-weight:800!important}
+#enjaz-public .workforce-stage .live{color:#0a67cc!important;font-weight:800!important;font-size:9px!important}
+#enjaz-public .workforce-stage .enjaz-operating-scene{inset:14px!important;top:54px!important;border-radius:23px!important;background:radial-gradient(500px 280px at 72% 18%,rgba(75,190,255,.32),transparent 62%),radial-gradient(450px 330px at 25% 80%,rgba(0,218,255,.14),transparent 60%),linear-gradient(150deg,#031538 0%,#063d91 52%,#0878e8 100%)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:inset 0 1px rgba(255,255,255,.18),0 22px 55px rgba(1,24,66,.24)!important}
+#enjaz-public .workforce-stage .enjaz-operating-scene:before{content:"PRODUCT WORKSPACE  /  LIVE FLOW";top:15px!important;left:16px!important;padding:6px 9px!important;border-radius:7px!important;background:rgba(0,12,34,.55)!important;border:1px solid rgba(255,255,255,.14)!important;color:#d9efff!important;font:800 8px/1 Arial,sans-serif!important;letter-spacing:.15em!important}
+#enjaz-public .workforce-stage .scene-grid{opacity:.055!important}
+#enjaz-public .workforce-stage .scene-ring{border-color:rgba(145,225,255,.13)!important}
+#enjaz-public .workforce-stage .scene-node{background:rgba(255,255,255,.97)!important;color:#0a2248!important;border:1px solid rgba(255,255,255,.95)!important;box-shadow:0 16px 42px rgba(0,9,32,.3)!important;backdrop-filter:blur(8px)}
+#enjaz-public .workforce-stage .scene-node small{color:#67809d!important}
+#enjaz-public .workforce-stage .scene-core{background:linear-gradient(145deg,#fff,#eaf7ff)!important;color:#073f93!important;border:1px solid #fff!important;box-shadow:0 28px 70px rgba(0,5,25,.34),0 0 0 10px rgba(255,255,255,.08)!important}
+#enjaz-public .workforce-stage .core-mark{background:#0755b6!important;color:#fff!important;box-shadow:0 10px 25px rgba(0,67,157,.24)!important}
+#enjaz-public .workforce-stage .core-aura{background:rgba(255,255,255,.25)!important}
+#enjaz-public .workforce-stage .scene-event{background:rgba(255,255,255,.96)!important;color:#10294d!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 14px 35px rgba(0,8,30,.22)!important}
+#enjaz-public .workforce-stage .scene-caption{bottom:15px!important;left:15px!important;right:15px!important;background:rgba(0,13,39,.72)!important;border:1px solid rgba(255,255,255,.13)!important;backdrop-filter:blur(12px);z-index:25!important}
+#enjaz-public .workforce-stage .stage-command,#enjaz-public .workforce-stage .employee-panel,#enjaz-public .workforce-stage .stage-metrics{display:none!important}
+
+/* Global SaaS sections */
+#enjaz-public .public-section{padding:clamp(80px,9vw,130px) 20px;background:#fff}
+#enjaz-public .public-section:nth-of-type(even){background:#f7faff}
+#enjaz-public .public-section-inner{max-width:1220px;margin:auto}
+#enjaz-public .section-eyebrow{font-size:10px;letter-spacing:.18em;font-weight:800;color:#1768c7}
+#enjaz-public .public-section h2{font-size:clamp(34px,4.4vw,60px);line-height:1.13;letter-spacing:-.045em;color:#091b38;margin:12px 0 16px}
+#enjaz-public .section-lead{max-width:720px;color:#65758c;font-size:16px;line-height:1.9}
+#enjaz-public .cap-grid,#enjaz-public .flow-grid,#enjaz-public .trust-grid{gap:12px}
+#enjaz-public .cap-card,#enjaz-public .flow-step,#enjaz-public .trust-grid>div{border:1px solid var(--e2-line)!important;border-radius:20px!important;background:#fff!important;box-shadow:var(--e2-shadow-1)!important;transition:transform .25s var(--e2-ease),box-shadow .25s var(--e2-ease),border-color .25s var(--e2-ease)!important}
+#enjaz-public .cap-card:hover,#enjaz-public .flow-step:hover,#enjaz-public .trust-grid>div:hover{transform:translateY(-5px)!important;box-shadow:var(--e2-shadow-2)!important;border-color:rgba(7,88,189,.22)!important}
+#enjaz-public .employee-catalog-preview article{border-color:var(--e2-line)!important;border-radius:16px!important;box-shadow:var(--e2-shadow-1)!important}
+#enjaz-public .final-cta{position:relative;overflow:hidden;background:linear-gradient(135deg,#031536,#0758bd)!important;border-radius:30px!important;box-shadow:var(--e2-shadow-3)!important;margin:30px auto 80px!important;max-width:1220px!important}
+#enjaz-public .final-cta:before{content:"";position:absolute;width:420px;height:420px;border-radius:50%;right:-120px;top:-220px;background:rgba(93,216,255,.16);filter:blur(2px)}
+#enjaz-public .final-cta h2,#enjaz-public .final-cta p{position:relative;z-index:2}
+
+/* INTERNAL WORKSPACE — enterprise density without changing navigation */
+.enjaz-root{--workspace-bg:#f5f8fc;--workspace-panel:#fff;--workspace-border:rgba(8,38,87,.1);--workspace-ink:#0b1b35;--workspace-muted:#64748b;--workspace-accent:#0868d5}
+.enjaz-root .enjaz-main{background:var(--workspace-bg)}
+.enjaz-root .enjaz-topbar{height:72px!important;background:rgba(255,255,255,.94)!important;border-bottom:1px solid var(--workspace-border)!important;backdrop-filter:blur(18px)!important}
+.enjaz-root .top-search{border:1px solid var(--workspace-border)!important;background:#f8faff!important;border-radius:12px!important}
+.enjaz-root .top-search:focus-within{border-color:rgba(8,104,213,.35)!important;box-shadow:0 0 0 4px rgba(8,104,213,.07)!important}
+.enjaz-root .enjaz-sidebar{background:linear-gradient(180deg,#031536,#06275e)!important;box-shadow:18px 0 50px rgba(1,15,43,.08)!important}
+.enjaz-root .enjaz-nav button{border-radius:11px!important;margin:2px 10px!important;color:rgba(255,255,255,.7)!important}
+.enjaz-root .enjaz-nav button.active{background:linear-gradient(90deg,rgba(38,139,255,.2),rgba(255,255,255,.07))!important;color:#fff!important;box-shadow:inset 3px 0 #59c9ff!important}
+.enjaz-root #content{padding:clamp(18px,2.5vw,34px)!important}
+.enjaz-root .enjaz-card,.enjaz-root .panel,.enjaz-root .card{border:1px solid var(--workspace-border)!important;box-shadow:0 8px 28px rgba(4,25,65,.055)!important;border-radius:16px!important}
+
+@keyframes e2Sweep{0%,12%{transform:translateX(-130%)}52%,100%{transform:translateX(130%)}}
+@media(max-width:1100px){#enjaz-public .public-hero{grid-template-columns:1fr!important}.hero-copy{max-width:800px!important}.workforce-stage{max-width:900px!important;width:100%!important;margin:auto!important}}
+@media(max-width:640px){#enjaz-public .public-nav{height:68px!important}.public-links{display:none!important}#enjaz-public .public-hero{padding:45px 16px 65px!important}.public-hero h1{font-size:clamp(40px,12vw,58px)!important}.public-hero p{font-size:15px!important}.workforce-stage{min-height:470px!important;border-radius:22px!important}.workforce-stage .enjaz-operating-scene{inset:10px!important;top:50px!important;border-radius:17px!important}.workforce-stage .scene-node{transform:scale(.72)!important}.workforce-stage .scene-caption{left:10px!important;right:10px!important;bottom:10px!important}}
+@media(prefers-reduced-motion:reduce){#enjaz-public *,#enjaz-public *:before,#enjaz-public *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
