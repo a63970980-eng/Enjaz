@@ -11,9 +11,13 @@ const lockKey=748319261;
 try {
   await pool.query('select pg_advisory_lock($1)',[lockKey]);
   try {
-    // The schema is the immutable base; versioned migrations contain additive/runtime changes.
-    const schema=await fs.readFile(schemaFile,'utf8');
-    await pool.query(schema);
+    // Bootstrap the immutable base schema only for a fresh database. Existing
+    // installations are advanced exclusively through versioned migrations.
+    const base=await pool.query("select to_regclass('public.organizations') as table_name");
+    if(!base.rows[0]?.table_name){
+      const schema=await fs.readFile(schemaFile,'utf8');
+      await pool.query(schema);
+    }
     await pool.query('create table if not exists schema_migrations (version text primary key, applied_at timestamptz not null default now())');
     const files=(await fs.readdir(migrationsDir)).filter(f=>f.endsWith('.sql')).sort();
     for(const file of files){
