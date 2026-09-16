@@ -1,5 +1,6 @@
 import { generateAI } from './ai-provider.js';
 import { validatePlan } from './employee-planner.js';
+import { AgentTaskSchema, parseContract } from './contracts.js';
 
 const providers = new Map();
 
@@ -8,9 +9,7 @@ export function registerModelProvider(name, provider) {
   providers.set(name, provider);
 }
 
-export function getModelProvider(name = 'deterministic') {
-  return providers.get(name) || null;
-}
+export function getModelProvider(name = 'deterministic') { return providers.get(name) || null; }
 
 function parsePlan(text) {
   const raw = String(text || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
@@ -18,9 +17,7 @@ function parsePlan(text) {
     const plan = JSON.parse(raw);
     if (!plan || typeof plan !== 'object') throw new Error('plan must be an object');
     return plan;
-  } catch {
-    throw new Error('AI provider returned an invalid JSON plan');
-  }
+  } catch { throw new Error('AI provider returned an invalid JSON plan'); }
 }
 
 function normalizePlan(plan, context) {
@@ -40,35 +37,27 @@ function normalizePlan(plan, context) {
 async function generateAIPlan(context, provider = process.env.AI_PROVIDER || 'auto') {
   const response = await generateAI({
     provider,
-    model: provider === 'gemini' ? process.env.GEMINI_MODEL : provider === 'openrouter' ? process.env.OPENROUTER_MODEL : undefined,
+    model: provider === 'gemini' ? process.env.GEMINI_MODEL : provider === 'openrouter' ? process.env.OPENROUTER_MODEL : provider === 'openai' ? process.env.OPENAI_MODEL : undefined,
     messages: [
       { role: 'system', content: context.system },
-      {
-        role: 'user',
-        content: JSON.stringify({
-          employee: context.employee,
-          goal: context.goal,
-          memory: context.memory,
-          availableTools: context.availableTools,
-          instructions: 'Return JSON only: {goal:string,steps:[{id,intent,action,input,approval_required,depends_on}]}. Use only availableTools. Keep 1-12 steps. Dependencies must reference earlier step ids.',
-        }),
-      },
+      { role: 'user', content: JSON.stringify({ employee: context.employee, goal: context.goal, memory: context.memory, availableTools: context.availableTools, instructions: 'Return JSON only: {goal:string,steps:[{id,intent,action,input,approval_required,depends_on}]}. Use only availableTools. Keep 1-12 steps. Dependencies must reference earlier step ids.' }) },
     ],
   });
   const plan = normalizePlan(parsePlan(response.text), context);
   return { ...plan, provider: response.provider, model: response.model };
 }
 
-registerModelProvider('deterministic', {
-  generate: async (context) => ({ goal: context.goal, version: 1, steps: [] }),
-});
-
+registerModelProvider('deterministic', { generate: async (context) => ({ goal: context.goal, version: 1, steps: [] }) });
 registerModelProvider('auto', { generate: (context) => generateAIPlan(context, 'auto') });
 registerModelProvider('gemini', { generate: (context) => generateAIPlan(context, 'gemini') });
 registerModelProvider('openrouter', { generate: (context) => generateAIPlan(context, 'openrouter') });
+registerModelProvider('openai', { generate: (context) => generateAIPlan(context, 'openai') });
 
 export async function generatePlan({ provider = process.env.AI_PROVIDER || 'auto', context }) {
   const p = getModelProvider(provider);
   if (!p) throw new Error(`AI provider not configured: ${provider}`);
+  if (provider !== 'deterministic') parseContract(AgentTaskSchema, {
+    workspaceId: context.workspaceId || 'planning-workspace', taskId: context.taskId || 'planning-task', employeeId: context.employeeId || 'planning-employee', goal: context.goal,
+  }, 'agent task');
   return p.generate(context);
 }
