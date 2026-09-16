@@ -149,7 +149,11 @@ CREATE INDEX IF NOT EXISTS idx_task_comments_task ON public.task_comments(worksp
 CREATE INDEX IF NOT EXISTS idx_task_delegations_parent ON public.task_delegations(workspace_id, parent_task_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_handoffs_task ON public.employee_handoffs(workspace_id, task_id, created_at DESC);
 
-CREATE OR REPLACE FUNCTION public.charge_employee_budget(
+-- PostgreSQL does not allow CREATE OR REPLACE FUNCTION to rename existing
+-- input parameters. Drop the exact signature first so upgrades are repeatable.
+DROP FUNCTION IF EXISTS public.charge_employee_budget(uuid, uuid, uuid, text, bigint, jsonb);
+
+CREATE FUNCTION public.charge_employee_budget(
   p_workspace_id uuid,
   p_employee_id uuid,
   p_task_id uuid,
