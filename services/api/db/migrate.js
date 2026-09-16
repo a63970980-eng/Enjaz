@@ -5,11 +5,15 @@ import { getPool } from '../src/db.js';
 
 const here=path.dirname(fileURLToPath(import.meta.url));
 const migrationsDir=path.join(here,'migrations');
+const schemaFile=path.join(here,'schema.sql');
 const pool=getPool();
 const lockKey=748319261;
 try {
   await pool.query('select pg_advisory_lock($1)',[lockKey]);
   try {
+    // The schema is the immutable base; versioned migrations contain additive/runtime changes.
+    const schema=await fs.readFile(schemaFile,'utf8');
+    await pool.query(schema);
     await pool.query('create table if not exists schema_migrations (version text primary key, applied_at timestamptz not null default now())');
     const files=(await fs.readdir(migrationsDir)).filter(f=>f.endsWith('.sql')).sort();
     for(const file of files){
