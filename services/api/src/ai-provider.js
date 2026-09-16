@@ -1,3 +1,5 @@
+import { withSpan } from './telemetry.js';
+
 const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const DEFAULT_OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
 const DEFAULT_OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-mini';
@@ -75,24 +77,21 @@ async function callOpenAICompatible({ messages, model, baseUrl, apiKey, provider
 async function callOpenRouter({ messages, model }) {
   const key = clean(process.env.OPENROUTER_API_KEY);
   if (!key) throw new Error('OPENROUTER_API_KEY is not configured');
-  return callOpenAICompatible({
-    messages,
-    model,
-    baseUrl: 'https://openrouter.ai/api/v1',
-    apiKey: key,
-    provider: 'openrouter',
-  });
+  return callOpenAICompatible({ messages, model, baseUrl: 'https://openrouter.ai/api/v1', apiKey: key, provider: 'openrouter' });
 }
 
 async function callOpenAI({ messages, model }) {
-  const key = clean(process.env.OPENAI_API_KEY);
   return callOpenAICompatible({
     messages,
     model,
     baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
-    apiKey: key,
+    apiKey: clean(process.env.OPENAI_API_KEY),
     provider: 'openai',
   });
+}
+
+async function tracedProvider(name, model, operation) {
+  return withSpan(`enjaz.ai.${name}`, { 'ai.provider': name, 'ai.model': model }, operation);
 }
 
 export async function generateAI({ messages, provider = process.env.AI_PROVIDER || 'auto', model }) {
@@ -104,10 +103,13 @@ export async function generateAI({ messages, provider = process.env.AI_PROVIDER 
     : ['gemini', 'openrouter', 'openai'];
   const errors = [];
   for (const name of providers) {
+    const selectedModel = model || (name === 'gemini' ? DEFAULT_GEMINI_MODEL : name === 'openrouter' ? DEFAULT_OPENROUTER_MODEL : DEFAULT_OPENAI_MODEL);
     try {
-      if (name === 'gemini') return await callGemini({ messages, model: model || DEFAULT_GEMINI_MODEL });
-      if (name === 'openrouter') return await callOpenRouter({ messages, model: model || DEFAULT_OPENROUTER_MODEL });
-      return await callOpenAI({ messages, model: model || DEFAULT_OPENAI_MODEL });
+      return await tracedProvider(name, selectedModel, () => {
+        if (name === 'gemini') return callGemini({ messages, model: selectedModel });
+        if (name === 'openrouter') return callOpenRouter({ messages, model: selectedModel });
+        return callOpenAI({ messages, model: selectedModel });
+      });
     } catch (error) {
       errors.push(`${name}: ${error instanceof Error ? error.message : String(error)}`);
     }
