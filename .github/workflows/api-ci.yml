@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: 24
           package-manager-cache: false
-      - run: npm install --ignore-scripts
+      - run: npm install --ignore-scripts --no-audit --no-fund
       - name: Prepare Supabase-compatible auth roles for RLS tests
         run: |
           PGPASSWORD=enjaz psql -h 127.0.0.1 -U enjaz -d enjaz_test -v ON_ERROR_STOP=1 <<'SQL'
