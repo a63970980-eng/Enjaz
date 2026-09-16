@@ -22,7 +22,7 @@ export async function planEmployeeTask({ employee, workspaceId, employeeId, task
     listEmployeeGoals(workspaceId, employeeId),
     listEmployeeKnowledge(workspaceId, employeeId),
   ]);
-  const context = buildBrainContext({ employee, goal, memory });
+  const context = buildBrainContext({ employee, goal, memory, workspaceId, taskId, employeeId });
   context.employee.objectives = goals.slice(0, 20).map(({ title, target, current_value, unit, period, status }) => ({ title, target, currentValue: current_value, unit, period, status }));
   context.employee.knowledge = knowledge.slice(0, 20).map(({ title, content, source, metadata }) => ({ title, content, source, metadata }));
 
