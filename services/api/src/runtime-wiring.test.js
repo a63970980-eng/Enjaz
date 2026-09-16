@@ -23,8 +23,10 @@ test('employee disable is normalized to the persisted archived enum', async () =
   assert.match(repository, /status==='disabled'\?'archived':status/);
 });
 
-test('API migration bootstraps the base schema only on a fresh database', async () => {
+test('API migration runner uses versioned migrations as the canonical schema source', async () => {
   const migration = await source('../db/migrate.js');
-  assert.match(migration, /to_regclass\('public\.organizations'\)/);
-  assert.match(migration, /if\(!base\.rows\[0\]\?\.table_name\)/);
+  assert.match(migration, /migrationsDir=path\.join\(here,'migrations'\)/);
+  assert.match(migration, /schema_migrations/);
+  assert.doesNotMatch(migration, /to_regclass\('public\.organizations'\)/);
+  assert.doesNotMatch(migration, /schemaFile/);
 });
