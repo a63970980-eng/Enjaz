@@ -5,19 +5,14 @@ import { getPool } from '../src/db.js';
 
 const here=path.dirname(fileURLToPath(import.meta.url));
 const migrationsDir=path.join(here,'migrations');
-const schemaFile=path.join(here,'schema.sql');
 const pool=getPool();
 const lockKey=748319261;
 try {
   await pool.query('select pg_advisory_lock($1)',[lockKey]);
   try {
-    // Bootstrap the immutable base schema only for a fresh database. Existing
-    // installations are advanced exclusively through versioned migrations.
-    const base=await pool.query("select to_regclass('public.organizations') as table_name");
-    if(!base.rows[0]?.table_name){
-      const schema=await fs.readFile(schemaFile,'utf8');
-      await pool.query(schema);
-    }
+    // Versioned migrations are the single source of truth. The legacy schema.sql
+    // bootstrap is intentionally not executed here because migration 001 owns
+    // the initial types and tables and executing both creates duplicate objects.
     await pool.query('create table if not exists schema_migrations (version text primary key, applied_at timestamptz not null default now())');
     const files=(await fs.readdir(migrationsDir)).filter(f=>f.endsWith('.sql')).sort();
     for(const file of files){
