@@ -10,6 +10,12 @@ async function dispatch(job){
   if(!p.workflowId)throw new Error('Workflow job requires workflowId');
   return runWorkflow({...p,workspaceId:job.workspace_id});
  }
+ if(job.job_type==='approval.execute'){
+  const {executeApprovedTask}=await import('./agent-runtime.js');
+  const p=job.payload||{};
+  if(!p.approvalId)throw new Error('Approval execution job requires approvalId');
+  return executeApprovedTask({workspaceId:job.workspace_id,approvalId:p.approvalId,actorUserId:p.actorUserId||null});
+ }
  if(job.job_type==='employee.step'){
   const {runEmployeeTask}=await import('./agent-runtime.js');
   const p=job.payload||{},s=p.step||{};
