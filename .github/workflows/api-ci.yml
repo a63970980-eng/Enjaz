@@ -59,6 +59,12 @@ jobs:
           GRANT USAGE ON SCHEMA public TO authenticated, service_role;
           GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated;
           SQL
+      - name: Provision pgvector for migration tests
+        run: |
+          POSTGRES_CONTAINER="$(docker ps --filter 'ancestor=postgres:16' --format '{{.ID}}' | head -n 1)"
+          test -n "$POSTGRES_CONTAINER"
+          docker exec "$POSTGRES_CONTAINER" bash -lc 'apt-get update && apt-get install -y --no-install-recommends postgresql-16-pgvector'
+          docker exec "$POSTGRES_CONTAINER" bash -lc 'test -f /usr/share/postgresql/16/extension/vector.control'
       - name: Apply database migrations
         run: npm run migrate
       - name: Run API tests
