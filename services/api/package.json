@@ -1,12 +1,12 @@
 {
   "name": "@enjaz/api",
   "private": true,
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "module",
   "scripts": {
-    "dev": "node src/index.js",
-    "start": "node src/index.js",
-    "worker": "node src/worker.js",
+    "dev": "node --import ./src/instrument.js src/index.js",
+    "start": "node --import ./src/instrument.js src/index.js",
+    "worker": "node --import ./src/instrument.js src/worker.js",
     "migrate": "node db/migrate.js",
     "mcp": "node src/mcp-server.js",
     "test": "node --test"
@@ -15,6 +15,7 @@
     "@ag-ui/core": "^0.0.59",
     "@modelcontextprotocol/server": "2.0.0",
     "@opentelemetry/api": "^1.9.0",
+    "@sentry/node": "10.75.0",
     "@supabase/supabase-js": "^2.57.0",
     "pg": "^8.16.3",
     "esbuild": "^0.25.0",
