@@ -101,3 +101,7 @@
   }
   #enjaz-public .enjaz-reveal{opacity:1;transform:none}
 }
+
+
+/* Public route owns the viewport; keep the authenticated shell out of the visual stack. */
+html.enjaz-public-route .enjaz-root{display:none!important;}
