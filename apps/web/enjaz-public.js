@@ -5,6 +5,8 @@ const query=new URLSearchParams(location.search);
 
 if(!hasSession()&&!query.has('auth')){
   window.__ENJAZ_PUBLIC_SHOWN__=true;
+  document.querySelector('.enjaz-root')?.setAttribute('aria-hidden','true');
+  document.documentElement.classList.add('enjaz-public-route');
   const mount=document.createElement('div');
   mount.id='enjaz-public';
   document.body.appendChild(mount);
