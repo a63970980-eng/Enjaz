@@ -100,3 +100,85 @@ if(!hasSession()&&!query.has('auth')){
   mount.querySelectorAll('[data-auth]').forEach(button=>button.addEventListener('click',()=>go(button.dataset.auth)));
   mount.querySelectorAll('[data-scroll]').forEach(button=>button.addEventListener('click',()=>document.getElementById(button.dataset.scroll)?.scrollIntoView({behavior:'smooth',block:'start'})));
 }
+
+
+if(window.__ENJAZ_PUBLIC_SHOWN__){
+  const stage=()=>document.querySelector('.workforce-stage');
+  const liveWorkforce=()=>{
+    const root=stage();
+    if(!root)return;
+    const command=root.querySelector('.stage-command strong');
+    const commandStatus=root.querySelector('.command-status');
+    const employee=root.querySelector('.employee-row strong');
+    const employeeRole=root.querySelector('.employee-row small');
+    const task=root.querySelector('.task-line span');
+    const steps=[...root.querySelectorAll('.task-flow span')];
+    const metrics=[...root.querySelectorAll('.stage-metrics strong')];
+    const live=root.querySelector('.live');
+    const scenarios=[
+      {name:'سارة',role:'مديرة خدمة العملاء · تعمل الآن',command:'إدارة طلبات العملاء',task:'تحليل طلب العميل والتحقق من البيانات ثم تجهيز الإجراء المناسب.',status:'يحلل',metric:'12',step:1},
+      {name:'عمر',role:'مدير العمليات · يعمل الآن',command:'مراقبة العمليات اليومية',task:'مراجعة سير العمليات واكتشاف حالة تحتاج إلى تدخل تشغيلي.',status:'يراقب',metric:'8',step:2},
+      {name:'مريم',role:'محللة الأعمال · تعمل الآن',command:'تحليل أداء المؤسسة',task:'مقارنة مؤشرات الأداء واستخراج الإشارات التي تستحق قرارًا.',status:'يحلل',metric:'24',step:1},
+      {name:'خالد',role:'منسق المشتريات · يعمل الآن',command:'تنسيق طلبات التوريد',task:'مطابقة الطلبات مع المخزون والسياسات وتجهيز التوصية.',status:'ينفذ',metric:'6',step:2}
+    ];
+    let index=0;
+    const render=()=>{
+      const s=scenarios[index%scenarios.length];
+      [command,employee,employeeRole,task].forEach(el=>{if(el)el.classList.add('is-updating')});
+      setTimeout(()=>{
+        if(command)command.textContent=s.command;
+        if(commandStatus)commandStatus.textContent=s.status;
+        if(employee)employee.textContent=s.name;
+        if(employeeRole)employeeRole.textContent=s.role;
+        if(task)task.textContent=s.task;
+        if(metrics[0])metrics[0].textContent=s.metric;
+        if(live)live.textContent='● LIVE';
+        steps.forEach((el,i)=>{
+          el.classList.toggle('done',i<s.step);
+          el.classList.toggle('active',i===s.step);
+        });
+        [command,employee,employeeRole,task].forEach(el=>{if(el)el.classList.remove('is-updating')});
+        index++;
+      },180);
+    };
+    render();
+    const timer=setInterval(render,4200);
+    window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
+  };
+  requestAnimationFrame(liveWorkforce);
+
+  const reveal=()=>{
+    const items=document.querySelectorAll('.public-section,.logo-strip,.final-cta,.trust-strip,.public-footer');
+    if(!('IntersectionObserver' in window)){items.forEach(el=>el.classList.add('enjaz-visible'));return}
+    const io=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(entry.isIntersecting){entry.target.classList.add('enjaz-visible');io.unobserve(entry.target)}
+    }),{threshold:.08});
+    items.forEach(el=>{el.classList.add('enjaz-reveal');io.observe(el)});
+  };
+  reveal();
+
+  const navButtons=[...document.querySelectorAll('.public-links [data-scroll]')];
+  const sections=navButtons.map(b=>document.getElementById(b.dataset.scroll)).filter(Boolean);
+  if('IntersectionObserver' in window){
+    const navIO=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      navButtons.forEach(btn=>btn.classList.toggle('is-current',btn.dataset.scroll===entry.target.id));
+    }),{rootMargin:'-35% 0px -55% 0px'});
+    sections.forEach(section=>navIO.observe(section));
+  }
+
+  const stageEl=stage();
+  if(stageEl && window.matchMedia('(pointer:fine)').matches){
+    stageEl.addEventListener('pointermove',event=>{
+      const r=stageEl.getBoundingClientRect();
+      const x=(event.clientX-r.left)/r.width-.5;
+      const y=(event.clientY-r.top)/r.height-.5;
+      stageEl.style.setProperty('--stage-x',String(x*7)+'px');
+      stageEl.style.setProperty('--stage-y',String(y*5)+'px');
+    });
+    stageEl.addEventListener('pointerleave',()=>{stageEl.style.setProperty('--stage-x','0px');stageEl.style.setProperty('--stage-y','0px')});
+  }
+
+  const prefersReduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  if(prefersReduced.matches)document.documentElement.classList.add('reduce-motion');
+}
