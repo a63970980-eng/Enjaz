@@ -216,3 +216,22 @@ html.enjaz-public-route .enjaz-root{display:none!important;}
   #enjaz-public .deck-card{min-height:142px;border-radius:18px}
   #enjaz-public .deck-card strong{font-size:14px}
 }
+
+
+#enjaz-public .deck-card{
+  transform:translate3d(0,var(--deck-y,0),0) scale(var(--deck-scale,1));
+  opacity:var(--deck-opacity,1);
+  filter:blur(var(--deck-blur,0px));
+  transition:transform .72s cubic-bezier(.22,1,.36,1),opacity .72s ease,filter .72s ease,box-shadow .28s ease;
+}
+#enjaz-public .deck-card.deck-immediate{
+  transition:none!important;
+}
+#enjaz-public .deck-card.deck-hover{
+  transform:translate3d(0,-6px,0) scale(1.015);
+}
+@media(prefers-reduced-motion:reduce){
+  #enjaz-public .deck-card{
+    transition:none!important;
+  }
+}
