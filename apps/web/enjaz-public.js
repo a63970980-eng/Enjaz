@@ -1,4 +1,5 @@
 import {authClient} from './auth-client.js';
+import gsap from 'gsap';
 
 const hasSession=()=>Boolean(authClient?.token?.());
 const query=new URLSearchParams(location.search);
@@ -52,6 +53,32 @@ if(!hasSession()&&!query.has('auth')){
       <div class="workforce-stage" aria-label="عرض حي للقوة العاملة الرقمية">
         <div class="stage-glow glow-one"></div><div class="stage-glow glow-two"></div>
         <div class="stage-top"><span class="stage-title"><i class="pulse"></i> Digital Workforce</span><span class="live">● LIVE</span></div>
+        <div class="workforce-deck" aria-label="موظفون رقميون يعملون الآن">
+          <article class="deck-card deck-card-operations" data-deck-index="0">
+            <div class="deck-card-head"><span class="deck-role">مدير العمليات</span><span class="deck-live">● يعمل الآن</span></div>
+            <strong>يراقب سير العمل والقرارات</strong>
+            <div class="deck-progress"><span style="width:82%"></span></div>
+            <small>8 عمليات قيد المتابعة · 2 تحتاج مراجعة</small>
+          </article>
+          <article class="deck-card deck-card-analytics" data-deck-index="1">
+            <div class="deck-card-head"><span class="deck-role">محلل الأعمال</span><span class="deck-live">● يحلل</span></div>
+            <strong>يحوّل البيانات إلى إشارات قابلة للقرار</strong>
+            <div class="deck-progress"><span style="width:68%"></span></div>
+            <small>24 مؤشرًا تمت مراجعته · 6 إشارات جديدة</small>
+          </article>
+          <article class="deck-card deck-card-procurement" data-deck-index="2">
+            <div class="deck-card-head"><span class="deck-role">منسق المشتريات</span><span class="deck-live">● ينفذ</span></div>
+            <strong>يطابق الطلبات مع المخزون والسياسات</strong>
+            <div class="deck-progress"><span style="width:56%"></span></div>
+            <small>6 طلبات توريد · اعتماد واحد مطلوب</small>
+          </article>
+          <article class="deck-card deck-card-service" data-deck-index="3">
+            <div class="deck-card-head"><span class="deck-role">خدمة العملاء</span><span class="deck-live">● يعالج</span></div>
+            <strong>يعالج الطلبات ويرفع النتيجة للمسؤول</strong>
+            <div class="deck-progress"><span style="width:91%"></span></div>
+            <small>12 طلبًا · 11 مكتملة تلقائيًا</small>
+          </article>
+        </div>
         <div class="stage-command"><span class="command-icon">✦</span><div><small>إنجاز الآن</small><strong>إدارة عمليات الشركة</strong></div><span class="command-status">يعمل</span></div>
         <div class="employee-panel featured">
           <div class="employee-row"><span class="employee-avatar avatar-s">س</span><div><strong>سارة</strong><small>مديرة خدمة العملاء · تعمل الآن</small></div><span class="mini-dot"></span></div>
@@ -148,6 +175,47 @@ if(window.__ENJAZ_PUBLIC_SHOWN__){
     window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
   };
   requestAnimationFrame(liveWorkforce);
+
+  const initWorkforceDeck=()=>{
+    const root=stage();
+    const cards=[...root?.querySelectorAll('.deck-card')||[]];
+    if(cards.length<2)return;
+    const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const states=[
+      {y:0,scale:1,opacity:1,z:4,filter:'blur(0px)'},
+      {y:-27,scale:.94,opacity:.84,z:3,filter:'blur(.15px)'},
+      {y:-50,scale:.88,opacity:.56,z:2,filter:'blur(.45px)'},
+      {y:-69,scale:.82,opacity:.32,z:1,filter:'blur(.8px)'}
+    ];
+    let order=cards.map((_,i)=>i);
+    const apply=({animate=true}={})=>{
+      order.forEach((cardIndex,position)=>{
+        const card=cards[cardIndex];
+        const state=states[position]||states[states.length-1];
+        card.style.zIndex=String(state.z);
+        if(reduced||!animate){
+          gsap.set(card,{y:state.y,scale:state.scale,opacity:state.opacity,filter:state.filter});
+        }else{
+          gsap.to(card,{y:state.y,scale:state.scale,opacity:state.opacity,filter:state.filter,duration:.72,ease:'power3.out',overwrite:true});
+        }
+      });
+    };
+    apply({animate:false});
+    if(reduced)return;
+    const timer=window.setInterval(()=>{
+      order=[...order.slice(1),order[0]];
+      apply();
+    },4200);
+    window.addEventListener('pagehide',()=>window.clearInterval(timer),{once:true});
+    cards.forEach(card=>{
+      card.addEventListener('pointerenter',()=>{
+        const position=order.indexOf(cards.indexOf(card));
+        if(position===0)gsap.to(card,{y:-6,scale:1.015,duration:.28,ease:'power2.out',overwrite:true});
+      });
+      card.addEventListener('pointerleave',()=>apply());
+    });
+  };
+  requestAnimationFrame(initWorkforceDeck);
 
   const reveal=()=>{
     const items=document.querySelectorAll('.public-section,.logo-strip,.final-cta,.trust-strip,.public-footer');
