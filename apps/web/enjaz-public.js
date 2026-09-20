@@ -1,5 +1,4 @@
 import {authClient} from './auth-client.js';
-import gsap from 'gsap';
 
 const hasSession=()=>Boolean(authClient?.token?.());
 const query=new URLSearchParams(location.search);
@@ -182,37 +181,37 @@ if(window.__ENJAZ_PUBLIC_SHOWN__){
     if(cards.length<2)return;
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const states=[
-      {y:0,scale:1,opacity:1,z:4,filter:'blur(0px)'},
-      {y:-27,scale:.94,opacity:.84,z:3,filter:'blur(.15px)'},
-      {y:-50,scale:.88,opacity:.56,z:2,filter:'blur(.45px)'},
-      {y:-69,scale:.82,opacity:.32,z:1,filter:'blur(.8px)'}
+      {y:0,scale:1,opacity:1,z:4,blur:0},
+      {y:-27,scale:.94,opacity:.84,z:3,blur:.15},
+      {y:-50,scale:.88,opacity:.56,z:2,blur:.45},
+      {y:-69,scale:.82,opacity:.32,z:1,blur:.8}
     ];
     let order=cards.map((_,i)=>i);
-    const apply=({animate=true}={})=>{
+    const paint=({animate=true}={})=>{
       order.forEach((cardIndex,position)=>{
         const card=cards[cardIndex];
         const state=states[position]||states[states.length-1];
         card.style.zIndex=String(state.z);
-        if(reduced||!animate){
-          gsap.set(card,{y:state.y,scale:state.scale,opacity:state.opacity,filter:state.filter});
-        }else{
-          gsap.to(card,{y:state.y,scale:state.scale,opacity:state.opacity,filter:state.filter,duration:.72,ease:'power3.out',overwrite:true});
-        }
+        card.style.setProperty('--deck-y',state.y+'px');
+        card.style.setProperty('--deck-scale',String(state.scale));
+        card.style.setProperty('--deck-opacity',String(state.opacity));
+        card.style.setProperty('--deck-blur',state.blur+'px');
+        if(reduced||!animate)card.classList.add('deck-immediate');
+        else card.classList.remove('deck-immediate');
       });
     };
-    apply({animate:false});
+    paint({animate:false});
     if(reduced)return;
     const timer=window.setInterval(()=>{
       order=[...order.slice(1),order[0]];
-      apply();
+      paint();
     },4200);
     window.addEventListener('pagehide',()=>window.clearInterval(timer),{once:true});
     cards.forEach(card=>{
       card.addEventListener('pointerenter',()=>{
-        const position=order.indexOf(cards.indexOf(card));
-        if(position===0)gsap.to(card,{y:-6,scale:1.015,duration:.28,ease:'power2.out',overwrite:true});
+        if(order.indexOf(cards.indexOf(card))===0)card.classList.add('deck-hover');
       });
-      card.addEventListener('pointerleave',()=>apply());
+      card.addEventListener('pointerleave',()=>card.classList.remove('deck-hover'));
     });
   };
   requestAnimationFrame(initWorkforceDeck);
