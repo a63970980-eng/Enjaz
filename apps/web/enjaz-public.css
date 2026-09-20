@@ -105,3 +105,114 @@
 
 /* Public route owns the viewport; keep the authenticated shell out of the visual stack. */
 html.enjaz-public-route .enjaz-root{display:none!important;}
+
+
+/* Workforce hero deck — stacked, purposeful motion inspired by enterprise product storytelling */
+#enjaz-public .workforce-stage{
+  min-height:560px;
+  perspective:1200px;
+}
+#enjaz-public .workforce-deck{
+  position:relative;
+  height:190px;
+  margin:20px 0 6px;
+  isolation:isolate;
+}
+#enjaz-public .deck-card{
+  position:absolute;
+  inset:0 2px auto;
+  min-height:156px;
+  border-radius:20px;
+  padding:17px 18px;
+  overflow:hidden;
+  transform-origin:center top;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 20px 45px rgba(0,0,0,.18);
+  color:#fff;
+  will-change:transform,opacity,filter;
+  background:linear-gradient(135deg,#0e4fba,#0b2c63);
+}
+#enjaz-public .deck-card::after{
+  content:'';
+  position:absolute;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  right:-65px;
+  bottom:-105px;
+  background:rgba(22,169,183,.18);
+  filter:blur(8px);
+  pointer-events:none;
+}
+#enjaz-public .deck-card-analytics{background:linear-gradient(135deg,#173f9e,#3154c7)}
+#enjaz-public .deck-card-procurement{background:linear-gradient(135deg,#075c67,#0b8f93)}
+#enjaz-public .deck-card-service{background:linear-gradient(135deg,#0a2f75,#1769e8)}
+#enjaz-public .deck-card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  position:relative;
+  z-index:1;
+}
+#enjaz-public .deck-role{
+  font-size:10px;
+  font-weight:800;
+  color:#dbe9ff;
+  letter-spacing:.02em;
+}
+#enjaz-public .deck-live{
+  font-size:8px;
+  color:#80e4bb;
+  white-space:nowrap;
+}
+#enjaz-public .deck-card strong{
+  display:block;
+  position:relative;
+  z-index:1;
+  max-width:78%;
+  margin-top:14px;
+  color:#fff;
+  font-size:17px;
+  line-height:1.45;
+}
+#enjaz-public .deck-card small{
+  display:block;
+  position:relative;
+  z-index:1;
+  margin-top:9px;
+  color:#afc4df;
+  font-size:8px;
+}
+#enjaz-public .deck-progress{
+  position:relative;
+  z-index:1;
+  height:4px;
+  max-width:62%;
+  margin-top:13px;
+  overflow:hidden;
+  border-radius:99px;
+  background:rgba(255,255,255,.13);
+}
+#enjaz-public .deck-progress span{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#61d9e2,#fff);
+  box-shadow:0 0 14px rgba(97,217,226,.55);
+}
+#enjaz-public .workforce-stage .stage-command{
+  margin-top:10px;
+}
+@media(max-width:800px){
+  #enjaz-public .workforce-stage{min-height:560px}
+  #enjaz-public .workforce-deck{height:178px}
+  #enjaz-public .deck-card{min-height:146px;padding:15px}
+  #enjaz-public .deck-card strong{font-size:15px;max-width:84%}
+}
+@media(max-width:560px){
+  #enjaz-public .workforce-stage{min-height:590px}
+  #enjaz-public .workforce-deck{height:172px;margin-top:17px}
+  #enjaz-public .deck-card{min-height:142px;border-radius:18px}
+  #enjaz-public .deck-card strong{font-size:14px}
+}
