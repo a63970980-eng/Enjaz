@@ -52,31 +52,45 @@ if(!hasSession()&&!query.has('auth')){
       <div class="workforce-stage" aria-label="عرض حي للقوة العاملة الرقمية">
         <div class="stage-glow glow-one"></div><div class="stage-glow glow-two"></div>
         <div class="stage-top"><span class="stage-title"><i class="pulse"></i> Digital Workforce</span><span class="live">● LIVE</span></div>
-        <div class="workforce-deck" aria-label="موظفون رقميون يعملون الآن">
-          <article class="deck-card deck-card-operations" data-deck-index="0">
-            <div class="deck-card-head"><span class="deck-role">مدير العمليات</span><span class="deck-live">● يعمل الآن</span></div>
-            <strong>يراقب سير العمل والقرارات</strong>
-            <div class="deck-progress"><span style="width:82%"></span></div>
-            <small>8 عمليات قيد المتابعة · 2 تحتاج مراجعة</small>
-          </article>
-          <article class="deck-card deck-card-analytics" data-deck-index="1">
-            <div class="deck-card-head"><span class="deck-role">محلل الأعمال</span><span class="deck-live">● يحلل</span></div>
-            <strong>يحوّل البيانات إلى إشارات قابلة للقرار</strong>
-            <div class="deck-progress"><span style="width:68%"></span></div>
-            <small>24 مؤشرًا تمت مراجعته · 6 إشارات جديدة</small>
-          </article>
-          <article class="deck-card deck-card-procurement" data-deck-index="2">
-            <div class="deck-card-head"><span class="deck-role">منسق المشتريات</span><span class="deck-live">● ينفذ</span></div>
-            <strong>يطابق الطلبات مع المخزون والسياسات</strong>
-            <div class="deck-progress"><span style="width:56%"></span></div>
-            <small>6 طلبات توريد · اعتماد واحد مطلوب</small>
-          </article>
-          <article class="deck-card deck-card-service" data-deck-index="3">
-            <div class="deck-card-head"><span class="deck-role">خدمة العملاء</span><span class="deck-live">● يعالج</span></div>
-            <strong>يعالج الطلبات ويرفع النتيجة للمسؤول</strong>
-            <div class="deck-progress"><span style="width:91%"></span></div>
-            <small>12 طلبًا · 11 مكتملة تلقائيًا</small>
-          </article>
+        <div class="workforce-visual" aria-label="محاكاة حية لفريق إنجاز الرقمي">
+          <div class="visual-grid" aria-hidden="true"></div>
+          <div class="visual-orbit orbit-a" aria-hidden="true"></div>
+          <div class="visual-orbit orbit-b" aria-hidden="true"></div>
+          <span class="visual-node node-a" aria-hidden="true"></span>
+          <span class="visual-node node-b" aria-hidden="true"></span>
+          <span class="visual-node node-c" aria-hidden="true"></span>
+          <div class="workforce-deck" aria-label="موظفون رقميون يعملون الآن">
+            <article class="deck-card deck-card-operations" data-deck-index="0">
+              <div class="deck-accent"></div>
+              <div class="deck-card-head"><span class="deck-person"><span class="deck-avatar">ع</span><span><b>عمر</b><small>مدير العمليات</small></span></span><span class="deck-live">● يعمل الآن</span></div>
+              <strong>مراقبة العمليات اليومية</strong>
+              <div class="deck-task"><span class="task-icon">↗</span><span>اكتشاف حالة تحتاج إلى تدخل تشغيلي</span></div>
+              <div class="deck-bottom"><span>8 عمليات</span><span class="deck-progress"><i style="width:82%"></i></span><em>82%</em></div>
+            </article>
+            <article class="deck-card deck-card-analytics" data-deck-index="1">
+              <div class="deck-accent"></div>
+              <div class="deck-card-head"><span class="deck-person"><span class="deck-avatar">م</span><span><b>مريم</b><small>محللة الأعمال</small></span></span><span class="deck-live">● يحلل</span></div>
+              <strong>تحليل أداء المؤسسة</strong>
+              <div class="deck-task"><span class="task-icon">⌁</span><span>استخراج الإشارات التي تستحق قرارًا</span></div>
+              <div class="deck-bottom"><span>24 مؤشرًا</span><span class="deck-progress"><i style="width:68%"></i></span><em>68%</em></div>
+            </article>
+            <article class="deck-card deck-card-procurement" data-deck-index="2">
+              <div class="deck-accent"></div>
+              <div class="deck-card-head"><span class="deck-person"><span class="deck-avatar">خ</span><span><b>خالد</b><small>منسق المشتريات</small></span></span><span class="deck-live">● ينفذ</span></div>
+              <strong>تنسيق طلبات التوريد</strong>
+              <div class="deck-task"><span class="task-icon">✓</span><span>مطابقة الطلبات مع المخزون والسياسات</span></div>
+              <div class="deck-bottom"><span>6 طلبات</span><span class="deck-progress"><i style="width:56%"></i></span><em>56%</em></div>
+            </article>
+            <article class="deck-card deck-card-service" data-deck-index="3">
+              <div class="deck-accent"></div>
+              <div class="deck-card-head"><span class="deck-person"><span class="deck-avatar">س</span><span><b>سارة</b><small>مديرة خدمة العملاء</small></span></span><span class="deck-live">● تعالج</span></div>
+              <strong>معالجة طلب العميل</strong>
+              <div class="deck-task"><span class="task-icon">→</span><span>التحقق ثم تنفيذ الإجراء وإرسال النتيجة</span></div>
+              <div class="deck-bottom"><span>12 طلبًا</span><span class="deck-progress"><i style="width:91%"></i></span><em>91%</em></div>
+            </article>
+          </div>
+          <div class="visual-command"><span class="command-spark">✦</span><div><small>إنجاز ينفذ الآن</small><strong>تحليل ← تخطيط ← موافقة ← تنفيذ</strong></div><span class="command-live"><i></i> LIVE</span></div>
+          <div class="visual-telemetry"><span><i></i> أدوات متصلة 12</span><span>مهام نشطة 08</span><span>قرارات بانتظار الاعتماد 02</span></div>
         </div>
         <div class="stage-command"><span class="command-icon">✦</span><div><small>إنجاز الآن</small><strong>إدارة عمليات الشركة</strong></div><span class="command-status">يعمل</span></div>
         <div class="employee-panel featured">
@@ -180,41 +194,20 @@ if(window.__ENJAZ_PUBLIC_SHOWN__){
     const cards=[...root?.querySelectorAll('.deck-card')||[]];
     if(cards.length<2)return;
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const states=[
-      {y:0,scale:1,opacity:1,z:4,blur:0},
-      {y:-27,scale:.94,opacity:.84,z:3,blur:.15},
-      {y:-50,scale:.88,opacity:.56,z:2,blur:.45},
-      {y:-69,scale:.82,opacity:.32,z:1,blur:.8}
-    ];
-    let order=cards.map((_,i)=>i);
-    const paint=({animate=true}={})=>{
-      order.forEach((cardIndex,position)=>{
-        const card=cards[cardIndex];
-        const state=states[position]||states[states.length-1];
-        card.style.zIndex=String(state.z);
-        card.style.setProperty('--deck-y',state.y+'px');
-        card.style.setProperty('--deck-scale',String(state.scale));
-        card.style.setProperty('--deck-opacity',String(state.opacity));
-        card.style.setProperty('--deck-blur',state.blur+'px');
-        if(reduced||!animate)card.classList.add('deck-immediate');
-        else card.classList.remove('deck-immediate');
+    const paint=()=>{
+      cards.forEach((card,index)=>{
+        card.style.setProperty('--deck-order',String(index));
       });
     };
-    paint({animate:false});
+    paint();
     if(reduced)return;
     const timer=window.setInterval(()=>{
-      order=[...order.slice(1),order[0]];
-      paint();
+      cards.forEach(card=>card.classList.remove('deck-flash'));
+      requestAnimationFrame(()=>cards.forEach(card=>card.classList.add('deck-flash')));
     },4200);
     window.addEventListener('pagehide',()=>window.clearInterval(timer),{once:true});
-    cards.forEach(card=>{
-      card.addEventListener('pointerenter',()=>{
-        if(order.indexOf(cards.indexOf(card))===0)card.classList.add('deck-hover');
-      });
-      card.addEventListener('pointerleave',()=>card.classList.remove('deck-hover'));
-    });
   };
-  requestAnimationFrame(initWorkforceDeck);
+
 
   const reveal=()=>{
     const items=document.querySelectorAll('.public-section,.logo-strip,.final-cta,.trust-strip,.public-footer');
