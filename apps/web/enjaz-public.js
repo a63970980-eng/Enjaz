@@ -196,7 +196,7 @@ if(window.__ENJAZ_PUBLIC_SHOWN__){
     const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const paint=()=>{
       cards.forEach((card,index)=>{
-        card.style.setProperty('--deck-order',String(index));
+        card.style.animationDelay=String(-index*4.2)+'s';
       });
     };
     paint();
