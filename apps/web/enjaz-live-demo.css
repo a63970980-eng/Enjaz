@@ -1,0 +1,35 @@
+/* Enjaz Live Product Demo — v1 */
+#enjaz-public .enjaz-live-demo{position:relative;z-index:10;width:min(100%,980px);margin:0 auto;padding:18px;border:1px solid rgba(196,222,244,.9);border-radius:28px;background:linear-gradient(145deg,#ffffff,#f4fbff);box-shadow:0 30px 80px rgba(3,45,96,.16),inset 0 1px #fff;overflow:hidden;color:#032d60}
+#enjaz-public .enjaz-live-demo:before{content:"";position:absolute;inset:-30% -10%;background:radial-gradient(circle at 50% 45%,rgba(20,209,190,.14),transparent 32%),radial-gradient(circle at 85% 10%,rgba(18,91,232,.13),transparent 28%);pointer-events:none}
+#enjaz-public .eld-chrome{position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:6px 6px 16px;border-bottom:1px solid #e5eef5}
+#enjaz-public .eld-title{display:flex;align-items:center;gap:10px;font-weight:800;font-size:12px}
+#enjaz-public .eld-logo{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#0759ea,#16b99d);box-shadow:0 8px 20px rgba(7,89,234,.2)}
+#enjaz-public .eld-live{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#edfbf6;border:1px solid #c9eee1;color:#07855b;font-size:9px;font-weight:800}
+#enjaz-public .eld-live i{width:6px;height:6px;border-radius:50%;background:#13b879;box-shadow:0 0 10px #13b879}
+#enjaz-public .eld-body{position:relative;display:grid;grid-template-columns:190px minmax(0,1fr) 190px;gap:14px;padding:18px 4px 4px}
+#enjaz-public .eld-panel{border:1px solid #dce9f2;background:rgba(255,255,255,.86);border-radius:19px;padding:13px;box-shadow:0 12px 28px rgba(3,45,96,.07)}
+#enjaz-public .eld-panel h4{margin:0 0 11px;font-size:10px;color:#698198}
+#enjaz-public .eld-sector{display:flex;align-items:center;gap:9px;padding:9px;border-radius:13px;border:1px solid transparent;cursor:pointer;transition:.25s}
+#enjaz-public .eld-sector.active{background:#edf7ff;border-color:#bcdcf5;box-shadow:0 8px 20px rgba(7,89,234,.08)}
+#enjaz-public .eld-sector b{font-size:10px}#enjaz-public .eld-sector small{display:block;color:#8295a8;font-size:7px;margin-top:2px}
+#enjaz-public .eld-icon{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;background:#f0f7fc;font-size:15px}
+#enjaz-public .eld-core{position:relative;min-height:330px;border:1px solid #dce9f2;border-radius:23px;background:linear-gradient(180deg,#fbfdff,#f0f8fd);overflow:hidden;padding:17px}
+#enjaz-public .eld-core:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(15,89,142,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(15,89,142,.05) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent)}
+#enjaz-public .eld-flow{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:17px;z-index:2}
+#enjaz-public .eld-step{font-size:8px;font-weight:800;padding:7px 9px;border-radius:999px;background:#fff;border:1px solid #d8e6ef;color:#7890a4;transition:.3s}
+#enjaz-public .eld-step.active{color:#0759ea;border-color:#8bc4ed;background:#edf7ff;box-shadow:0 7px 18px rgba(7,89,234,.12)}
+#enjaz-public .eld-arrow{color:#a4b7c7;font-size:11px}
+#enjaz-public .eld-workcard{position:relative;z-index:2;max-width:500px;margin:0 auto;padding:17px;border-radius:20px;background:#fff;border:1px solid #d6e5ef;box-shadow:0 20px 40px rgba(3,45,96,.12);transition:.4s}
+#enjaz-public .eld-workhead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#enjaz-public .eld-person{display:flex;align-items:center;gap:10px}.eld-person .avatar{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#0759ea,#16b99d);font-weight:800}
+#enjaz-public .eld-person b{display:block;font-size:11px}.eld-person small{display:block;color:#8194a7;font-size:7px;margin-top:3px}
+#enjaz-public .eld-status{font-size:7px;font-weight:800;color:#07855b;background:#edf9f4;padding:6px 8px;border-radius:999px}
+#enjaz-public .eld-task{margin-top:15px;padding:11px;border-radius:13px;background:#f5f9fc;color:#536d82;font-size:8px;line-height:1.7}
+#enjaz-public .eld-bars{display:grid;gap:7px;margin-top:14px}.eld-bar{display:flex;align-items:center;gap:8px;font-size:7px;color:#7c91a3}.eld-bar i{height:6px;flex:1;background:#e6eef4;border-radius:99px;overflow:hidden}.eld-bar i:after{content:"";display:block;width:var(--w,70%);height:100%;background:linear-gradient(90deg,#0759ea,#16b99d);border-radius:inherit;animation:eldBar 2.8s ease-in-out infinite}
+#enjaz-public .eld-result{position:relative;z-index:2;margin:14px auto 0;max-width:500px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.eld-result div{padding:9px;border-radius:12px;background:#fff;border:1px solid #e0ebf2;text-align:center}.eld-result b{display:block;font-size:12px}.eld-result small{font-size:6px;color:#8295a8}
+#enjaz-public .eld-right .eld-mini{padding:10px 0;border-bottom:1px solid #edf2f6}.eld-mini:last-child{border:0}.eld-mini strong{display:block;font-size:9px}.eld-mini span{display:block;font-size:7px;color:#8194a7;margin-top:3px}
+#enjaz-public .eld-activity{display:flex;align-items:center;gap:7px;margin-top:8px}.eld-dot{width:7px;height:7px;border-radius:50%;background:#16b99d;box-shadow:0 0 9px rgba(22,185,157,.5)}
+#enjaz-public .eld-caption{position:relative;text-align:center;margin:15px 0 2px;color:#587287;font-size:9px}.eld-caption b{color:#032d60}
+@keyframes eldBar{0%,100%{transform:scaleX(.82);transform-origin:left}50%{transform:scaleX(1);transform-origin:left}}
+@media(max-width:760px){#enjaz-public .eld-body{grid-template-columns:1fr;}.eld-left{display:none!important}#enjaz-public .eld-right{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.eld-right h4{grid-column:1/-1;margin-bottom:0}.eld-mini{border:0!important;padding:8px!important;background:#f7fafc;border-radius:10px}.eld-mini span{font-size:6px}#enjaz-public .eld-core{min-height:325px}}
+@media(prefers-reduced-motion:reduce){#enjaz-public .eld-bar i:after{animation:none}}
