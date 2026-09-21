@@ -67,3 +67,24 @@ Therefore new libraries must complement these primitives rather than replace the
 ## Decision rule
 
 Every new dependency must remove measurable complexity, improve a user-facing capability, or close a production reliability/security gap. Otherwise it stays out.
+
+
+## Implemented in the current frontend
+
+The repository now uses these open-source foundations directly in the production web path:
+
+- Motion 13.4.x (`motion`) for framework-agnostic JavaScript animation, entrance choreography, staggered surfaces, and restrained pointer-depth interaction on the public experience.
+- Lucide 1.47.x (`lucide`) for consistent SVG iconography in the canonical V4 workspace shell instead of ad-hoc Unicode glyphs.
+- Playwright 1.63.x (`@playwright/test`) for end-to-end browser coverage.
+- axe-core 4.13.x (`@axe-core/playwright`) for automated accessibility checks alongside browser flows.
+
+The following remain deliberate architecture choices:
+
+- The existing execution runtime, queue/worker, approvals, tool gateway, policy layer, Supabase/RLS and telemetry remain the source of truth.
+- OpenAI Agents SDK and LangGraph remain candidates for isolated adapters/evaluations, not replacements for the current runtime.
+- React Flow/XYFlow is not introduced while the canonical frontend remains Vite + vanilla JavaScript; a framework migration solely to adopt a UI library would add unnecessary risk.
+- Charting libraries are not introduced until the analytics surface requires richer interactive charts than the current CSS/data visualizations.
+
+## GitHub research references
+
+Research was performed against the official repositories for Motion, Lucide, Playwright, axe-core, Vercel AI SDK, OpenAI Agents JS, LangGraph JS, AG-UI, XYFlow, Chart.js, and OpenTelemetry JS. Selection is based on fit with the existing architecture, not popularity alone.
