@@ -1,26 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "npm install --prefix services/api && npm install --prefix apps/web",
-  "buildCommand": "npm run build --prefix apps/web && ./services/api/node_modules/.bin/esbuild services/api/src/index.js --bundle --platform=node --format=cjs --outfile=api/server.cjs",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm --filter @enjaz/web build",
   "outputDirectory": "apps/web/dist",
-  "rewrites": [
-    {
-      "source": "/api/v1/:path*",
-      "destination": "/api?__enjaz_path=/api/v1/:path*"
-    }
-  ],
+  "rewrites": [{ "source": "/api/v1/:path*", "destination": "/api?__enjaz_path=/api/v1/:path*" }],
   "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    },
-    "api/[...path].js": {
-      "maxDuration": 30
-    },
-    "api/v1/index.js": {
-      "maxDuration": 30
-    },
-    "api/v1/[...path].js": {
-      "maxDuration": 30
-    }
-  }
+    "api/index.js": { "maxDuration": 30 },
+    "api/[...path].js": { "maxDuration": 30 },
+    "api/v1/index.js": { "maxDuration": 30 },
+    "api/v1/[...path].js": { "maxDuration": 30 }
+  },
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "X-Frame-Options", "value": "DENY" },
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=()" },
+      { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+    ]},
+    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+  ]
 }
