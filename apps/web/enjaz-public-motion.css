@@ -1,0 +1,4 @@
+/* Motion-powered interaction layer. Keeps animation optional and honors reduced-motion preferences. */
+#enjaz-public .workforce-stage,#enjaz-public .deck-card,#enjaz-public .employee-catalog-preview article,#enjaz-public .cap-card,#enjaz-public .flow-step{transform:perspective(1100px) rotateX(var(--enjaz-tilt-x,0deg)) rotateY(var(--enjaz-tilt-y,0deg));transform-style:preserve-3d;will-change:transform}
+#enjaz-public .deck-card,#enjaz-public .employee-catalog-preview article,#enjaz-public .cap-card,#enjaz-public .flow-step{transition:transform .24s cubic-bezier(.22,1,.36,1),box-shadow .24s ease}
+#enjaz-public .deck-card:hover{box-shadow:0 28px 60px rgba(3,45,96,.28)!important}
