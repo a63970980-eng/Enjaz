@@ -1,4 +1,5 @@
 import {apiClient} from './api-client.js';
+import {createIcons,Home,Users,Check,Workflow,ShieldCheck,BarChart3,Plug,ClipboardList,Sparkles,ArrowRight,Search,Bell,CircleHelp,Menu} from 'lucide';
 
 const esc=v=>String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));
 const root=()=>document.getElementById('content');
@@ -21,7 +22,9 @@ const nav=[
  ['integrations','التكاملات','⊕','الأنظمة والأدوات المتصلة'],
  ['audit','الحوكمة والتدقيق','▤','الأحداث والسياسات والسجل']
 ];
-function icon(i){return `<span class="ev4-icon">${i}</span>`}
+const iconMap={'⌂':'home','◉':'users','✓':'check','↯':'workflow','◇':'shield-check','◌':'bar-chart-3','⊕':'plug','▤':'clipboard-list','✦':'sparkles','←':'arrow-right','⌕':'search','♢':'bell','?':'circle-help','☰':'menu'};
+const iconSet={Home,Users,Check,Workflow,ShieldCheck,BarChart3,Plug,ClipboardList,Sparkles,ArrowRight,Search,Bell,CircleHelp,Menu};
+function icon(i){return `<span class="ev4-icon" data-lucide="${i in iconMap?iconMap[i]:'circle'}" aria-hidden="true"></span>`}
 function status(v){const s=norm(v||'unknown');const label={active:'نشط',running:'قيد التنفيذ',in_progress:'قيد التنفيذ',processing:'قيد التنفيذ',queued:'بالانتظار',pending:'معلق',completed:'مكتمل',done:'مكتمل',success:'ناجح',paused:'متوقف',disabled:'معطل'}[s]||String(v||'غير محدد');return `<span class="ev4-status ev4-status-${s}"><i></i>${esc(label)}</span>`}
 function employeeName(id){return state.employees.find(x=>String(x.id)===String(id))?.name||'غير محدد'}
 function time(v){if(!v)return '—';const d=new Date(v);if(Number.isNaN(d.getTime()))return esc(v);const m=Math.max(0,Math.floor((Date.now()-d)/60000));if(m<1)return 'الآن';if(m<60)return `منذ ${m} د`;const h=Math.floor(m/60);if(h<24)return `منذ ${h} س`;return `منذ ${Math.floor(h/24)} ي`}
@@ -54,6 +57,6 @@ async function planTask(id){try{await apiClient.planTask(ws(),tk(),id,{});await 
 async function revoke(id){try{await apiClient.revokeIntegration(ws(),tk(),id);await load()}catch(e){state.error=e?.message||'تعذر إلغاء التكامل.';render()}}
 async function openEmployee(id){if(typeof window.ENJAZ_OPEN_EMPLOYEE_360==='function'){window.ENJAZ_OPEN_EMPLOYEE_360(id);return}state.error='ملف الموظف 360 غير متاح حاليًا.';render()}
 function palette(){if(!state.palette)return '';return `<div class="ev4-palette-backdrop" data-close-palette><div class="ev4-palette" onclick="event.stopPropagation()"><div class="ev4-palette-search"><span>⌕</span><input data-palette-input placeholder="ابحث في إنجاز…" value="${esc(state.query)}"><kbd>ESC</kbd></div><div class="ev4-palette-items">${nav.map(([id,label,ic,sub])=>`<button class="ev4-palette-item" data-palette-action="${id}">${icon(ic)}<span><strong>${label}</strong><small>${sub}</small></span><kbd>↵</kbd></button>`).join('')}<button class="ev4-palette-item" data-palette-action="workforce">${icon('✦')}<span><strong>مكتبة القوى العاملة</strong><small>فتح الموظفين الجاهزين</small></span><kbd>↵</kbd></button></div></div></div>`}
-function render(){const el=root();if(!el)return;try{el.innerHTML=shell()+palette();wire()}catch(e){el.innerHTML=`<div class="boot-error"><strong>تعذر عرض مركز القيادة</strong><span>${esc(e.message||'خطأ غير متوقع')}</span><button onclick="location.reload()">إعادة المحاولة</button></div>`}}
+function render(){const el=root();if(!el)return;try{el.innerHTML=shell()+palette();createIcons({root:el,icons:iconSet,attrs:{'stroke-width':1.8}});wire()}catch(e){el.innerHTML=`<div class="boot-error"><strong>تعذر عرض مركز القيادة</strong><span>${esc(e.message||'خطأ غير متوقع')}</span><button onclick="location.reload()">إعادة المحاولة</button></div>`}}
 window.ENJAZ_WORKSPACE_V4={render,load,openLibrary};
 render();load();
