@@ -1,0 +1,137 @@
+
+/* ENJAZ LUXURY OS — public experience
+   Visual language: premium enterprise, dark observatory command center, luminous blue/cyan,
+   restrained glass, strong typography, live operational storytelling. */
+#enjaz-public{--lx-ink:#071a33;--lx-navy:#06152d;--lx-blue:#1677ff;--lx-cyan:#23d6df;--lx-green:#35d39a;--lx-muted:#71839a;--lx-line:#dce6f1;--lx-soft:#f5f8fc;font-family:"IBM Plex Sans Arabic","Cairo",sans-serif;color:var(--lx-ink);background:#fff;overflow:hidden}
+#enjaz-public *{box-sizing:border-box}
+#enjaz-public button,#enjaz-public a{font:inherit}
+#enjaz-public .public-nav{position:fixed!important;inset:0 0 auto;z-index:100;height:76px;padding:0 clamp(20px,5vw,78px);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.78)!important;border-bottom:1px solid rgba(211,224,238,.72)!important;backdrop-filter:blur(24px) saturate(150%);box-shadow:0 10px 35px rgba(4,30,65,.05)}
+#enjaz-public .public-brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--lx-ink)!important}
+#enjaz-public .public-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,#061a3b,#116ef0 60%,#21cfd7)!important;color:#fff;font-weight:900;box-shadow:0 12px 28px rgba(12,91,211,.23)}
+#enjaz-public .public-brand strong{font-size:18px;line-height:1}
+#enjaz-public .public-brand small{display:block;margin-top:4px;font-size:8px;letter-spacing:.13em;color:#7d8fa4}
+#enjaz-public .public-links{gap:7px!important}
+#enjaz-public .public-links button{border:0;background:transparent!important;color:#53667e;padding:9px 13px!important;font-size:12px;font-weight:700;cursor:pointer}
+#enjaz-public .public-links button:hover{color:var(--lx-blue)!important}
+#enjaz-public .public-login{border:1px solid #d6e1ed!important;background:#fff!important;border-radius:10px!important}
+#enjaz-public .public-nav-cta,#enjaz-public .public-primary{border:0!important;border-radius:10px!important;background:linear-gradient(100deg,#0a62e9,#17a5ee 62%,#22c5bf)!important;color:#fff!important;box-shadow:0 14px 32px rgba(15,105,220,.25)!important}
+#enjaz-public .public-nav-cta{padding:10px 17px!important}
+#enjaz-public .public-hero{position:relative;display:grid;grid-template-columns:minmax(0,.85fr) minmax(520px,1.15fr);align-items:center;gap:clamp(30px,5vw,80px);min-height:900px;padding:132px clamp(20px,6vw,100px) 90px;background:radial-gradient(circle at 76% 42%,rgba(36,213,223,.12),transparent 25%),radial-gradient(circle at 92% 8%,rgba(25,111,255,.12),transparent 27%),linear-gradient(135deg,#fff 20%,#f5f9fd 100%)}
+#enjaz-public .public-hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(14,67,125,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(14,67,125,.035) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(to right,transparent 0,#000 45%,#000 100%);pointer-events:none}
+#enjaz-public .hero-copy{position:relative;z-index:3;max-width:650px}
+#enjaz-public .public-kicker{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid #dce7f2;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 8px 25px rgba(13,54,98,.06);color:#376180;font-size:10px;font-weight:900;letter-spacing:.03em}
+#enjaz-public .public-kicker i{width:7px;height:7px;border-radius:50%;background:var(--lx-green);box-shadow:0 0 0 5px rgba(53,211,154,.11)}
+#enjaz-public .public-kicker b{padding:3px 6px;border-radius:5px;background:#e7f9f7;color:#0a9e7a;font-size:8px}
+#enjaz-public .public-hero h1{margin:24px 0 20px;font-size:clamp(47px,5.6vw,80px);line-height:1.02;letter-spacing:-.065em;color:#071e3f;font-weight:900}
+#enjaz-public .public-hero h1 span{background:linear-gradient(100deg,#0a61e9,#0a9be9 50%,#12bda7);-webkit-background-clip:text;background-clip:text;color:transparent}
+#enjaz-public .public-hero p{max-width:610px;margin:0 0 28px;color:#637891;font-size:16px;line-height:2}
+#enjaz-public .public-actions{gap:10px!important}
+#enjaz-public .public-primary{padding:15px 22px!important;font-weight:900}
+#enjaz-public .public-secondary{border:1px solid #cfdde9!important;border-radius:10px!important;background:#fff!important;color:#31506f!important;padding:14px 18px!important}
+#enjaz-public .public-secondary .play{font-size:9px;margin-left:7px}
+#enjaz-public .public-trust-line{gap:17px!important;margin-top:19px;font-size:10px;color:#8191a4}
+#enjaz-public .public-trust-line span:first-child{color:#0b9c78}
+
+#enjaz-public .workforce-stage{position:relative;z-index:4;min-height:590px!important;padding:17px!important;border-radius:28px!important;background:linear-gradient(145deg,#071a35,#0b2a53 55%,#0b3861)!important;border:1px solid rgba(112,181,235,.24)!important;box-shadow:0 50px 110px rgba(5,34,70,.28),0 1px 0 rgba(255,255,255,.1) inset!important;transform:translate3d(var(--stage-x,0),var(--stage-y,0),0);transition:transform .25s ease}
+#enjaz-public .workforce-stage:before{content:"";position:absolute;inset:-90px -120px;background:radial-gradient(circle at 60% 50%,rgba(27,183,255,.18),transparent 44%);z-index:-1;filter:blur(15px)}
+#enjaz-public .stage-top{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 13px;color:#fff}
+#enjaz-public .stage-title{font-size:10px;letter-spacing:.1em;font-weight:900;text-transform:uppercase}
+#enjaz-public .stage-title .pulse{display:inline-block;width:7px;height:7px;margin-left:6px;border-radius:50%;background:#38dfa5;box-shadow:0 0 0 5px rgba(56,223,165,.1)}
+#enjaz-public .live{font-size:8px;color:#54e1b0;letter-spacing:.13em;font-weight:900}
+#enjaz-public .workforce-visual{position:relative;min-height:390px!important;border:1px solid rgba(120,190,235,.2)!important;border-radius:21px!important;background:linear-gradient(145deg,rgba(14,48,82,.92),rgba(5,25,53,.98))!important;overflow:hidden!important}
+#enjaz-public .workforce-visual:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(111,190,238,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(111,190,238,.055) 1px,transparent 1px);background-size:38px 38px}
+#enjaz-public .workforce-visual:after{content:"";position:absolute;width:480px;height:480px;left:50%;top:45%;transform:translate(-50%,-50%);border:1px solid rgba(43,205,218,.12);border-radius:50%;box-shadow:0 0 0 70px rgba(25,164,206,.025),0 0 0 140px rgba(25,164,206,.02)}
+#enjaz-public .visual-grid,#enjaz-public .visual-orbit,#enjaz-public .visual-node{display:none}
+#enjaz-public .workforce-deck{position:absolute;inset:0;z-index:6}
+#enjaz-public .deck-card{width:214px!important;padding:14px!important;border-radius:15px!important;background:rgba(9,31,57,.88)!important;border:1px solid rgba(132,205,244,.2)!important;color:#dcecf8!important;box-shadow:0 20px 45px rgba(0,0,0,.24)!important;backdrop-filter:blur(14px);animation:luxFloat 6s ease-in-out infinite}
+#enjaz-public .deck-card-operations{right:5%;top:26px;transform:rotate(2deg)}
+#enjaz-public .deck-card-analytics{left:4%;top:86px;transform:rotate(-2deg) scale(.94);animation-delay:-2s}
+#enjaz-public .deck-card-procurement{right:9%;bottom:25px;transform:rotate(-2deg) scale(.92);animation-delay:-3.5s}
+#enjaz-public .deck-card-service{left:7%;bottom:18px;transform:rotate(2deg) scale(.92);animation-delay:-1.2s}
+#enjaz-public .deck-accent{height:2px!important;background:linear-gradient(90deg,#28d6df,#2679ff)!important}
+#enjaz-public .deck-card-head{margin-top:9px}
+#enjaz-public .deck-avatar{background:linear-gradient(145deg,#1264df,#24cdd4)!important;color:#fff!important}
+#enjaz-public .deck-live{color:#50dcae!important;font-size:8px}
+#enjaz-public .deck-card strong{font-size:11px!important}
+#enjaz-public .deck-task{font-size:8px!important;color:#91abc2!important}
+#enjaz-public .deck-bottom{color:#7892aa!important}
+#enjaz-public .visual-command{z-index:10!important;min-width:265px!important;padding:13px 16px!important;border:1px solid rgba(105,200,240,.25)!important;background:rgba(4,19,39,.94)!important;box-shadow:0 20px 45px rgba(0,0,0,.28)!important}
+#enjaz-public .visual-command strong{color:#fff!important;font-size:10px}
+#enjaz-public .visual-command small{color:#6e9aba!important}
+#enjaz-public .command-live{color:#50dcae!important}
+#enjaz-public .employee-panel{background:rgba(9,30,56,.94)!important;border:1px solid rgba(126,201,240,.2)!important;color:#fff!important;box-shadow:0 18px 40px rgba(0,0,0,.26)!important}
+#enjaz-public .employee-panel.featured{right:-18px!important;bottom:72px!important}
+#enjaz-public .employee-panel.compact{left:-18px!important;bottom:64px!important}
+#enjaz-public .employee-row small,#enjaz-public .task-line span{color:#91aac0!important}
+#enjaz-public .task-flow span{border-color:rgba(132,199,232,.18)!important;color:#a6bbce!important}
+#enjaz-public .task-flow span.done,#enjaz-public .task-flow span.active{background:rgba(28,174,208,.15)!important;color:#61e1d3!important;border-color:rgba(49,205,213,.3)!important}
+#enjaz-public .approval-pill{background:rgba(255,194,82,.12)!important;color:#f3c76c!important;border-color:rgba(255,194,82,.2)!important}
+#enjaz-public .stage-metrics{display:flex!important;position:absolute;left:24px;right:24px;bottom:13px;justify-content:space-around;border-top:1px solid rgba(133,196,228,.12);padding-top:10px}
+#enjaz-public .stage-metrics strong{color:#fff}.stage-metrics span{color:#7391aa}
+
+#enjaz-public .logo-strip{padding:35px clamp(20px,6vw,100px)!important;background:#fff!important;border-color:#e7eef5!important}
+#enjaz-public .logo-strip>span{font-size:9px!important;letter-spacing:.13em;text-transform:uppercase}
+#enjaz-public .logo-strip b{height:78px!important;border-radius:13px!important;background:#fbfdff!important;border-color:#e3ebf3!important;box-shadow:none!important;color:#48627e!important}
+#enjaz-public .logo-strip b:before{display:none!important}
+#enjaz-public .logo-strip b:after{display:none!important}
+
+#enjaz-public .public-section{padding:120px clamp(20px,7vw,115px)!important;background:#fff!important}
+#enjaz-public .public-section:nth-of-type(even){background:#f6f9fc!important}
+#enjaz-public .public-section-inner{max-width:1220px!important}
+#enjaz-public .section-eyebrow{font-size:9px!important;letter-spacing:.17em!important;color:#1187c8!important;font-weight:900}
+#enjaz-public .public-section h2{font-size:clamp(38px,4.8vw,66px)!important;line-height:1.06!important;letter-spacing:-.055em!important;color:#071e3f!important}
+#enjaz-public .section-lead{font-size:15px!important;max-width:700px!important;color:#71839a!important;line-height:1.95}
+#enjaz-public .employee-catalog-preview{gap:13px!important}
+#enjaz-public .employee-catalog-preview article{min-height:190px!important;border-radius:16px!important;background:#fff!important;border:1px solid #dfe8f1!important;box-shadow:0 14px 38px rgba(15,49,84,.055)!important}
+#enjaz-public .employee-catalog-preview article:hover{transform:translateY(-6px)!important;box-shadow:0 24px 48px rgba(15,60,100,.11)!important}
+#enjaz-public .cap-card,#enjaz-public .flow-step,#enjaz-public .trust-grid>div{border-radius:16px!important;border:1px solid #dfe8f1!important;background:#fff!important;box-shadow:0 15px 40px rgba(15,49,84,.045)!important}
+#enjaz-public .cap-card{min-height:210px!important}
+#enjaz-public .cap-number{font-size:11px!important;color:#138fbd!important}
+#enjaz-public .final-cta{margin:0 clamp(15px,6vw,100px) 30px!important;border-radius:26px!important;background:linear-gradient(120deg,#06152e,#0b3764 65%,#087eae)!important;box-shadow:0 35px 80px rgba(4,31,64,.25)!important}
+#enjaz-public .final-cta h2{color:#fff!important}
+#enjaz-public .final-cta p{color:#a7bfd2!important}
+#enjaz-public .final-cta button{border-radius:10px!important;background:#fff!important;color:#0a4e91!important}
+
+@keyframes luxFloat{0%,100%{translate:0 0}50%{translate:0 -7px}}
+@keyframes luxPulse{0%,100%{opacity:.55}50%{opacity:1}}
+#enjaz-public .enjaz-reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.22,1,.36,1)}
+#enjaz-public .enjaz-visible{opacity:1;transform:none}
+#enjaz-public .is-updating{animation:luxPulse .25s ease}
+
+@media(max-width:1050px){
+ #enjaz-public .public-hero{grid-template-columns:1fr;min-height:auto;padding-top:125px}
+ #enjaz-public .hero-copy{max-width:820px}
+ #enjaz-public .workforce-stage{max-width:850px;margin:auto}
+ #enjaz-public .logo-strip>div{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:680px){
+ #enjaz-public .public-nav{height:64px;padding:0 15px}
+ #enjaz-public .public-links,#enjaz-public .public-login{display:none!important}
+ #enjaz-public .public-nav-cta{padding:8px 12px!important}
+ #enjaz-public .public-hero{padding:102px 15px 55px}
+ #enjaz-public .public-hero h1{font-size:43px!important}
+ #enjaz-public .public-hero p{font-size:14px;line-height:1.8}
+ #enjaz-public .public-actions{flex-direction:column;align-items:stretch}
+ #enjaz-public .public-primary,#enjaz-public .public-secondary{width:100%;justify-content:center}
+ #enjaz-public .workforce-stage{min-height:560px!important;padding:10px!important;border-radius:21px!important}
+ #enjaz-public .workforce-visual{min-height:390px!important}
+ #enjaz-public .deck-card{width:165px!important}
+ #enjaz-public .deck-card-analytics{left:-4%!important}
+ #enjaz-public .deck-card-operations{right:-4%!important}
+ #enjaz-public .deck-card-procurement{right:2%!important}
+ #enjaz-public .deck-card-service{left:2%!important}
+ #enjaz-public .visual-command{min-width:205px!important}
+ #enjaz-public .employee-panel.featured,#enjaz-public .employee-panel.compact{left:8px!important;right:8px!important;width:auto!important}
+ #enjaz-public .employee-panel.featured{bottom:69px!important}
+ #enjaz-public .employee-panel.compact{bottom:9px!important}
+ #enjaz-public .stage-command{display:none!important}
+ #enjaz-public .stage-metrics{display:none!important}
+ #enjaz-public .logo-strip>div{grid-template-columns:repeat(2,1fr)}
+ #enjaz-public .public-section{padding:75px 16px!important}
+ #enjaz-public .employee-catalog-preview{grid-template-columns:1fr!important}
+ #enjaz-public .final-cta{margin:0 15px 20px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #enjaz-public *{animation:none!important;transition:none!important}
+ #enjaz-public .enjaz-reveal{opacity:1;transform:none}
+}
