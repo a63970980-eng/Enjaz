@@ -1,4 +1,5 @@
 import './auth-gate-v2.js';
+import { mount as mountPublicExperience } from './enjaz-public-entry.js';
 
 const BOOT_TIMEOUT=15000;
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -14,7 +15,11 @@ const showBootError=error=>{
 
 const start=async()=>{
   const authReady=window.__ENJAZ_AUTH_READY__;
-  if(authReady){const authState=await authReady;if(authState!=='authenticated')return}
+  if(authReady){
+    const authState=await authReady;
+    if(authState==='public'){mountPublicExperience();return}
+    if(authState!=='authenticated')return;
+  } else if(window.__ENJAZ_AUTH_STATE__==='public'){mountPublicExperience();return}
   else if(window.__ENJAZ_AUTH_STATE__!=='authenticated')return;
   const started=Date.now();
   while(true){

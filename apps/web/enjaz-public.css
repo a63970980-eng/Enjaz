@@ -215,6 +215,13 @@ html.enjaz-public-route .enjaz-root{display:none!important;}
   #enjaz-public .workforce-deck{height:172px;margin-top:17px}
   #enjaz-public .deck-card{min-height:142px;border-radius:18px}
   #enjaz-public .deck-card strong{font-size:14px}
+  #enjaz-public .public-nav{height:64px;padding:0 14px;gap:10px}
+  #enjaz-public .public-brand{gap:8px}
+  #enjaz-public .public-mark{width:34px;height:34px;border-radius:10px;font-size:18px}
+  #enjaz-public .public-brand strong{font-size:17px}
+  #enjaz-public .public-brand small,#enjaz-public .public-links,#enjaz-public .public-actions{display:none!important}
+  #enjaz-public .public-mobile-cta{display:block!important;padding:8px 12px;font-size:11px}
+  #enjaz-public .public-hero{padding-top:50px}
 }
 
 
