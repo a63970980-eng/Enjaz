@@ -82,3 +82,7 @@
 #enjaz-public .public-hero .hero-actions .ghost{background:rgba(255,255,255,.07)!important;color:#f3fbff!important;border-color:rgba(255,255,255,.22)!important}
 @media(max-width:600px){#enjaz-public .public-hero{min-height:auto!important;padding-top:44px!important}.hero-copy h1{font-size:43px!important}.workforce-stage{margin-top:4px!important}}
 
+/* Final responsive correction: keep Arabic copy inside the viewport while preserving the square live surface. */
+@media(max-width:560px){#enjaz-public .hero-copy{width:calc(100vw - 28px)!important;max-width:calc(100vw - 28px)!important;min-width:0!important;flex:0 0 auto!important}.hero-copy h1{width:100%!important;max-width:100%!important;font-size:clamp(31px,8.8vw,39px)!important;line-height:1.22!important;overflow-wrap:anywhere!important}.hero-copy p{width:100%!important;max-width:100%!important}.public-hero{overflow-x:hidden!important}}
+@media(prefers-reduced-motion:reduce){#enjaz-public .workforce-stage:after{animation:none!important}}
+

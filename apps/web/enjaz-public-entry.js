@@ -33,6 +33,9 @@ const mount = () => {
     </main>
     <footer class="public-footer"><span>© 2026 ENJAZ</span><span>Digital Workforce Operating System</span></footer>`;
   document.body.append(root);
+  const responsiveHeroStyle = document.createElement('style');
+  responsiveHeroStyle.textContent = '@media (max-width:560px){#enjaz-public .public-hero{grid-template-columns:minmax(0,1fr)!important;width:100%!important}.hero-copy{width:calc(100vw - 28px)!important;max-width:calc(100vw - 28px)!important;min-width:0!important;flex:0 0 auto!important;position:static!important;margin-inline:auto!important;transform:none!important;justify-self:center!important}.hero-copy h1{width:100%!important;max-width:100%!important;font-size:clamp(31px,8.8vw,39px)!important;line-height:1.22!important;overflow-wrap:anywhere!important}.hero-copy p{width:100%!important;max-width:100%!important}.public-hero{overflow-x:hidden!important}}';
+  document.head.append(responsiveHeroStyle);
   root.querySelectorAll('[data-scroll]').forEach((button) => button.addEventListener('click', () => document.getElementById(button.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' })));
   root.querySelectorAll('[data-auth]').forEach((button) => button.addEventListener('click', () => { const url = new URL(location.href); url.search = ''; url.searchParams.set('auth', '1'); if (button.dataset.auth === 'signup') url.searchParams.set('signup', '1'); location.href = url.toString(); }));
   root.querySelector('[data-demo]')?.addEventListener('click', () => { const url = new URL(location.href); url.search = ''; url.searchParams.set('demo', '1'); location.href = url.toString(); });
