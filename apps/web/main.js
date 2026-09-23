@@ -1,8 +1,6 @@
 import './boot-config.js';
 import './enjaz-enterprise-finish.css';
 import './enjaz-reference-v4.css';
-import './enjaz-enterprise-marquee.css';
-import './enjaz-enterprise-marquee.js';
 
 const authRoute=new URLSearchParams(window.location.search).has('auth');
 
