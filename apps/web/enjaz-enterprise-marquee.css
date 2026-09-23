@@ -1,0 +1,114 @@
+/* ENJAZ — premium infinite enterprise ticker
+   Pattern adapted from proven open-source marquee approaches (Magic UI / UI Layouts).
+   Kept framework-free because the current Enjaz web app is Vite + vanilla JS.
+*/
+#enjaz-public .enjaz-enterprise-marquee{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  margin-top:20px;
+  padding:8px 0;
+  isolation:isolate;
+}
+#enjaz-public .enjaz-enterprise-marquee::before,
+#enjaz-public .enjaz-enterprise-marquee::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:clamp(46px,8vw,130px);
+  z-index:3;
+  pointer-events:none;
+}
+#enjaz-public .enjaz-enterprise-marquee::before{
+  right:0;
+  background:linear-gradient(270deg,#fff 0%,rgba(255,255,255,.94) 28%,rgba(255,255,255,0) 100%);
+}
+#enjaz-public .enjaz-enterprise-marquee::after{
+  left:0;
+  background:linear-gradient(90deg,#fff 0%,rgba(255,255,255,.94) 28%,rgba(255,255,255,0) 100%);
+}
+#enjaz-public .enjaz-marquee-track{
+  display:flex;
+  width:max-content;
+  gap:0;
+  animation:enjazEnterpriseTicker 34s linear infinite;
+  will-change:transform;
+  transform:translate3d(0,0,0);
+}
+#enjaz-public .enjaz-marquee-group{
+  display:flex;
+  align-items:center;
+  flex:none;
+  gap:clamp(28px,4vw,68px);
+  padding-inline-end:clamp(28px,4vw,68px);
+}
+#enjaz-public .enjaz-marquee-item{
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  white-space:nowrap;
+  color:#46617d;
+  font-size:clamp(12px,1.1vw,16px);
+  font-weight:800;
+  letter-spacing:.045em;
+  line-height:1;
+  transition:color .25s ease,transform .25s ease;
+}
+#enjaz-public .enjaz-marquee-item::before{
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#075bea,#16a9b7);
+  box-shadow:0 0 0 5px rgba(7,91,234,.07);
+  flex:none;
+}
+#enjaz-public .enjaz-marquee-item::after{
+  content:"";
+  width:1px;
+  height:18px;
+  background:#d9e5f0;
+  margin-inline-start:8px;
+}
+#enjaz-public .enjaz-marquee-item:hover{
+  color:#075bea;
+  transform:translateY(-1px);
+}
+#enjaz-public .logo-strip{
+  display:block!important;
+  overflow:hidden!important;
+}
+#enjaz-public .logo-strip > span{
+  display:block;
+  margin-bottom:2px;
+}
+#enjaz-public .logo-strip > div{
+  display:block!important;
+  flex:none!important;
+  overflow:visible!important;
+}
+#enjaz-public .enjaz-marquee-rtl{
+  animation-direction:reverse;
+}
+#enjaz-public .enjaz-enterprise-marquee:hover .enjaz-marquee-track{
+  animation-play-state:paused;
+}
+@keyframes enjazEnterpriseTicker{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-50%,0,0)}
+}
+@media(max-width:700px){
+  #enjaz-public .enjaz-marquee-track{animation-duration:28s}
+  #enjaz-public .enjaz-marquee-group{gap:30px;padding-inline-end:30px}
+  #enjaz-public .enjaz-marquee-item{font-size:11px}
+  #enjaz-public .enjaz-marquee-item::after{height:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  #enjaz-public .enjaz-marquee-track{
+    animation:none!important;
+    transform:none!important;
+  }
+  #enjaz-public .enjaz-enterprise-marquee::before,
+  #enjaz-public .enjaz-enterprise-marquee::after{display:none}
+}
