@@ -243,6 +243,37 @@ html.enjaz-public-route .enjaz-root{display:none!important;}
   }
 }
 
+/* Reference-led product showcase: a confident, editorial SaaS hero instead of a generic card grid. */
+#enjaz-public .public-hero{
+  max-width:none;
+  padding:92px clamp(22px,7vw,112px) 86px;
+  grid-template-columns:minmax(0,1fr) minmax(540px,1.12fr);
+  gap:clamp(34px,6vw,108px);
+  align-items:center;
+  background:radial-gradient(circle at 74% 42%,rgba(17,133,184,.22),transparent 30%),linear-gradient(135deg,#071c3d 0%,#092c5b 48%,#061832 100%);
+  color:#fff;
+  overflow:hidden;
+}
+#enjaz-public .public-hero::before{content:'';position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(164,210,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(164,210,255,.055) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(90deg,transparent,black 30%,black 75%,transparent)}
+#enjaz-public .hero-copy{max-width:560px;order:2}
+#enjaz-public .hero-copy .eyebrow{color:#78d6e6;letter-spacing:.08em}
+#enjaz-public .hero-copy h1{font-size:clamp(42px,5.4vw,78px);line-height:1.08;letter-spacing:-.055em;color:#fff;margin:22px 0}
+#enjaz-public .hero-copy h1 em{color:#7bd7e9;font-style:normal}
+#enjaz-public .hero-copy p{max-width:510px;color:#c2d2e8;font-size:17px;line-height:2; margin:0 0 28px}
+#enjaz-public .hero-proof{color:#a7bdd8}.hero-proof i{background:rgba(255,255,255,.25)}
+#enjaz-public .hero-actions .ghost{color:#eaf5ff;border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.06)}
+#enjaz-public .workforce-stage{order:1;min-height:540px;border-radius:28px;padding:15px;background:rgba(244,249,255,.96);box-shadow:0 34px 100px rgba(0,0,0,.3);border:7px solid rgba(255,255,255,.17);color:#112646;overflow:visible}
+#enjaz-public .browser-chrome{height:30px;display:flex;align-items:center;gap:16px;padding:0 10px;color:#8795a9;font:600 9px Arial;direction:ltr}
+#enjaz-public .browser-dots{display:flex;gap:5px}.browser-dots i{width:8px;height:8px;border-radius:50%;background:#e4a35e}.browser-dots i:nth-child(2){background:#dbc36c}.browser-dots i:nth-child(3){background:#75c895}.browser-url{flex:1;text-align:center;background:#edf2f8;border-radius:8px;padding:6px}.browser-actions{font-size:11px}
+#enjaz-public .product-preview{display:flex;min-height:390px;border:1px solid #dce6f1;border-radius:14px;overflow:hidden;background:#f7faff;direction:ltr;box-shadow:0 8px 20px rgba(14,44,84,.08)}
+#enjaz-public .preview-rail{width:48px;padding:14px 0;display:flex;align-items:center;flex-direction:column;gap:20px;background:#09244b;color:#8da9c9;font:14px Arial}.preview-rail strong{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#39b8cf;color:#fff}.preview-rail span{opacity:.8}.preview-rail .active{color:#6cdeed}
+#enjaz-public .preview-main{flex:1;padding:20px 22px;direction:rtl}.preview-top,.preview-title{display:flex;align-items:center;justify-content:space-between;gap:14px}.preview-top{font-size:11px;font-weight:800;color:#19345c}.preview-top small{font-size:8px;color:#7387a2}.preview-top small b{display:inline-block;width:6px;height:6px;border-radius:50%;background:#36c58c}.preview-title{margin:30px 0 20px}.preview-title small{color:#7890ae;font:700 8px Arial;letter-spacing:.08em}.preview-title h3{margin:8px 0 0;font-size:19px;color:#0b2247}.preview-title>span{background:#fff;border:1px solid #dde7f1;border-radius:7px;padding:8px 10px;color:#6f819a;font-size:9px}.preview-grid{display:grid;grid-template-columns:1.22fr .78fr;gap:15px;direction:ltr}.agent-stack,.preview-chart{background:#fff;border:1px solid #e0e8f2;border-radius:12px;padding:14px;direction:rtl}.preview-label{display:flex;justify-content:space-between;color:#627692;font-size:10px;font-weight:700;margin-bottom:12px}.preview-label b{color:#1591ad}.agent-stack article{display:flex;align-items:center;gap:9px;padding:10px 0;border-bottom:1px solid #edf1f6}.agent-icon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;font-size:16px}.agent-icon.blue{background:#2376ce}.agent-icon.teal{background:#14a8a7}.agent-icon.violet{background:#7767d8}.agent-stack article div{flex:1}.agent-stack article strong{display:block;font-size:10px;color:#18345c}.agent-stack article small{display:block;color:#8191a4;font-size:8px;margin-top:4px}.agent-stack article em{font-style:normal;color:#1b9b84;font-size:8px;font-weight:800}.preview-chart>strong{display:block;font:800 38px Arial;color:#0d2c55;margin:12px 0 3px}.preview-chart>strong span{font-size:18px;color:#2697ad}.preview-chart>small{color:#8797aa;font-size:8px}.chart-bars{height:90px;display:flex;align-items:end;gap:7px;margin-top:24px;border-bottom:1px solid #dbe5ef}.chart-bars i{display:block;flex:1;background:linear-gradient(#35b8c2,#1f73c9);border-radius:4px 4px 0 0;opacity:.8}.chart-line{height:2px;background:#8ddce1;transform:rotate(-7deg) translateY(-38px);box-shadow:0 0 8px #8ddce1}
+#enjaz-public .workforce-stage .stage-command{margin:14px 4px 0;color:#17345c}.workforce-stage .stage-command span{color:#189cb1}.workforce-stage .stage-command strong{color:#19355b}.workforce-stage .stage-metrics{color:#385475}.workforce-stage .stage-metrics div{border-color:#d8e4f0;background:#fff}
+#enjaz-public .sectors-section{background:#f7fbff}
+@media(max-width:900px){#enjaz-public .public-hero{grid-template-columns:1fr;padding-top:60px}.hero-copy{order:1!important;max-width:680px}.workforce-stage{order:2!important}.public-hero .hero-copy h1{font-size:clamp(42px,9vw,64px)}}
+@media(max-width:560px){#enjaz-public .public-hero{padding:54px 16px 48px;gap:28px}.hero-copy h1{font-size:42px!important}.hero-copy p{font-size:14px;line-height:1.9}.workforce-stage{min-height:430px!important;padding:9px!important;border-width:4px!important;border-radius:19px!important}.product-preview{min-height:294px!important}.preview-rail{width:32px!important;gap:15px!important;font-size:10px!important}.preview-main{padding:13px!important}.preview-title{margin:18px 0 12px}.preview-title h3{font-size:13px}.preview-grid{gap:8px}.agent-stack,.preview-chart{padding:9px}.agent-stack article{padding:7px 0}.agent-icon{width:23px;height:23px;font-size:12px}.agent-stack article strong{font-size:8px}.agent-stack article small{font-size:6px}.agent-stack article em{font-size:6px}.preview-chart>strong{font-size:27px}.chart-bars{height:62px;gap:3px}.browser-url{font-size:7px}.browser-actions{display:none}.workforce-stage .stage-command{font-size:11px}.workforce-stage .stage-metrics{gap:5px!important}.workforce-stage .stage-metrics div{padding:8px 5px!important}.workforce-stage .stage-metrics b{font-size:15px!important}}
+
+
 
 /* Enjaz hero v2 — a real visual system, not static cards. */
 #enjaz-public .workforce-stage{
