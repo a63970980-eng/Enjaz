@@ -8,7 +8,9 @@ export function mountDemo(){
  root.querySelectorAll('[data-command-open]').forEach(b=>b.onclick=()=>root.querySelector('.demo-command-modal').hidden=false);
  root.querySelectorAll('[data-close-command]').forEach(b=>b.onclick=()=>root.querySelector('.demo-command-modal').hidden=true);
  root.querySelector('[data-run-command]')?.addEventListener('click',e=>{e.currentTarget.disabled=true;e.currentTarget.textContent='Running workforce…';setTimeout(()=>{root.querySelector('.demo-result').hidden=false;e.currentTarget.textContent='Run another command ↗';e.currentTarget.disabled=false},850)});
- root.querySelectorAll('[data-demo-nav]').forEach(b=>b.onclick=()=>{root.querySelectorAll('[data-demo-nav]').forEach(x=>x.classList.remove('active'));b.classList.add('active');root.querySelector('.demo-breadcrumb strong').textContent=b.dataset.demoNav;root.querySelector('.demo-welcome h1').textContent=b.dataset.demoNav==='Overview'?'Good morning, Mohammed.':b.dataset.demoNav;});
+ root.querySelectorAll('[data-demo-nav]').forEach(b=>b.onclick=()=>{root.querySelectorAll('[data-demo-nav]').forEach(x=>x.classList.remove('active'));b.classList.add('active');root.querySelector('.demo-breadcrumb strong').textContent=b.dataset.demoNav;root.querySelector('.demo-welcome h1').textContent=b.dataset.demoNav==='Overview'?'Good morning, Mohammed.':b.dataset.demoNav;root.querySelector('.demo-sidebar')?.classList.remove('is-open');});
+ root.querySelector('.demo-menu')?.addEventListener('click',()=>root.querySelector('.demo-sidebar')?.classList.toggle('is-open'));
+ root.querySelector('.demo-main')?.addEventListener('click',event=>{if(event.target.closest('.demo-menu'))return;root.querySelector('.demo-sidebar')?.classList.remove('is-open')});
  document.documentElement.classList.add('enjaz-demo-route');
 }
 if(new URLSearchParams(location.search).has('demo'))mountDemo();
