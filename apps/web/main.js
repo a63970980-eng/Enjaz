@@ -2,6 +2,8 @@ import './boot-config.js';
 import './enjaz-enterprise-finish.css';
 import './enjaz-reference-v4.css';
 import './enjaz-public.js';
+import './enjaz-21st-layer.css';
+import './enjaz-21st-layer.js';
 
 const authRoute=new URLSearchParams(window.location.search).has('auth');
 
