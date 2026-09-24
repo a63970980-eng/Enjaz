@@ -71,7 +71,7 @@ function profileFor(role,pack,departmentId){
  };
 }
 
-export function listIndustryPacks(){return Object.entries(PACKS).map(([id,p])=>({id,label:p.label,departments:p.departments.length,employees:p.departments.reduce((n,d)=>n+d[2].length,0)}));}
+export function listIndustryPacks(){return Object.entries(PACKS).map(([id,p])=>({id,label:p.label,departments:p.departments.length,roles:p.departments.reduce((n,d)=>n+d[2].length,0),employees:p.departments.reduce((n,d)=>n+d[2].length,0)}));}
 
 export async function provisionIndustryPack({workspaceId,pack,actorUserId}){
  const template=PACKS[pack];if(!template)throw Object.assign(new Error(`Unknown industry pack: ${pack}`),{status:400});
