@@ -3,6 +3,8 @@ import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import * as z from 'zod/v4';
 import { query } from './db.js';
 import { executeTool, listTools } from './tool-registry.js';
+import { listEmployeeRoutines } from './employee-routines.js';
+import { createTask, listTasks, createTaskComment } from './workforce-repository.js';
 
 const workspaceId = process.env.ENJAZ_MCP_WORKSPACE_ID;
 const employeeId = process.env.ENJAZ_MCP_EMPLOYEE_ID;
@@ -34,6 +36,57 @@ server.registerTool(
     content: [{
       type: 'text',
       text: JSON.stringify(listTools().filter(tool => Array.isArray(employeeRow.tools) && employeeRow.tools.some(allowed => (typeof allowed === 'string' ? allowed : allowed?.name) === tool.name))),
+    }],
+  }),
+);
+
+server.registerTool(
+  'enjaz.list_routines',
+  { description: 'List scheduled routines assigned to the configured digital employee.' },
+  async () => ({
+    content: [{ type: 'text', text: JSON.stringify(await listEmployeeRoutines(workspaceId, employeeId)) }],
+  }),
+);
+
+server.registerTool(
+  'enjaz.create_task',
+  {
+    description: 'Create a new task for the configured digital employee.',
+    inputSchema: {
+      title: z.string().min(1).max(200),
+      objective: z.string().min(3).max(4000),
+      priority: z.number().int().min(1).max(10).default(5),
+    },
+  },
+  async ({ title, objective, priority }) => ({
+    content: [{
+      type: 'text',
+      text: JSON.stringify(await createTask({ workspaceId, employeeId, title, objective, priority })),
+    }],
+  }),
+);
+
+server.registerTool(
+  'enjaz.list_my_tasks',
+  { description: 'List recent tasks assigned to the configured digital employee.' },
+  async () => ({
+    content: [{ type: 'text', text: JSON.stringify((await listTasks(workspaceId)).filter(task => String(task.employee_id) === String(employeeId)).slice(0, 50)) }],
+  }),
+);
+
+server.registerTool(
+  'enjaz.add_task_comment',
+  {
+    description: 'Write a persistent note to one of the configured employee\'s tasks.',
+    inputSchema: {
+      taskId: z.string().uuid(),
+      body: z.string().min(1).max(4000),
+    },
+  },
+  async ({ taskId, body }) => ({
+    content: [{
+      type: 'text',
+      text: JSON.stringify(await createTaskComment({ workspaceId, taskId, employeeId, body })),
     }],
   }),
 );
