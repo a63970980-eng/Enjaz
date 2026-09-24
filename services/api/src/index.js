@@ -57,7 +57,7 @@ const employeeGoals=url.pathname.match(/^\/api\/v1\/employees\/([^/]+)\/goals$/)
 const employeeKnowledge=url.pathname.match(/^\/api\/v1\/employees\/([^/]+)\/knowledge$/);if(employeeKnowledge&&req.method==='GET')return json(res,200,{data:await listEmployeeKnowledge(workspaceId,employeeKnowledge[1])},origin,context.id);if(employeeKnowledge&&req.method==='POST'){requireManager(user);return json(res,201,{data:await createEmployeeKnowledge({...await body(req),workspaceId,employeeId:employeeKnowledge[1]})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/routines')return json(res,200,{data:await listEmployeeRoutines(workspaceId,url.searchParams.get('employeeId'))},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/routines'){requireManager(user);const input=await body(req);return json(res,201,{data:await createEmployeeRoutine({...input,workspaceId})},origin,context.id);}
-const routineMatch=url.pathname.match(/^\\/api\\/v1\\/routines\\/([^/]+)$/);
+const routineMatch=url.pathname.match(/^\/api\/v1\/routines\/([^/]+)$/);
 if(routineMatch&&req.method==='PATCH'){requireManager(user);return json(res,200,{data:await updateEmployeeRoutine({workspaceId,routineId:routineMatch[1],patch:await body(req)})},origin,context.id);}
 if(routineMatch&&req.method==='DELETE'){requireManager(user);return json(res,200,{data:await deleteEmployeeRoutine({workspaceId,routineId:routineMatch[1]})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tasks')return json(res,200,{data:await listTasks(workspaceId)},origin,context.id);
