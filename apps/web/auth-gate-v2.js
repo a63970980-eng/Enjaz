@@ -60,6 +60,63 @@ const renderForm=({error='' }={})=>{const el=form({error});el.querySelector('#au
 async function recover(){try{const profile=await authClient.me(apiBase);if(!profile){authClient.signOut();setAuthState('public');window.location.href=location.origin+location.pathname;return}const memberships=Array.isArray(profile.workspaces)?profile.workspaces:[];if(!memberships.length){setAuthState('auth');await workspaceSetup(profile);return}const requested=q.get('workspaceId')||localStorage.getItem('ENJAZ_WORKSPACE_ID')||'';const selected=requested&&memberships.some(w=>String(w.id)===String(requested))?memberships.find(w=>String(w.id)===String(requested)):memberships[0];localStorage.setItem('ENJAZ_WORKSPACE_ID',selected.id);sessionStorage.setItem('ENJAZ_WORKSPACES',JSON.stringify(memberships));sessionStorage.setItem('ENJAZ_USER_PROFILE',JSON.stringify(profile));window.ENJAZ_WORKSPACE_ID=selected.id;window.ENJAZ_ACCESS_TOKEN=authClient.token();const enteredFromAuth=q.has('auth')||q.has('signup')||q.has('workspaceId');if(enteredFromAuth){const url=new URL(location.href);url.search='';history.replaceState({},'',url.toString())}setAuthState('authenticated');clearGate();window.dispatchEvent(new CustomEvent('enjaz:authenticated'));if(enteredFromAuth)window.location.reload();
 }catch(err){setAuthState('error');const el=mount(`<div class="auth-shell"><div class="auth-card session-recovery"><div class="auth-brand"><span class="brand-mark">إ</span><div><strong>إنجاز</strong><small>ENJAZ · SESSION RECOVERY</small></div></div><div class="auth-copy"><div class="eyebrow">SESSION RECOVERY</div><h1>تعذر تحميل مساحة العمل</h1><p>لم نفقد حسابك. حاول استعادة الجلسة أو ابدأ من جديد.</p></div><div class="auth-error" role="alert">${esc(err?.message||'تعذر قراءة جلسة المستخدم.')}</div><div class="auth-recovery-actions"><button class="primary" id="retry-session" type="button">إعادة المحاولة</button><button class="ghost" id="reset-session" type="button">إعادة ضبط الجلسة</button></div></div></div>`);el.querySelector('#retry-session')?.addEventListener('click',()=>location.reload());el.querySelector('#reset-session')?.addEventListener('click',()=>{authClient.signOut();location.href=location.origin+location.pathname})}}
 
-function renderPublic(){if(!root)return;root.innerHTML=`<section class="ev4-public"><div class="ev4-public-copy"><span class="ev4-kicker">ENJAZ · DIGITAL WORKFORCE OS</span><h1>قوة العمل الرقمية<br><em>تعمل من أجلك.</em></h1><p>موظفون رقميون متخصصون للقطاعات والمؤسسات، من المهمة إلى التنفيذ والنتيجة تحت حوكمة إنجاز.</p><div class="ev4-public-actions"><button type="button" class="ev4-primary" data-public-login>تسجيل الدخول</button><button type="button" class="ev4-secondary" data-public-signup>ابدأ الآن</button></div><div class="ev4-public-sectors"><span>مطاعم</span><span>مستشفيات</span><span>فنادق</span><span>شركات</span><span>جهات حكومية</span></div></div><div class="ev4-public-visual"><div class="ev4-public-orb"></div><div class="ev4-public-card"><small>LIVE WORKFORCE</small><strong>AI Employees</strong><span>Plan · Execute · Verify · Report</span><i></i></div><div class="ev4-public-card second"><small>ENTERPRISE CONTROL</small><strong>Governed by Enjaz</strong><span>Approvals · Audit · ROI</span></div></div></section>`;root.querySelector('[data-public-login]')?.addEventListener('click',()=>goAuth(false));root.querySelector('[data-public-signup]')?.addEventListener('click',()=>goAuth(true));}
+function renderPublic(){
+ if(!root)return;
+ root.id='enjaz-public';
+ root.classList.add('enjaz-cw-public');
+ root.innerHTML=`<div class="cw-nav">
+   <a class="cw-brand" href="#" aria-label="إنجاز"><span class="cw-mark">إ</span><span><strong>إنجاز</strong><small>ENJAZ · DIGITAL WORKFORCE OS</small></span></a>
+   <nav class="cw-links" aria-label="التنقل العام">
+    <button type="button" data-cw-scroll="workforce">القوى العاملة</button>
+    <button type="button" data-cw-scroll="sectors">القطاعات</button>
+    <button type="button" data-cw-scroll="how">كيف يعمل</button>
+    <button type="button" class="cw-nav-ghost" data-public-login>تسجيل الدخول</button>
+    <button type="button" class="cw-nav-primary" data-public-signup>ابدأ الآن</button>
+   </nav>
+   <button type="button" class="cw-mobile cw-nav-primary" data-public-signup>ابدأ الآن</button>
+  </div>
+  <main>
+   <section class="cw-hero" id="workforce">
+    <div class="cw-copy">
+     <span class="cw-eyebrow"><i></i> ENJAZ · DIGITAL WORKFORCE OS</span>
+     <h1>حوّل مؤسستك إلى<br><em>قوة عمل تعمل معك.</em></h1>
+     <p>موظفون رقميون متخصصون للقطاعات والمؤسسات — يخططون، ينفذون، يتحققون ويرفعون النتائج تحت حوكمة إنجاز.</p>
+     <div class="cw-actions">
+      <button type="button" class="cw-primary" data-public-signup>فعّل قوة العمل الرقمية ←</button>
+      <button type="button" class="cw-secondary" data-public-login>تسجيل الدخول</button>
+     </div>
+     <div class="cw-proof"><span><b>●</b> تشغيل مؤسسي مستمر</span><span><b>✓</b> صلاحيات وحوكمة</span><span><b>↗</b> نتائج قابلة للقياس</span></div>
+    </div>
+    <div class="cw-visual" aria-label="منظومة القوى العاملة الرقمية">
+     <div class="cw-grid"></div><div class="cw-orbit"></div><div class="cw-orbit o2"></div><div class="cw-beam"></div><div class="cw-beam b2"></div>
+     <div class="cw-core">إ</div>
+     <article class="cw-card c1"><div class="cw-card-head"><div class="cw-card-role"><span class="cw-avatar">م</span><span><strong>مدير العمليات الرقمي</strong><small>OPERATIONS MANAGER</small></span></div><span class="cw-live">● LIVE</span></div><div class="cw-card-title">مراجعة أداء الفروع وتحديد الاختناقات</div><div class="cw-card-meta"><span class="cw-chip">تحليل البيانات</span><span class="cw-chip">خطة تنفيذ</span><span class="cw-chip">اعتماد</span></div><div class="cw-progress"><i></i></div><div class="cw-status"><span>التقدم التشغيلي</span><b>78%</b></div></article>
+     <article class="cw-card c2"><div class="cw-card-head"><div class="cw-card-role"><span class="cw-avatar">م</span><span><strong>منسق المشتريات الرقمي</strong><small>PROCUREMENT SPECIALIST</small></span></div><span class="cw-live">● ACTIVE</span></div><div class="cw-card-title">اكتشاف احتياج المخزون وتجهيز توصية الشراء</div><div class="cw-card-meta"><span class="cw-chip">مخزون</span><span class="cw-chip">موردون</span><span class="cw-chip">توصية</span></div><div class="cw-progress"><i style="width:64%"></i></div><div class="cw-status"><span>المهمة الحالية</span><b>64%</b></div></article>
+     <div class="cw-command"><small>ENJAZ CONTROL PLANE</small><strong>Task → Execute → Verify → Report</strong><span>● جميع العمليات تحت المراقبة</span></div>
+    </div>
+   </section>
+   <div class="cw-trust"><b>مصمم للمؤسسات والقطاعات</b><div class="cw-trust-logos"><span>مطاعم</span><span>مستشفيات</span><span>فنادق</span><span>شركات</span><span>جهات حكومية</span></div></div>
+   <section class="cw-section" id="sectors"><div class="cw-inner"><div class="cw-section-head"><small>READY-MADE DIGITAL WORKFORCE</small><h2>لا تبدأ من الصفر.<br>اختر القطاع، وابدأ بالتشغيل.</h2><p>يجهّز إنجاز أدوارًا رقمية متخصصة مرتبطة بمهام المؤسسة وسير العمل، بدل إنشاء موظفين يدويًا واحدًا واحدًا.</p></div><div class="cw-role-grid">
+    <article class="cw-role"><div class="cw-role-icon">م</div><strong>المطاعم</strong><span>مدير فرع، مشتريات، مخزون، جودة، خدمة عملاء وتسويق.</span></article>
+    <article class="cw-role"><div class="cw-role-icon">ص</div><strong>المستشفيات</strong><span>تنسيق العمليات، الجودة، المواعيد، المرضى والتقارير.</span></article>
+    <article class="cw-role"><div class="cw-role-icon">ف</div><strong>الفنادق</strong><span>الضيافة، الحجوزات، التشغيل، خدمة النزلاء والجودة.</span></article>
+    <article class="cw-role"><div class="cw-role-icon">ش</div><strong>الشركات</strong><span>المبيعات، العمليات، الموارد، المالية وخدمة العملاء.</span></article>
+   </div></div></section>
+   <section class="cw-section cw-flow" id="how"><div class="cw-inner"><div class="cw-section-head"><small>OPERATING MODEL</small><h2>من المهمة إلى النتيجة<br>في مسار واحد.</h2><p>كل موظف رقمي يعمل ضمن سياق مؤسستك، مع صلاحيات واضحة، موافقات وسجل تدقيق.</p></div><div class="cw-flow-grid">
+    <article class="cw-flow-card"><b>01</b><strong>حدد الهدف</strong><span>اختر المهمة أو المشكلة التشغيلية.</span></article>
+    <article class="cw-flow-card"><b>02</b><strong>حلّل</strong><span>يجمع الموظف الرقمي السياق والبيانات اللازمة.</span></article>
+    <article class="cw-flow-card"><b>03</b><strong>نفّذ</strong><span>يحوّل القرار إلى خطوات تشغيلية.</span></article>
+    <article class="cw-flow-card"><b>04</b><strong>تحقّق</strong><span>مراجعة النتائج والسياسات قبل الإغلاق.</span></article>
+    <article class="cw-flow-card"><b>05</b><strong>ارفع التقرير</strong><span>نتيجة واضحة قابلة للقياس والمتابعة.</span></article>
+   </div></div></section>
+   <section class="cw-final"><div class="cw-final-box"><div><h2>قوة العمل الرقمية تبدأ من إنجاز.</h2><p>أسّس مؤسستك، اختر قطاعك، وفعّل الأدوار المتخصصة.</p></div><button type="button" data-public-signup>ابدأ بناء قوة العمل ←</button></div></section>
+  </main>
+  <footer class="cw-footer"><strong>إنجاز</strong><span>Digital Workforce Operating System · Enterprise-ready</span></footer>`;
+ root.querySelectorAll('[data-public-signup]').forEach(el=>el.addEventListener('click',()=>goAuth(true)));
+ root.querySelectorAll('[data-public-login]').forEach(el=>el.addEventListener('click',()=>goAuth(false)));
+ root.querySelectorAll('[data-cw-scroll]').forEach(el=>el.addEventListener('click',()=>{
+   const target=document.getElementById(el.dataset.cwScroll); target?.scrollIntoView({behavior:'smooth',block:'start'});
+ }));
+}
 
 if(q.has('auth')){root?.classList.add('is-auth-locked');setAuthState('auth');renderForm()}else if(authClient.token()){recover()}else{window.__ENJAZ_PUBLIC_SHOWN__=true;setAuthState('public');renderPublic()}
