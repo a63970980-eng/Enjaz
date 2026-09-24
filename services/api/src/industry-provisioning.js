@@ -49,6 +49,7 @@ const ecommerceRoleSkills={
 };
 const defaultSkills=['إدارة المهام','إعداد التقارير','التعاون بين الأقسام'];
 const defaultTools=['data.analyze','report.create','task.comment','task.handoff'];
+const ecommerceTools=['commerce.orders.list','commerce.products.list','commerce.inventory.alerts','commerce.analytics.summary','commerce.customer.lookup'];
 const defaultPermissions=['read_workspace','read_tasks','create_tasks','read_knowledge','write_knowledge','read_reports'];
 const sensitive=r=>/مالية|مشتريات|تدقيق|مراجعة|جودة|موارد بشرية|تأمين|Legal|Finance|Procurement|HR/.test(r);
 
@@ -59,7 +60,7 @@ function profileFor(role,pack,departmentId){
  return {
   goal:mission,
   skills,
-  tools:defaultTools,
+  tools:pack==='ecommerce'?[...defaultTools,...ecommerceTools]:defaultTools,
   permissions:defaultPermissions,
   policy:{industryPack:pack,departmentId,readyTemplate:true,autonomy:supervised?'supervised':'balanced',approvalMode:'required',sensitiveActionsRequireApproval:true,decisionPrinciples:['التزم بالدور والصلاحيات','تحقق من البيانات قبل القرار','وثّق النتيجة','صعّد المخاطر أو الغموض إلى المدير']},
   knowledge:[
