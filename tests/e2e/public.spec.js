@@ -16,3 +16,14 @@ test('public landing page has no serious automated accessibility violations',asy
   const serious=results.violations.filter(v=>v.impact==='critical'||v.impact==='serious');
   expect(serious).toEqual([]);
 });
+
+
+test('login gate renders a real credential form and validates required fields',async({page})=>{
+  await page.goto('/?auth=1',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#auth-gate')).toBeVisible();
+  await expect(page.locator('#auth-form input[name="email"]')).toBeVisible();
+  await expect(page.locator('#auth-form input[name="password"]')).toBeVisible();
+  const button=page.getByRole('button',{name:'تسجيل الدخول'});
+  await button.click();
+  await expect(page.locator('#auth-form input[name="email"]:invalid')).toBeVisible();
+});
