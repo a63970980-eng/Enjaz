@@ -12,6 +12,7 @@ import { requestContext } from './request-context.js';
 import { closeDb,query } from './db.js';
 import { listIndustryPacks,provisionIndustryPack } from './industry-provisioning.js';
 import { getAIProviderStatus } from './ai-provider.js';
+import { listEmployeeRoutines,createEmployeeRoutine,updateEmployeeRoutine,deleteEmployeeRoutine } from './employee-routines.js';
 import { listBillingPlans,getBillingSubscription,getBillingUsage,assertWorkspaceLimit } from './billing-repository.js';
 import './integrations/index.js';
 const port=process.env.PORT||4000;
@@ -54,6 +55,11 @@ const employeeMatch=url.pathname.match(/^\/api\/v1\/employees\/([^/]+)$/);if(emp
 const employeeStatus=url.pathname.match(/^\/api\/v1\/employees\/([^/]+)\/(activate|pause|disable)$/);if(employeeStatus&&req.method==='POST'){requireManager(user);return json(res,200,{data:await setEmployeeStatus({workspaceId,employeeId:employeeStatus[1],status:{activate:'active',pause:'paused',disable:'disabled'}[employeeStatus[2]]})},origin,context.id);}
 const employeeGoals=url.pathname.match(/^\/api\/v1\/employees\/([^/]+)\/goals$/);if(employeeGoals&&req.method==='GET')return json(res,200,{data:await listEmployeeGoals(workspaceId,employeeGoals[1])},origin,context.id);if(employeeGoals&&req.method==='POST'){requireManager(user);return json(res,201,{data:await createEmployeeGoal({...await body(req),workspaceId,employeeId:employeeGoals[1]})},origin,context.id);}
 const employeeKnowledge=url.pathname.match(/^\/api\/v1\/employees\/([^/]+)\/knowledge$/);if(employeeKnowledge&&req.method==='GET')return json(res,200,{data:await listEmployeeKnowledge(workspaceId,employeeKnowledge[1])},origin,context.id);if(employeeKnowledge&&req.method==='POST'){requireManager(user);return json(res,201,{data:await createEmployeeKnowledge({...await body(req),workspaceId,employeeId:employeeKnowledge[1]})},origin,context.id);}
+if(req.method==='GET'&&url.pathname==='/api/v1/routines')return json(res,200,{data:await listEmployeeRoutines(workspaceId,url.searchParams.get('employeeId'))},origin,context.id);
+if(req.method==='POST'&&url.pathname==='/api/v1/routines'){requireManager(user);const input=await body(req);return json(res,201,{data:await createEmployeeRoutine({...input,workspaceId})},origin,context.id);}
+const routineMatch=url.pathname.match(/^\\/api\\/v1\\/routines\\/([^/]+)$/);
+if(routineMatch&&req.method==='PATCH'){requireManager(user);return json(res,200,{data:await updateEmployeeRoutine({workspaceId,routineId:routineMatch[1],patch:await body(req)})},origin,context.id);}
+if(routineMatch&&req.method==='DELETE'){requireManager(user);return json(res,200,{data:await deleteEmployeeRoutine({workspaceId,routineId:routineMatch[1]})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tasks')return json(res,200,{data:await listTasks(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/tasks'){requireManager(user);await assertWorkspaceLimit(workspaceId,'tasks');return json(res,201,{data:await createTask({...await body(req),workspaceId})},origin,context.id);}
 const taskMatch=url.pathname.match(/^\/api\/v1\/tasks\/([^/]+)$/);if(taskMatch&&req.method==='GET')return json(res,200,{data:await getTask(taskMatch[1],workspaceId)},origin,context.id);if(taskMatch&&req.method==='DELETE'){requireManager(user);return json(res,200,{data:await cancelTask({workspaceId,taskId:taskMatch[1],userId:user.id})},origin,context.id);}
