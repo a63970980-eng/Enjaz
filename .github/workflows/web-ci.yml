@@ -8,6 +8,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'tests/e2e/**'
   pull_request:
     branches: [main, chore/reset-public-ui]
     paths:
@@ -16,6 +17,7 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'tests/e2e/**'
   workflow_dispatch:
 
 jobs:
