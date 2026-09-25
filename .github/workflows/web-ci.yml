@@ -1,7 +1,7 @@
 name: ENJAZ Web CI
 on:
   push:
-    branches: [main]
+    branches: [main, chore/reset-public-ui]
     paths:
       - 'apps/web/**'
       - '.github/workflows/web-ci.yml'
@@ -9,7 +9,7 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
   pull_request:
-    branches: [main]
+    branches: [main, chore/reset-public-ui]
     paths:
       - 'apps/web/**'
       - '.github/workflows/web-ci.yml'
@@ -34,3 +34,10 @@ jobs:
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter @enjaz/web test
       - run: pnpm --filter @enjaz/web build
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Start production preview
+        run: pnpm --filter @enjaz/web exec vite preview --host 127.0.0.1 --port 4173 > /tmp/enjaz-vite.log 2>&1 &
+      - name: Run public E2E and accessibility gates
+        env:
+          ENJAZ_E2E_BASE_URL: http://127.0.0.1:4173
+        run: pnpm exec playwright test
