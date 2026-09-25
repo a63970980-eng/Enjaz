@@ -1,242 +1,172 @@
-/* ENJAZ LIVE EXPERIENCE — isolated public presentation layer */
+/* ENJAZ LIVE EXPERIENCE — product network engine (isolated public presentation) */
 (()=> {
-  const BOOT_KEY = '__ENJAZ_LIVE_EXPERIENCE__';
-  if (window[BOOT_KEY]) return;
-  window[BOOT_KEY] = true;
+  const BOOT_KEY='__ENJAZ_LIVE_EXPERIENCE__V2__';
+  if(window[BOOT_KEY]) return;
+  window[BOOT_KEY]=true;
 
-  const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js';
-  const GSAP_URL = 'https://cdn.jsdelivr.net/npm/gsap@3.14.0/+esm';
-  const LENIS_URL = 'https://cdn.jsdelivr.net/npm/lenis@1.3.26/+esm';
-  const POST_URL = 'https://cdn.jsdelivr.net/npm/postprocessing@6.37.8/+esm';
+  const THREE_URL='https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js';
+  const GSAP_URL='https://cdn.jsdelivr.net/npm/gsap@3.14.0/+esm';
+  const LENIS_URL='https://cdn.jsdelivr.net/npm/lenis@1.3.26/+esm';
+  const POST_URL='https://cdn.jsdelivr.net/npm/postprocessing@6.37.8/+esm';
 
-  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const mobile = () => window.matchMedia('(max-width: 900px)').matches;
+  const reduced=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mobile=()=>window.matchMedia('(max-width: 900px)').matches;
 
-  async function boot(publicRoot) {
-    if (!publicRoot || publicRoot.dataset.liveReady) return;
-    publicRoot.dataset.liveReady = 'loading';
+  async function boot(root){
+    if(!root||root.dataset.liveReady) return;
+    root.dataset.liveReady='loading';
+    try{
+      const [{default:THREE},{gsap},{default:Lenis},{EffectComposer,RenderPass,BloomEffect,EffectPass}]=await Promise.all([
+        import(THREE_URL),import(GSAP_URL),import(LENIS_URL),import(POST_URL)
+      ]);
+      const hero=root.querySelector('.sf-hero'), stage=root.querySelector('.sf-hero-stage');
+      if(!hero||!stage) throw new Error('hero mount unavailable');
+      let canvas=document.getElementById('enjaz-live-canvas');
+      if(!canvas){canvas=document.createElement('canvas');canvas.id='enjaz-live-canvas';canvas.setAttribute('aria-hidden','true');hero.prepend(canvas);}
 
-    try {
-      const [{default:THREE},{gsap},{default:Lenis},{EffectComposer,RenderPass,BloomEffect,EffectPass}] =
-        await Promise.all([
-          import(THREE_URL),
-          import(GSAP_URL),
-          import(LENIS_URL),
-          import(POST_URL)
-        ]);
+      const scene=new THREE.Scene();
+      scene.fog=new THREE.FogExp2(0xeef8ff,0.042);
+      const camera=new THREE.PerspectiveCamera(34,1,.1,100);
+      camera.position.set(0,.1,8.4);
 
-      if (!document.getElementById('enjaz-live-canvas')) {
-        const canvas = document.createElement('canvas');
-        canvas.id = 'enjaz-live-canvas';
-        canvas.setAttribute('aria-hidden','true');
-        publicRoot.querySelector('.sf-hero')?.prepend(canvas);
-      }
+      const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:false,powerPreference:'high-performance'});
+      renderer.setPixelRatio(Math.min(devicePixelRatio,mobile()?1.25:1.7));
+      renderer.outputColorSpace=THREE.SRGBColorSpace;
+      renderer.toneMapping=THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure=1.08;
 
-      const canvas = document.getElementById('enjaz-live-canvas');
-      const hero = publicRoot.querySelector('.sf-hero');
-      const stage = publicRoot.querySelector('.sf-hero-stage');
-      if (!canvas || !hero || !stage) throw new Error('Live hero mount unavailable');
-
-      const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0xeef8ff, 0.035);
-
-      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-      camera.position.set(0, 0.15, 8.5);
-
-      const renderer = new THREE.WebGLRenderer({
-        canvas,
-        alpha:true,
-        antialias:false,
-        powerPreference:'high-performance'
-      });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, mobile()?1.35:1.8));
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
-
-      const composer = new EffectComposer(renderer);
+      const composer=new EffectComposer(renderer);
       composer.addPass(new RenderPass(scene,camera));
-      const bloom = new BloomEffect({
-        intensity: mobile()?0.85:1.25,
-        luminanceThreshold:0.28,
-        luminanceSmoothing:0.7,
-        mipmapBlur:true
-      });
+      const bloom=new BloomEffect({intensity:mobile()?.72:1.05,luminanceThreshold:.3,luminanceSmoothing:.72,mipmapBlur:true});
       composer.addPass(new EffectPass(camera,bloom));
 
-      const root3d = new THREE.Group();
-      scene.add(root3d);
+      const network=new THREE.Group(); scene.add(network);
+      const lights=new THREE.Group(); scene.add(lights);
+      lights.add(new THREE.AmbientLight(0xffffff,1.45));
+      const blue=new THREE.PointLight(0x169fe1,17,13,2); blue.position.set(-3,2.4,4); lights.add(blue);
+      const green=new THREE.PointLight(0x2e9b61,12,10,2); green.position.set(3,-2,3); lights.add(green);
 
-      const ambient = new THREE.AmbientLight(0xffffff, 1.5);
-      scene.add(ambient);
-      const key = new THREE.PointLight(0x17a8e8, 18, 12, 2);
-      key.position.set(-3,2,4);
-      scene.add(key);
-      const green = new THREE.PointLight(0x2e9b61, 13, 10, 2);
-      green.position.set(3,-2,3);
-      scene.add(green);
+      // Central operational core: the visual metaphor is a live organization, not a decorative orb.
+      const coreGroup=new THREE.Group(); network.add(coreGroup);
+      const core=new THREE.Mesh(new THREE.IcosahedronGeometry(1.0,3),new THREE.MeshPhysicalMaterial({
+        color:0x0878c9,emissive:0x0878c9,emissiveIntensity:1.55,roughness:.2,metalness:.3,transparent:true,opacity:.95
+      }));
+      coreGroup.add(core);
+      const coreWire=new THREE.Mesh(new THREE.IcosahedronGeometry(1.18,2),new THREE.MeshBasicMaterial({
+        color:0x6ee1ff,transparent:true,opacity:.16,wireframe:true
+      })); coreGroup.add(coreWire);
 
-      const core = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(1.05,3),
-        new THREE.MeshPhysicalMaterial({
-          color:0x0b75c9, emissive:0x0b75c9, emissiveIntensity:1.9,
-          roughness:.18, metalness:.35, transparent:true, opacity:.92
-        })
-      );
-      root3d.add(core);
-
-      const inner = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(.7,2),
-        new THREE.MeshBasicMaterial({color:0x8ee8ff,transparent:true,opacity:.13,wireframe:true})
-      );
-      root3d.add(inner);
-
-      const ringMat = new THREE.MeshBasicMaterial({
-        color:0x1aa9df,transparent:true,opacity:.42,side:THREE.DoubleSide,
-        blending:THREE.AdditiveBlending
-      });
-      [1.45,1.9,2.35].forEach((radius,i)=>{
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(radius,.008+i*.002,8,160),ringMat.clone());
-        ring.rotation.set(i*.42, i*.7, i*.35);
-        root3d.add(ring);
+      // Three semantic layers: workforce -> workflows -> command center.
+      const layerRadii=[1.58,2.15,2.72];
+      const layerColors=[0x18a9df,0x2e9b61,0x4c7fd9];
+      const rings=[];
+      layerRadii.forEach((radius,i)=>{
+        const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,.009+i*.001,8,180),
+          new THREE.MeshBasicMaterial({color:layerColors[i],transparent:true,opacity:.38,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));
+        ring.rotation.set(.35+i*.32,.55+i*.43,.18+i*.27);
+        network.add(ring); rings.push(ring);
       });
 
-      const nodeCount = mobile()?48:92;
-      const positions = new Float32Array(nodeCount*3);
-      const nodeObjects=[];
-      for(let i=0;i<nodeCount;i++){
-        const r=2.2+Math.random()*2.8;
-        const a=Math.random()*Math.PI*2;
-        const z=(Math.random()-.5)*4.8;
-        positions[i*3]=Math.cos(a)*r;
-        positions[i*3+1]=Math.sin(a)*r*.55;
-        positions[i*3+2]=z;
-        const n=new THREE.Mesh(
-          new THREE.SphereGeometry(.025+Math.random()*.035,8,8),
-          new THREE.MeshBasicMaterial({color:i%5===0?0x2e9b61:0x20b6ec,transparent:true,opacity:.7})
-        );
-        n.position.set(positions[i*3],positions[i*3+1],positions[i*3+2]);
-        root3d.add(n); nodeObjects.push(n);
+      const roleCount=mobile()?18:28;
+      const roleGeo=new THREE.SphereGeometry(.055,8,8);
+      const roleMat=new THREE.MeshBasicMaterial({color:0x25b5e8,transparent:true,opacity:.82});
+      const roleMesh=new THREE.InstancedMesh(roleGeo,roleMat,roleCount);
+      const dummy=new THREE.Object3D();
+      const roleData=[];
+      for(let i=0;i<roleCount;i++){
+        const layer=i%3, radius=layerRadii[layer]+(.12*Math.random());
+        const angle=(i/roleCount)*Math.PI*2+layer*.8;
+        roleData.push({radius,angle,speed:(.12+.08*Math.random())*(i%2?-1:1),y:(Math.random()-.5)*.55,phase:Math.random()*6.28});
+        dummy.position.set(Math.cos(angle)*radius,roleData[i].y+Math.sin(roleData[i].phase)*.12,Math.sin(angle)*radius*.62);
+        dummy.scale.setScalar(.7+.45*Math.random()); dummy.updateMatrix(); roleMesh.setMatrixAt(i,dummy.matrix);
       }
+      roleMesh.instanceMatrix.needsUpdate=true; network.add(roleMesh);
 
-      const linePositions=[];
-      for(let i=0;i<nodeCount;i++){
-        for(let j=i+1;j<nodeCount;j++){
-          const dx=positions[i*3]-positions[j*3];
-          const dy=positions[i*3+1]-positions[j*3+1];
-          const dz=positions[i*3+2]-positions[j*3+2];
-          if(dx*dx+dy*dy+dz*dz < 3.1) {
-            linePositions.push(
-              positions[i*3],positions[i*3+1],positions[i*3+2],
-              positions[j*3],positions[j*3+1],positions[j*3+2]
-            );
-          }
-        }
+      // Workflow beams connect a sparse subset of the workforce to the operating core.
+      const beamCount=mobile()?7:12, beamPos=new Float32Array(beamCount*6);
+      const beamPhase=[];
+      for(let i=0;i<beamCount;i++){
+        const a=(i/beamCount)*Math.PI*2;
+        const r=1.7+Math.random()*.7;
+        beamPos[i*6]=Math.cos(a)*r; beamPos[i*6+1]=(Math.random()-.5)*.45; beamPos[i*6+2]=Math.sin(a)*r*.62;
+        beamPos[i*6+3]=Math.cos(a)*.55; beamPos[i*6+4]=(Math.random()-.5)*.18; beamPos[i*6+5]=Math.sin(a)*.55*.62;
+        beamPhase.push(Math.random()*6.28);
       }
-      const lineGeo=new THREE.BufferGeometry();
-      lineGeo.setAttribute('position',new THREE.Float32BufferAttribute(linePositions,3));
-      const lines=new THREE.LineSegments(lineGeo,new THREE.LineBasicMaterial({
-        color:0x5cc9ef,transparent:true,opacity:.12,blending:THREE.AdditiveBlending
-      }));
-      root3d.add(lines);
+      const beamGeo=new THREE.BufferGeometry(); beamGeo.setAttribute('position',new THREE.BufferAttribute(beamPos,3));
+      const beams=new THREE.LineSegments(beamGeo,new THREE.LineBasicMaterial({color:0x39b9e9,transparent:true,opacity:.18,blending:THREE.AdditiveBlending}));
+      network.add(beams);
 
-      const particleCount=mobile()?350:850;
-      const particlePos=new Float32Array(particleCount*3);
-      const particleVel=new Float32Array(particleCount*3);
-      for(let i=0;i<particleCount;i++){
-        particlePos[i*3]=(Math.random()-.5)*10;
-        particlePos[i*3+1]=(Math.random()-.5)*6;
-        particlePos[i*3+2]=(Math.random()-.5)*7;
-        particleVel[i*3]=(Math.random()-.5)*.001;
-        particleVel[i*3+1]=(Math.random()-.5)*.001;
-        particleVel[i*3+2]=(Math.random()-.5)*.001;
-      }
-      const pGeo=new THREE.BufferGeometry();
-      pGeo.setAttribute('position',new THREE.BufferAttribute(particlePos,3));
-      const particles=new THREE.Points(pGeo,new THREE.PointsMaterial({
-        color:0x54c8ef,size:mobile()?.018:.025,transparent:true,opacity:.42,
-        blending:THREE.AdditiveBlending,depthWrite:false
-      }));
-      root3d.add(particles);
+      // Background field uses one draw call for predictable mobile performance.
+      const particleCount=mobile()?300:720, p=new Float32Array(particleCount*3);
+      for(let i=0;i<particleCount;i++){p[i*3]=(Math.random()-.5)*10;p[i*3+1]=(Math.random()-.5)*6;p[i*3+2]=(Math.random()-.5)*7;}
+      const pg=new THREE.BufferGeometry(); pg.setAttribute('position',new THREE.BufferAttribute(p,3));
+      const particles=new THREE.Points(pg,new THREE.PointsMaterial({color:0x54c8ef,size:mobile()?.018:.024,transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false}));
+      scene.add(particles);
 
       const pointer={x:0,y:0,tx:0,ty:0};
-      const onPointer=e=>{
-        pointer.tx=(e.clientX/innerWidth-.5)*2;
-        pointer.ty=(e.clientY/innerHeight-.5)*2;
-      };
-      window.addEventListener('pointermove',onPointer,{passive:true});
+      const onPointer=e=>{pointer.tx=(e.clientX/innerWidth-.5)*2;pointer.ty=(e.clientY/innerHeight-.5)*2};
+      addEventListener('pointermove',onPointer,{passive:true});
 
-      let scrollProgress=0;
       let lenis=null;
       if(!reduced()){
-        lenis=new Lenis({duration:1.15,smoothWheel:true,touchMultiplier:1.35});
-        lenis.on('scroll',({progress})=>{scrollProgress=progress});
-        const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)};
-        requestAnimationFrame(raf);
+        lenis=new Lenis({duration:1.05,smoothWheel:true,touchMultiplier:1.25});
+        const raf=t=>{lenis.raf(t);requestAnimationFrame(raf)}; requestAnimationFrame(raf);
       }
 
       const resize=()=>{
-        const r=hero.getBoundingClientRect();
-        const w=Math.max(1,r.width),h=Math.max(1,r.height);
-        camera.aspect=w/h;camera.updateProjectionMatrix();
-        renderer.setSize(w,h,false);
-        composer.setSize(w,h);
+        const r=hero.getBoundingClientRect(),w=Math.max(1,r.width),h=Math.max(1,r.height);
+        camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false);composer.setSize(w,h);
       };
-      resize();
-      addEventListener('resize',resize,{passive:true});
+      resize(); addEventListener('resize',resize,{passive:true});
 
       let last=performance.now();
       const animate=now=>{
-        const dt=Math.min(32,now-last);last=now;
-        pointer.x+=(pointer.tx-pointer.x)*.045;
-        pointer.y+=(pointer.ty-pointer.y)*.045;
-        const t=now*.001;
+        const dt=Math.min(34,now-last); last=now; const t=now*.001;
+        pointer.x+=(pointer.tx-pointer.x)*.045; pointer.y+=(pointer.ty-pointer.y)*.045;
 
-        root3d.rotation.y += .0011;
-        root3d.rotation.x = pointer.y*.08 + Math.sin(t*.18)*.035;
-        root3d.rotation.y += pointer.x*.0018;
-        core.rotation.x=t*.22;core.rotation.y=t*.31;
-        inner.rotation.x=-t*.15;inner.rotation.z=t*.23;
-        root3d.position.x=pointer.x*.32;
-        root3d.position.y=-pointer.y*.18;
-        camera.position.x+=(pointer.x*.32-camera.position.x)*.025;
-        camera.position.y+=((.15+pointer.y*.22)-camera.position.y)*.025;
+        const hr=hero.getBoundingClientRect(), vh=innerHeight||1;
+        const scroll=Math.max(0,Math.min(1,(vh-hr.top)/(vh+hr.height)));
+        network.rotation.y=t*.045+pointer.x*.035;
+        network.rotation.x=pointer.y*.055+Math.sin(t*.16)*.018;
+        network.position.x=pointer.x*.24; network.position.y=-pointer.y*.12;
+        core.rotation.x=t*.2; core.rotation.y=t*.3;
+        coreWire.rotation.x=-t*.12; coreWire.rotation.z=t*.19;
+        coreGroup.scale.setScalar(1+Math.sin(t*1.1)*.025+scroll*.07);
 
-        nodeObjects.forEach((n,i)=>{
-          n.position.y += Math.sin(t*.65+i)*.00045;
-          n.material.opacity=.38+.25*(.5+.5*Math.sin(t*1.2+i));
-        });
-        particles.rotation.y=t*.012;
-        particles.rotation.x=Math.sin(t*.1)*.04;
+        rings.forEach((r,i)=>{r.rotation.z+=dt*.00005*(i%2?-1:1);r.rotation.x+=dt*.000025*(i+1);});
+        for(let i=0;i<roleCount;i++){
+          const d=roleData[i],a=d.angle+t*d.speed;
+          dummy.position.set(Math.cos(a)*d.radius,d.y+Math.sin(t*.7+d.phase)*.12,Math.sin(a)*d.radius*.62);
+          dummy.scale.setScalar(.72+.32*(.5+.5*Math.sin(t*1.5+d.phase)));
+          dummy.updateMatrix(); roleMesh.setMatrixAt(i,dummy.matrix);
+        }
+        roleMesh.instanceMatrix.needsUpdate=true;
+        for(let i=0;i<beamCount;i++){
+          const phase=(t*1.2+beamPhase[i])%(Math.PI*2), pulse=.5+.5*Math.sin(phase);
+          beamPos[i*6+1]+=Math.sin(t*.8+i)*.00012;
+          beamPos[i*6+4]=beamPos[i*6+4]*.92+Math.sin(t*.7+i)*.0008;
+        }
+        beamGeo.attributes.position.needsUpdate=true;
+        beams.material.opacity=.11+.09*(.5+.5*Math.sin(t*1.4));
+        particles.rotation.y=t*.009; particles.rotation.x=Math.sin(t*.11)*.035;
 
-        const heroRect=hero.getBoundingClientRect();
-        const vh=innerHeight||1;
-        const local=Math.max(0,Math.min(1,(vh-heroRect.top)/(vh+heroRect.height)));
-        root3d.scale.setScalar(1+local*.09);
-        camera.position.z=8.5-local*.65;
+        camera.position.x+=(pointer.x*.28-camera.position.x)*.025;
+        camera.position.y+=((.1+pointer.y*.18)-camera.position.y)*.025;
+        camera.position.z+=(8.4-scroll*.5-camera.position.z)*.025;
 
-        composer.render();
-        requestAnimationFrame(animate);
+        composer.render(); requestAnimationFrame(animate);
       };
       requestAnimationFrame(animate);
 
       if(!reduced()){
-        gsap.fromTo(stage,{opacity:0,scale:.96},{opacity:1,scale:1,duration:1.15,ease:'power3.out',delay:.12});
-        gsap.to(core.scale,{x:1.06,y:1.06,z:1.06,duration:2.2,repeat:-1,yoyo:true,ease:'sine.inOut'});
-        gsap.to(key,{intensity:23,duration:2.4,repeat:-1,yoyo:true,ease:'sine.inOut'});
+        gsap.fromTo(stage,{opacity:0,scale:.975},{opacity:1,scale:1,duration:1.1,ease:'power3.out',delay:.08});
+        gsap.to(core.scale,{x:1.045,y:1.045,z:1.045,duration:2.2,repeat:-1,yoyo:true,ease:'sine.inOut'});
+        gsap.to(blue,{intensity:22,duration:2.5,repeat:-1,yoyo:true,ease:'sine.inOut'});
       }
-
-      publicRoot.dataset.liveReady='ready';
-    } catch(error) {
-      console.warn('[ENJAZ_LIVE_EXPERIENCE]',error);
-      publicRoot.dataset.liveReady='fallback';
-    }
+      root.dataset.liveReady='ready';
+    }catch(err){console.warn('[ENJAZ_LIVE_EXPERIENCE]',err);root.dataset.liveReady='fallback';}
   }
 
-  const watch=()=>{
-    const root=document.getElementById('enjaz-public');
-    if(root) boot(root);
-  };
-  new MutationObserver(watch).observe(document.body,{childList:true,subtree:true});
-  watch();
+  const watch=()=>{const root=document.getElementById('enjaz-public');if(root)boot(root)};
+  new MutationObserver(watch).observe(document.body,{childList:true,subtree:true}); watch();
 })();
