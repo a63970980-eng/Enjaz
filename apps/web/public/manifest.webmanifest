@@ -1,0 +1,11 @@
+{
+  "name":"إنجاز — Workforce OS",
+  "short_name":"إنجاز",
+  "lang":"ar",
+  "dir":"rtl",
+  "start_url":"/",
+  "display":"standalone",
+  "background_color":"#ffffff",
+  "theme_color":"#075bea",
+  "description":"منصة مؤسسية للقوة العاملة الرقمية والعمليات وسير العمل والحوكمة."
+}
