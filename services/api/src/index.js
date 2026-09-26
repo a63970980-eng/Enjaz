@@ -16,8 +16,8 @@ import { listEmployeeRoutines,createEmployeeRoutine,updateEmployeeRoutine,delete
 import { listBillingPlans,getBillingSubscription,getBillingUsage,assertWorkspaceLimit } from './billing-repository.js';
 import './integrations/index.js';
 const port=process.env.PORT||4000;
-const supabaseUrl=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL||'';
-const supabaseKey=process.env.SUPABASE_ANON_KEY||process.env.SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY||'';
+const supabaseUrl=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
+const supabaseKey=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_ANON_KEY||'sb_publishable_U12modLyDRQWV2sNAJHiqg_vJPOSoOz';
 // Supabase configuration is required in production; the health/version routes remain boot-safe when it is not provisioned.
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean));
 const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
