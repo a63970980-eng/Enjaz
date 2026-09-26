@@ -32,7 +32,7 @@ Deno.serve(async req=>{
         "Content-Type":"application/json",
         "X-Enjaz-Worker-Token":token
       },
-      body:JSON.stringify({limit:Math.min(Math.max(Number(body?.limit||6),1),6),time:new Date().toISOString()})
+      body:JSON.stringify({limit:Math.min(Math.max(Number(body?.limit||6),1),6),time:new Date().toISOString(),workerToken:token})
     });
     const text=await r.text();
     let data:unknown=text;
