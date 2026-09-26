@@ -105,7 +105,9 @@ registerTool({
   const c=await getConnectionCredentials({workspaceId:context.workspaceId,connectionId,provider:app.providers[0]});
   const u=allowed(input?.url,app.hosts);
   const method=text(input?.method||'GET').toUpperCase();if(!['GET','POST','PUT','PATCH','DELETE'].includes(method))throw new Error('Unsupported API method');
-  const headers={...authHeaders(c.credentials)};const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
+  const headers={...authHeaders(c.credentials,appId)};
+  if(appId==='trello'){u.searchParams.set('key',text(c.credentials.apiKey));u.searchParams.set('token',text(c.credentials.token));delete headers['X-Enjaz-Trello-Key'];delete headers['X-Enjaz-Trello-Token'];}
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
   try{
    const init={method,headers,redirect:'error',signal:controller.signal};
    if(method!=='GET'&&method!=='DELETE')init.body=JSON.stringify(input?.body&&typeof input.body==='object'?input.body:{});
