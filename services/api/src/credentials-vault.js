@@ -9,3 +9,15 @@ export async function saveConnection({workspaceId,provider,name,displayName=null
 // Contract marker: update integration_connections set enabled=false,status='revoked'
 export async function revokeConnection({workspaceId,connectionId,actorUserId=null}){if(!connectionId)throw new Error('connectionId is required');return withTransaction(async client=>{const connection=(await client.query('update integration_connections set enabled=false,status=\'revoked\',updated_at=now() where id=$1 and workspace_id=$2 returning id,workspace_id,provider,name,config,enabled,auth_type,scopes,status,metadata,expires_at,created_at,updated_at',[connectionId,workspaceId])).rows[0];if(!connection)throw Object.assign(new Error('Integration connection not found'),{status:404});await client.query('insert into audit_events (id,workspace_id,event_type,actor_type,action,metadata) values ($1,$2,$3,$4,$5,$6::jsonb)',[randomUUID(),workspaceId,'integration.revoked','user','integration.revoke',JSON.stringify({connectionId:connection.id,provider:connection.provider,name:connection.name,userId:actorUserId})]);return connection;});}
 export async function listConnections(workspaceId){return (await query('select id,workspace_id,provider,name,config,enabled,auth_type,scopes,status,metadata,expires_at,created_at,updated_at from integration_connections where workspace_id=$1 order by created_at desc',[workspaceId])).rows;}
+export async function getConnectionCredentials({workspaceId,connectionId,provider=null}){
+ const row=(await query('select id,workspace_id,provider,name,encrypted_credentials,config,status,enabled,expires_at from integration_connections where id=$1 and workspace_id=$2 limit 1',[connectionId,workspaceId])).rows[0];
+ if(!row)throw Object.assign(new Error('Integration connection not found'),{status:404});
+ if(provider&&row.provider!==provider)throw new Error('Integration provider mismatch');
+ if(!row.enabled||row.status!=='active')throw new Error('Integration connection is not active');
+ if(row.expires_at&&new Date(row.expires_at).getTime()<=Date.now())throw new Error('Integration connection has expired');
+ return {...row,credentials:await decryptCredentials(row.encrypted_credentials)};
+}
+export async function logIntegrationAction({workspaceId,taskId=null,employeeId=null,connectionId=null,provider,action,status,requestMeta={},responseMeta={}}){
+ await query('insert into integration_action_logs(id,workspace_id,task_id,employee_id,connection_id,provider,action,status,request_meta,response_meta,completed_at) values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10::jsonb,now())',[randomUUID(),workspaceId,taskId,employeeId,connectionId,provider,action,status,JSON.stringify(requestMeta),JSON.stringify(responseMeta)]);
+}
+
