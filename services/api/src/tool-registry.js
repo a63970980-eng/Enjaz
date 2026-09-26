@@ -41,3 +41,55 @@ registerTool({name:'task.handoff',description:'Hand off the current task to anot
   return {type:'task_handoff',handoff,childTask:{id:childTaskId,employeeId:toEmployeeId,title:childTitle,objective:childObjective}};
  });
 }});
+
+registerTool({name:'finance.read',description:'Read-only financial snapshot from the workspace commerce ledger.',risk:'low',execute:async({input,context})=>{
+ const days=Math.min(365,Math.max(1,Number(input?.days)||30));
+ const row=(await query("select count(*)::int as transactions,coalesce(sum(total),0)::numeric as revenue,coalesce(sum(discount),0)::numeric as discounts,coalesce(avg(total),0)::numeric as average_transaction,count(*) filter(where payment_status='paid')::int as paid_transactions,count(*) filter(where payment_status='pending')::int as pending_transactions from commerce_orders where workspace_id=$1 and ordered_at >= now()-($2::text||' days')::interval",[context.workspaceId,String(days)])).rows[0];
+ return {type:'finance_snapshot',days,metrics:row,scope:'commerce_orders',note:'This is a read-only operational sales snapshot; a full general-ledger accounting module is not present in the current schema.'};
+}});
+registerTool({name:'knowledge',description:'Read the employee knowledge base.',risk:'low',execute:async({input,context})=>{
+ const limit=Math.min(50,Math.max(1,Number(input?.limit)||20));
+ const rows=(await query('select id,title,content,source,metadata,updated_at from employee_knowledge where workspace_id=$1 and employee_id=$2 order by updated_at desc limit $3',[context.workspaceId,context.employeeId,limit])).rows;
+ return {type:'knowledge',items:rows};
+}});
+registerTool({name:'analytics',description:'Analyze workspace data without external side effects.',risk:'low',execute:async({input,context})=>({type:'analysis',input,context,summary:'Structured analysis completed by the ENJAZ analytics tool.'})});
+registerTool({name:'reports',description:'Create an in-memory business report.',risk:'low',execute:async({input,context})=>({type:'report',title:input?.title||'ENJAZ Report',content:input?.content||'',context})});
+registerTool({name:'approvals',description:'Read pending approvals in the current workspace.',risk:'low',execute:async({input,context})=>{
+ const limit=Math.min(50,Math.max(1,Number(input?.limit)||20));
+ const rows=(await query("select id,task_id,action,reason,status,created_at from approvals where workspace_id=$1 and status='pending' order by created_at desc limit $2",[context.workspaceId,limit])).rows;
+ return {type:'approvals',items:rows};
+}});
+registerTool({name:'approval.request',description:'Create a human approval request for the current task.',risk:'high',execute:async({input,context})=>{
+ if(!context.workspaceId||!context.taskId)throw new Error('Approval request requires task context');
+ const action=String(input?.action||'review').trim();
+ const reason=String(input?.reason||'Human approval requested by digital employee.').trim();
+ const payload=input?.payload&&typeof input.payload==='object'?input.payload:{};
+ const row=(await query('insert into approvals(id,workspace_id,task_id,action,reason,payload) values($1,$2,$3,$4,$5,$6::jsonb) returning *',[randomUUID(),context.workspaceId,context.taskId,action,reason,JSON.stringify(payload)])).rows[0];
+ return {type:'approval_request',approval:row};
+}});
+registerTool({name:'crm',description:'Read customer records from the workspace commerce customer store.',risk:'low',execute:async({input,context})=>{
+ const term=String(input?.query||'').trim();
+ const rows=term
+  ? (await query('select id,name,email,phone,orders_count,lifetime_value,last_order_at from commerce_customers where workspace_id=$1 and (name ilike $2 or email ilike $2 or phone ilike $2) order by updated_at desc limit 20',[context.workspaceId,'%'+term+'%'])).rows
+  : (await query('select id,name,email,phone,orders_count,lifetime_value,last_order_at from commerce_customers where workspace_id=$1 order by updated_at desc limit 20',[context.workspaceId])).rows;
+ return {type:'crm_customers',customers:rows};
+}});
+registerTool({name:'tasks',description:'Read current workspace tasks.',risk:'low',execute:async({input,context})=>{
+ const limit=Math.min(50,Math.max(1,Number(input?.limit)||20));
+ const rows=(await query('select id,title,objective,status,priority,employee_id,created_at,completed_at from tasks where workspace_id=$1 order by created_at desc limit $2',[context.workspaceId,limit])).rows;
+ return {type:'tasks',items:rows};
+}});
+registerTool({name:'task.manage',description:'Read the current task or append a work note; it does not mutate task state.',risk:'low',execute:async({input,context})=>{
+ if(String(input?.operation||'read')==='comment'){
+  const body=String(input?.body||'').trim();if(!body)throw new Error('Task comment body is required');
+  const row=(await query('insert into task_comments(id,workspace_id,task_id,employee_id,body) values($1,$2,$3,$4,$5) returning id,body,created_at',[randomUUID(),context.workspaceId,context.taskId,context.employeeId,body])).rows[0];
+  return {type:'task_comment',comment:row};
+ }
+ const row=(await query('select id,title,objective,status,priority,employee_id,input,output from tasks where id=$1 and workspace_id=$2',[context.taskId,context.workspaceId])).rows[0];
+ return {type:'task',task:row||null};
+}});
+registerTool({name:'workflow.run',description:'Queue an existing workflow for execution.',risk:'high',execute:async({input,context})=>{
+ const workflowId=String(input?.workflowId||'').trim();if(!workflowId)throw new Error('workflowId is required');
+ const job=await enqueueJob({workspaceId:context.workspaceId,jobType:'workflow.run',payload:{workflowId},maxAttempts:3,idempotencyKey:'workflow:'+workflowId+':'+context.taskId});
+ return {type:'workflow_queued',workflowId,jobId:job.id};
+}});
