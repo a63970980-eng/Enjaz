@@ -33,7 +33,7 @@ const APPS={
  twilio:{name:'Twilio',hosts:['api.twilio.com'],providers:['twilio']},
  zoom:{name:'Zoom',hosts:['api.zoom.us'],providers:['zoom']},
  n8n:{name:'n8n',hosts:['n8n.cloud'],providers:['n8n']},
- webhooks:{name:'Webhooks',hosts:[],providers:['webhook']}
+ webhooks:{name:'Webhooks',hosts:['hooks.example.invalid'],providers:['webhook']}
 };
 
 function allowed(url,hosts){
@@ -42,8 +42,25 @@ function allowed(url,hosts){
  if(hosts.length&&!hosts.some(h=>u.hostname===h||u.hostname.endsWith('.'+h)))throw new Error('Integration host is not allowed for this app');
  return u;
 }
-function authHeaders(credentials){
- const token=text(credentials?.accessToken||credentials?.token||credentials?.apiKey);
+function authHeaders(credentials,appId){
+ const c=credentials||{};
+ const token=text(c.accessToken||c.token||c.apiKey||c.apiToken);
+ if(appId==='stripe'||appId==='twilio'){
+  if(!token)throw new Error('Integration credential is missing');
+  return {Authorization:'Basic '+Buffer.from(token+':').toString('base64'),Accept:'application/json','Content-Type':'application/json'};
+ }
+ if(appId==='trello'){
+  const key=text(c.apiKey), t=text(c.token);if(!key||!t)throw new Error('Trello API key and token are required');
+  return {Accept:'application/json','Content-Type':'application/json','X-Enjaz-Trello-Key':key,'X-Enjaz-Trello-Token':t};
+ }
+ if(appId==='shopify'){
+  if(!token)throw new Error('Shopify access token is missing');
+  return {'X-Shopify-Access-Token':token,Accept:'application/json','Content-Type':'application/json'};
+ }
+ if(appId==='discord'){
+  if(!token)throw new Error('Discord credential is missing');
+  return {Authorization:token.startsWith('Bot ')?token:'Bot '+token,Accept:'application/json','Content-Type':'application/json'};
+ }
  if(!token)throw new Error('Integration credential is missing');
  return {Authorization:'Bearer '+token,Accept:'application/json','Content-Type':'application/json'};
 }
@@ -58,11 +75,11 @@ registerTool({
  description:'Read from an allowlisted API of a connected external application using encrypted credentials.',
  risk:'low',
  execute:async({input,context})=>{
-  const appId=text(input?.app);const app=APPS[appId];if(!app)throw new Error('Unsupported external application');
+  const appId=text(input?.app);const app=APPS[appId];if(!app||appId==='webhooks')throw new Error('Unsupported external application');
   const connectionId=text(input?.connectionId);if(!connectionId)throw new Error('connectionId is required');
   const c=await getConnectionCredentials({workspaceId:context.workspaceId,connectionId,provider:app.providers[0]});
   const u=allowed(input?.url,app.hosts);
-  const headers={...authHeaders(c.credentials)};
+  const headers={...authHeaders(c.credentials,appId)};
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
   try{
    const r=await fetch(u,{method:'GET',headers,redirect:'error',signal:controller.signal});
