@@ -81,6 +81,7 @@ registerTool({
   const u=allowed(input?.url,app.hosts);
   const headers={...authHeaders(c.credentials,appId)};
   if(appId==='trello'){u.searchParams.set('key',text(c.credentials.apiKey));u.searchParams.set('token',text(c.credentials.token));delete headers['X-Enjaz-Trello-Key'];delete headers['X-Enjaz-Trello-Token'];}
+  if(appId==='stripe'||appId==='twilio'){headers.Authorization='Basic '+Buffer.from(text(c.credentials.secretKey||c.credentials.apiKey||c.credentials.token)+':').toString('base64');}
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
   try{
    const r=await fetch(u,{method:'GET',headers,redirect:'error',signal:controller.signal});
@@ -107,6 +108,7 @@ registerTool({
   const method=text(input?.method||'GET').toUpperCase();if(!['GET','POST','PUT','PATCH','DELETE'].includes(method))throw new Error('Unsupported API method');
   const headers={...authHeaders(c.credentials,appId)};
   if(appId==='trello'){u.searchParams.set('key',text(c.credentials.apiKey));u.searchParams.set('token',text(c.credentials.token));delete headers['X-Enjaz-Trello-Key'];delete headers['X-Enjaz-Trello-Token'];}
+  if(appId==='stripe'||appId==='twilio'){headers.Authorization='Basic '+Buffer.from(text(c.credentials.secretKey||c.credentials.apiKey||c.credentials.token)+':').toString('base64');}
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
   try{
    const init={method,headers,redirect:'error',signal:controller.signal};
