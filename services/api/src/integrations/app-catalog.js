@@ -54,6 +54,30 @@ registerTool({
  execute:async()=>({type:'app_catalog',apps:Object.entries(APPS).map(([id,v])=>({id,...v}))})
 });
 registerTool({
+ name:'app.api.read',
+ description:'Read from an allowlisted API of a connected external application using encrypted credentials.',
+ risk:'low',
+ execute:async({input,context})=>{
+  const appId=text(input?.app);const app=APPS[appId];if(!app)throw new Error('Unsupported external application');
+  const connectionId=text(input?.connectionId);if(!connectionId)throw new Error('connectionId is required');
+  const c=await getConnectionCredentials({workspaceId:context.workspaceId,connectionId,provider:app.providers[0]});
+  const u=allowed(input?.url,app.hosts);
+  const headers={...authHeaders(c.credentials)};
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);
+  try{
+   const r=await fetch(u,{method:'GET',headers,redirect:'error',signal:controller.signal});
+   const raw=await r.text();let data=raw;try{data=raw?JSON.parse(raw):{}}catch{}
+   await logIntegrationAction({workspaceId:context.workspaceId,taskId:context.taskId,employeeId:context.employeeId,connectionId:c.id,provider:c.provider,action:'api.read',status:r.ok?'succeeded':'failed',requestMeta:{app:appId,method:'GET',path:u.pathname},responseMeta:{status:r.status}});
+   if(!r.ok)throw new Error(app.name+' API read failed with HTTP '+r.status);
+   return {type:'external_api_result',app:appId,status:r.status,data};
+  }catch(error){
+   if(error?.name==='AbortError')throw new Error('External API read timed out');
+   throw error;
+  }finally{clearTimeout(timer)}
+ }
+});
+
+registerTool({
  name:'app.api.request',
  description:'Call an allowlisted API of a connected external application using encrypted credentials.',
  risk:'high',
