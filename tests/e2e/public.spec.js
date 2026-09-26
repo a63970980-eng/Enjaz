@@ -4,10 +4,10 @@ import AxeBuilder from '@axe-core/playwright';
 test('public landing page boots and exposes working authentication CTAs',async({page})=>{
   await page.goto('/',{waitUntil:'domcontentloaded'});
   await expect(page.locator('#enjaz-public')).toBeVisible();
-  await expect(page.getByRole('heading',{name:/حوّل الذكاء الاصطناعي/})).toBeVisible();
-  await expect(page.locator('[data-auth="login"]').first()).toBeVisible();
-  await expect(page.locator('[data-auth="signup"]').first()).toBeVisible();
-  await expect(page.locator('.workforce-stage')).toBeVisible();
+  await expect(page.getByRole('heading',{name:/قوة عمل رقمية تعمل معك/})).toBeVisible();
+  await expect(page.locator('[data-public-login]').first()).toBeVisible();
+  await expect(page.locator('[data-public-signup]').first()).toBeVisible();
+  await expect(page.locator('.sf-command-card')).toBeVisible();
 });
 
 test('public landing page has no serious automated accessibility violations',async({page})=>{
@@ -16,7 +16,6 @@ test('public landing page has no serious automated accessibility violations',asy
   const serious=results.violations.filter(v=>v.impact==='critical'||v.impact==='serious');
   expect(serious).toEqual([]);
 });
-
 
 test('login gate renders a real credential form and validates required fields',async({page})=>{
   await page.goto('/?auth=1',{waitUntil:'domcontentloaded'});
