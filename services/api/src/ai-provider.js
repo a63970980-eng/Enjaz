@@ -1,4 +1,5 @@
 import { withSpan } from './telemetry.js';
+import { generateWithRoute, getModelRoutingStatus } from './ai-model-router.js';
 
 const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const DEFAULT_OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
@@ -94,27 +95,20 @@ async function tracedProvider(name, model, operation) {
   return withSpan(`enjaz.ai.${name}`, { 'ai.provider': name, 'ai.model': model }, operation);
 }
 
-export async function generateAI({ messages, provider = process.env.AI_PROVIDER || 'auto', model }) {
+export async function generateAI({ messages, provider = process.env.AI_PROVIDER || 'auto', model, purpose = 'reasoning' }) {
   if (!Array.isArray(messages) || !messages.length) throw new Error('messages are required');
-  const requested = String(provider).toLowerCase();
-  const providers = requested === 'gemini' ? ['gemini']
-    : requested === 'openrouter' ? ['openrouter']
-    : requested === 'openai' ? ['openai']
-    : ['gemini', 'openrouter', 'openai'];
-  const errors = [];
-  for (const name of providers) {
-    const selectedModel = model || (name === 'gemini' ? DEFAULT_GEMINI_MODEL : name === 'openrouter' ? DEFAULT_OPENROUTER_MODEL : DEFAULT_OPENAI_MODEL);
-    try {
-      return await tracedProvider(name, selectedModel, () => {
-        if (name === 'gemini') return callGemini({ messages, model: selectedModel });
-        if (name === 'openrouter') return callOpenRouter({ messages, model: selectedModel });
-        return callOpenAI({ messages, model: selectedModel });
-      });
-    } catch (error) {
-      errors.push(`${name}: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-  throw new Error(`No AI provider succeeded. ${errors.join(' | ')}`);
+  return generateWithRoute({
+    purpose,
+    provider,
+    model,
+    messages,
+    generate: ({ provider: routedProvider, model: routedModel }) => {
+      if (routedProvider === 'gemini') return callGemini({ messages, model: routedModel || DEFAULT_GEMINI_MODEL });
+      if (routedProvider === 'openrouter') return callOpenRouter({ messages, model: routedModel || DEFAULT_OPENROUTER_MODEL });
+      if (routedProvider === 'openai') return callOpenAI({ messages, model: routedModel || DEFAULT_OPENAI_MODEL });
+      throw new Error(`Unsupported AI provider: ${routedProvider}`);
+    },
+  });
 }
 
 export function getAIProviderStatus() {
@@ -123,5 +117,6 @@ export function getAIProviderStatus() {
     gemini: Boolean(clean(process.env.GEMINI_API_KEY)),
     openrouter: Boolean(clean(process.env.OPENROUTER_API_KEY)),
     openai: Boolean(clean(process.env.OPENAI_API_KEY)),
+    routing: getModelRoutingStatus(),
   };
 }
