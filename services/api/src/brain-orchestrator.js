@@ -4,6 +4,7 @@ import { generatePlan } from './model-provider.js';
 import './openai-model-provider.js';
 import { materializePlan } from './execution-graph.js';
 import { listEmployeeGoals, listEmployeeKnowledge } from './workforce-repository.js';
+import { query } from './db.js';
 
 function normalizeExecutionPlan(plan) {
   return {
@@ -17,12 +18,13 @@ function normalizeExecutionPlan(plan) {
 }
 
 export async function planEmployeeTask({ employee, workspaceId, employeeId, taskId, goal, provider = process.env.ENJAZ_MODEL_PROVIDER || process.env.AI_PROVIDER || 'auto' }) {
-  const [memory, goals, knowledge] = await Promise.all([
+  const [memory, goals, knowledge, integrations] = await Promise.all([
     recall({ workspaceId, employeeId, limit: 20 }),
     listEmployeeGoals(workspaceId, employeeId),
     listEmployeeKnowledge(workspaceId, employeeId),
+    query("select provider,status,display_name from integration_connections where workspace_id=$1 and status='active' order by provider", [workspaceId]).then((r) => r.rows),
   ]);
-  const context = buildBrainContext({ employee, goal, memory, workspaceId, taskId, employeeId });
+  const context = buildBrainContext({ employee, goal, memory, workspaceId, taskId, employeeId, integrations });
   context.employee.objectives = goals.slice(0, 20).map(({ title, target, current_value, unit, period, status }) => ({ title, target, currentValue: current_value, unit, period, status }));
   context.employee.knowledge = knowledge.slice(0, 20).map(({ title, content, source, metadata }) => ({ title, content, source, metadata }));
 
