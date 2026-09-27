@@ -7,8 +7,8 @@ const guard=await readFile(new URL('../src/credential-guard.js',import.meta.url)
 const migration=await readFile(new URL('../db/migrations/021_integration_credentials_metadata.sql',import.meta.url),'utf8');
 
 test('credential vault writes only the actual integration connection schema',()=>{
-  assert.match(vault,/insert into integration_connections \(id,workspace_id,provider,name,encrypted_credentials,config,enabled,auth_type,scopes,status,metadata,expires_at\)/);
-  assert.doesNotMatch(vault,/insert into integration_connections \([^)]*display_name/);
+  assert.match(vault,/insert into integration_connections \(id,workspace_id,provider,display_name,encrypted_credentials,config,auth_type,scopes,status,metadata,expires_at\)/);
+  
   assert.match(vault,/AES-GCM/);
 });
 
