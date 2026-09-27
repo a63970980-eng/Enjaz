@@ -50,6 +50,7 @@ async function generateAIPlan(context, provider = process.env.AI_PROVIDER || 'au
   const response = await generateAI({
     provider,
     model: provider === 'gemini' ? process.env.GEMINI_MODEL : provider === 'openrouter' ? process.env.OPENROUTER_MODEL : provider === 'openai' ? process.env.OPENAI_MODEL : undefined,
+    purpose: 'planning',
     messages: [
       { role: 'system', content: context.system },
       { role: 'user', content: JSON.stringify({ employee: context.employee, goal: context.goal, memory: context.memory, availableTools: context.availableTools, instructions: 'Return JSON only: {goal:string,steps:[{id,intent,action,input,approval_required,depends_on}]}. Use only tools assigned to the employee. Use intents analyze, create_report, notify, lookup, or request_approval. Keep 1-12 steps. Dependencies must reference earlier step ids exactly.' }) },
