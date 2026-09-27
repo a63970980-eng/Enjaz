@@ -4,7 +4,7 @@ import { registerTool } from '../tool-registry.js';
 
 const text = value => String(value ?? '').trim();
 
-function validateEndpoint(value) {
+function validateEndpoint(value, allowedHosts = []) {
   let url;
   try { url = new URL(text(value)); } catch { throw new Error('MCP endpoint must be a valid URL'); }
   if (url.protocol !== 'https:') throw new Error('MCP endpoint must use HTTPS');
@@ -15,6 +15,11 @@ function validateEndpoint(value) {
       hostname.endsWith('.local') || hostname.endsWith('.internal')) {
     throw new Error('MCP endpoint cannot target a local or internal hostname');
   }
+  const hosts = Array.isArray(allowedHosts) ? allowedHosts.map(text).filter(Boolean) : [];
+  if (!hosts.length) throw new Error('MCP connection must declare an allowed host');
+  if (!hosts.some(host => hostname === host.toLowerCase() || hostname.endsWith('.' + host.toLowerCase()))) {
+    throw new Error('MCP endpoint host is not allowlisted for this connection');
+  }
   return url;
 }
 
@@ -22,7 +27,7 @@ function authHeaders(credentials, config) {
   const token = text(credentials?.accessToken || credentials?.token || credentials?.apiKey || credentials?.apiToken);
   if (!token) return {};
   const headerName = text(config?.authHeaderName || 'Authorization');
-  if (!/^[A-Za-z0-9!#$%&'*+.^_|~-]+$/.test(headerName)) throw new Error('Invalid MCP authentication header name');
+  if (!/^[A-Za-z0-9!#$%&'*+.^_`|~-]+$/.test(headerName)) throw new Error('Invalid MCP authentication header name');
   return {
     [headerName]: headerName.toLowerCase() === 'authorization' && !/^Bearer\s/i.test(token) ? 'Bearer ' + token : token,
   };
@@ -30,9 +35,23 @@ function authHeaders(credentials, config) {
 
 async function withClient({ workspaceId, connectionId, context, operation }) {
   const connection = await getConnectionCredentials({ workspaceId, connectionId, provider: 'mcp' });
-  const endpoint = validateEndpoint(connection.config?.endpoint);
+  const endpoint = validateEndpoint(connection.config?.endpoint, connection.config?.allowedHosts);
   const headers = authHeaders(connection.credentials, connection.config);
-  const transport = new StreamableHTTPClientTransport(endpoint, { requestInit: { headers } });
+  const transport = new StreamableHTTPClientTransport(endpoint, {
+    requestInit: { headers },
+    fetch: async (input, init = {}) => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      try {
+        const upstream = init.signal;
+        if (upstream?.aborted) controller.abort(upstream.reason);
+        else if (upstream) upstream.addEventListener('abort', () => controller.abort(upstream.reason), { once: true });
+        return await fetch(input, { ...init, signal: controller.signal, redirect: 'error' });
+      } finally {
+        clearTimeout(timeout);
+      }
+    },
+  });
   const client = new Client({ name: 'enjaz-workforce', version: '1.0.0' });
   try {
     await client.connect(transport);
@@ -40,6 +59,15 @@ async function withClient({ workspaceId, connectionId, context, operation }) {
   } finally {
     await client.close().catch(() => {});
   }
+}
+
+function publicToolDescriptor(tool) {
+  return {
+    name: String(tool?.name || '').slice(0, 200),
+    description: String(tool?.description || '').slice(0, 500),
+    inputSchema: tool?.inputSchema && typeof tool.inputSchema === 'object' ? tool.inputSchema : {},
+    source: 'external_mcp_untrusted',
+  };
 }
 
 registerTool({
@@ -50,9 +78,7 @@ registerTool({
     const connectionId = text(input?.connectionId);
     if (!connectionId) throw new Error('connectionId is required');
     return withClient({
-      workspaceId: context.workspaceId,
-      connectionId,
-      context,
+      workspaceId: context.workspaceId, connectionId, context,
       operation: async ({ client, connection, endpoint }) => {
         const result = await client.listTools();
         await logIntegrationAction({
@@ -62,12 +88,7 @@ registerTool({
           requestMeta: { endpoint: endpoint.origin + endpoint.pathname },
           responseMeta: { toolCount: result.tools?.length || 0 },
         });
-        return {
-          type: 'mcp_tools', connectionId: connection.id,
-          tools: (result.tools || []).map(tool => ({
-            name: tool.name, description: tool.description || '', inputSchema: tool.inputSchema || {},
-          })),
-        };
+        return { type: 'mcp_tools', connectionId: connection.id, tools: (result.tools || []).map(publicToolDescriptor) };
       },
     });
   },
