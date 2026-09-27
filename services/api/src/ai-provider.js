@@ -1,5 +1,5 @@
 import { withSpan } from './telemetry.js';
-import { generateWithRoute, getModelRoutingStatus } from './ai-model-router.js';
+import { generateWithRoute } from './ai-model-router.js';
 
 const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const DEFAULT_OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/free';
@@ -117,6 +117,5 @@ export function getAIProviderStatus() {
     gemini: Boolean(clean(process.env.GEMINI_API_KEY)),
     openrouter: Boolean(clean(process.env.OPENROUTER_API_KEY)),
     openai: Boolean(clean(process.env.OPENAI_API_KEY)),
-    routing: getModelRoutingStatus(),
   };
 }
