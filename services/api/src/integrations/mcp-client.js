@@ -52,7 +52,7 @@ async function withClient({ workspaceId, connectionId, context, operation }) {
       }
     },
   });
-  const client = new Client({ name: 'enjaz-workforce', version: '1.0.0' });
+  const client = new Client({ name: 'enjaz-workforce', version: '1.0.0' }, { versionNegotiation: { mode: 'auto' } });
   try {
     await client.connect(transport);
     return await operation({ client, connection, endpoint });
