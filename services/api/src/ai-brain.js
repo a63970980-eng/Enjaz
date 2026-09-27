@@ -4,7 +4,20 @@ const SYSTEM='You are an ENJAZ AI employee planner. Return only valid JSON. Brea
 const MAX_STEPS=12;
 const SAFE_INTENTS=new Set(['analyze','create_report','notify','lookup','request_approval']);
 
-export function buildBrainContext({employee,goal,memory=[],workspaceId='',taskId='',employeeId=''}){return {system:SYSTEM,workspaceId,taskId,employeeId,employee:{name:employee.name,role:employee.role,goal:employee.goal,skills:employee.skills||[],permissions:employee.permissions||[],tools:employee.tools||[]},goal,memory:memory.slice(-20),availableTools:listTools()};}
+export function buildBrainContext({employee,goal,memory=[],workspaceId='',taskId='',employeeId='',integrations=[]}){
+ const assigned=new Set((employee.tools||[]).map(t=>typeof t==='string'?t:t?.name).filter(Boolean));
+ const availableTools=listTools().filter(tool=>assigned.has(tool.name));
+ return {
+  system:SYSTEM,
+  workspaceId,taskId,employeeId,
+  employee:{
+   name:employee.name,role:employee.role,goal:employee.goal,
+   skills:employee.skills||[],permissions:employee.permissions||[],
+   tools:employee.tools||[],integrations
+  },
+  goal,memory:memory.slice(-20),availableTools
+ };
+}
 
 export function validatePlan(plan,employee){
  if(!plan||!Array.isArray(plan.steps)||plan.steps.length<1||plan.steps.length>MAX_STEPS)throw new Error(`Invalid AI plan: steps must contain 1-${MAX_STEPS} items`);
