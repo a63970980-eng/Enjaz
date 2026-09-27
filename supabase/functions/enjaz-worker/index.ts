@@ -21,6 +21,7 @@ Deno.serve(async req=>{
   const db=createClient(base,service);
   const {data:valid,error}=await db.rpc("enjaz_worker_token_valid",{p_token:token});
   if(error||valid!==true) return out({error:"Invalid worker token"},401);
+  if(body?.validateOnly===true) return out({valid:true},200);
 
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),25000);
