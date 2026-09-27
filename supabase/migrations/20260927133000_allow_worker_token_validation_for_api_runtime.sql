@@ -1,4 +1,5 @@
--- Enjaz worker runtime: allow the API runtime to validate the worker token through PostgREST.
--- The function returns only a boolean and compares against the Vault secret; the secret itself is never exposed.
+-- Worker token validation is performed by the authenticated worker Edge Function.
+-- Do not expose the SECURITY DEFINER Vault lookup through the public Data API.
 revoke execute on function public.enjaz_worker_token_valid(text) from public;
-grant execute on function public.enjaz_worker_token_valid(text) to anon;
+revoke execute on function public.enjaz_worker_token_valid(text) from anon;
+grant execute on function public.enjaz_worker_token_valid(text) to service_role;
