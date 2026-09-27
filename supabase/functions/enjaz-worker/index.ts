@@ -14,14 +14,14 @@ Deno.serve(async req=>{
   const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if(!base||!service) return out({error:"Production worker is not configured"},503);
 
-  const token=String(req.headers.get("X-Enjaz-Worker-Token")||"").trim();
+  const body=await req.json().catch(()=>({}));
+  const token=String(req.headers.get("X-Enjaz-Worker-Token")||body?.workerToken||"").trim();
   if(!token) return out({error:"Worker authentication required"},401);
 
   const db=createClient(base,service);
   const {data:valid,error}=await db.rpc("enjaz_worker_token_valid",{p_token:token});
   if(error||valid!==true) return out({error:"Invalid worker token"},401);
 
-  const body=await req.json().catch(()=>({}));
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),25000);
   try{
