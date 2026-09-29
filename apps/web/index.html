@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#075bea">
+<meta name="theme-color" content="#04110f">
 <meta name="application-name" content="إنجاز">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_AR">
-<meta property="og:title" content="إنجاز — منصة القوة العاملة الرقمية للمؤسسات">
-<meta property="og:description" content="قوة عمل رقمية وعمليات وسير عمل وحوكمة فوق نظام تشغيل واحد.">
+<meta property="og:title" content="إنجاز — نظام تشغيل القوة العاملة الرقمية">
+<meta property="og:description" content="قوة عمل رقمية، عمليات، سير عمل وحوكمة تحت نظام تشغيل مؤسسي واحد.">
 <meta property="og:image" content="/favicon.svg">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -16,9 +16,9 @@
 <meta name="description" content="إنجاز — منصة مؤسسية للقوة العاملة الرقمية والعمليات وسير العمل والحوكمة.">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>إنجاز — منصة القوة العاملة الرقمية للمؤسسات</title>
+<title>إنجاز — نظام تشغيل القوة العاملة الرقمية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="./enjaz-design-system.css?v=20260909-04">
 <link rel="stylesheet" href="./enjaz-enterprise.css?v=20260908-01">
 <link rel="stylesheet" href="./enjaz-workspace-shell.css?v=20260908-01">
@@ -35,21 +35,76 @@
 <link rel="stylesheet" href="./enjaz-enterprise-polish.css?v=20260910-01">
 <link rel="stylesheet" href="./enjaz-brand-system.css?v=20260911-03">
 <link rel="stylesheet" href="./enjaz-auth.css?v=20260911-05">
-<link rel="stylesheet" href="./enjaz-public-v1.css?v=20260924-01">
 <link rel="stylesheet" href="./enjaz-workspace-v4.css?v=20260912-02">
 <link rel="stylesheet" href="./enjaz-workspace-v4-override.css?v=20260912-03">
-<link rel="stylesheet" href="./enjaz-public-v2.css?v=20260925-01">
-<link rel="stylesheet" href="./enjaz-public-v3.css?v=20260926-01">
+<link rel="stylesheet" href="./enjaz-public-v5.css?v=20260929-01">
 </head>
 <body>
-<div class="app enjaz-root">
-  <aside class="enjaz-sidebar"><div class="enjaz-brand"><span class="enjaz-mark" aria-hidden="true">إ</span><div><strong>إنجاز</strong><small>ENJAZ · WORKFORCE OS</small></div></div><div class="enjaz-workspace"><small>مساحة العمل</small><strong>مساحة العمل الرئيسية</strong><span>● متصلة وآمنة</span></div><nav class="enjaz-nav"><div class="enjaz-nav-label">العمليات</div><button type="button" data-nav="dashboard" class="active"><i>⌂</i><span>لوحة التحكم</span></button><button type="button" data-nav="employees"><i>◉</i><span>الموظفون الرقميون</span></button><button type="button" data-nav="tasks"><i>✓</i><span>المهام</span></button><button type="button" data-nav="teams"><i>◌</i><span>الفرق الذكية</span></button><div class="enjaz-nav-label">الأتمتة والتحكم</div><button type="button" data-nav="workflows"><i>↯</i><span>سير العمل</span></button><button type="button" data-nav="approvals"><i>◇</i><span>الموافقات</span></button><button type="button" data-nav="integrations"><i>⊕</i><span>التكاملات</span></button><button type="button" data-nav="audit"><i>▤</i><span>سجل التدقيق</span></button></nav><div class="enjaz-sidebar-footer"><strong>ENJAZ</strong><span>Digital Workforce Operating System</span></div></aside>
-  <main class="enjaz-main"><header class="enjaz-topbar"><div class="top-search" role="button" tabindex="0"><span aria-hidden="true">⌕</span><input aria-label="البحث" placeholder="ابحث في إنجاز..." readonly/><kbd>⌘ K</kbd></div><div class="top-actions"><button type="button" class="icon-btn" title="الإشعارات" aria-label="الإشعارات">♢</button><button type="button" class="icon-btn" title="المساعدة" aria-label="المساعدة">?</button><div class="top-user"><span class="avatar">م</span><div><strong>حسابك</strong><small>Workspace</small></div></div></div></header><div id="content"><div class="boot-error" style="margin:12vh auto"><strong>جارٍ تشغيل مساحة العمل</strong><span>نجهّز مركز قيادة إنجاز…</span></div></div></main>
+<div class="enjaz-root">
+  <div class="lp-page">
+    <div class="lp-grid"></div><div class="lp-orb" aria-hidden="true"></div>
+    <header class="lp-nav">
+      <a class="lp-brand" href="./">
+        <span class="lp-mark">إ</span><span><strong>إنجاز</strong><small>ENJAZ · WORKFORCE OS</small></span>
+      </a>
+      <nav class="lp-navlinks" aria-label="التنقل">
+        <a href="#platform">المنصة</a><a href="#workforce">القوة العاملة</a><a href="#sectors">القطاعات</a><a href="#governance">الحوكمة</a>
+      </nav>
+      <div class="lp-actions">
+        <a class="lp-btn" href="?auth=1">تسجيل الدخول</a>
+        <a class="lp-btn primary" href="?auth=1&signup=1">ابدأ مع إنجاز</a>
+      </div>
+    </header>
+
+    <main id="content">
+      <section class="lp-hero">
+        <div class="lp-copy">
+          <span class="lp-eyebrow"><i class="lp-dot"></i> نظام تشغيل مؤسسي للقوة العاملة الرقمية</span>
+          <h1>لا تضف أداة جديدة.<br><em>ابنِ طريقة عمل جديدة.</em></h1>
+          <p>إنجاز يحوّل الذكاء الاصطناعي من محادثة منفصلة إلى قوة عمل رقمية تعمل داخل مؤسستك: موظفون، مهام، سير عمل، أدوات، موافقات ونتائج — تحت حوكمة واحدة.</p>
+          <div class="lp-hero-actions">
+            <a class="lp-btn primary" href="?auth=1&signup=1">أنشئ مساحة مؤسستك ←</a>
+            <a class="lp-btn" href="#platform">استكشف المنصة</a>
+          </div>
+          <div class="lp-proof">
+            <div><b>24/7</b><span>تشغيل مستمر</span></div><div><b>Multi‑Tenant</b><span>عزل مؤسسي</span></div><div><b>Human‑in‑the‑Loop</b><span>قرارات تحت سيطرتك</span></div>
+          </div>
+        </div>
+        <div class="lp-stage" aria-label="معاينة مركز قيادة إنجاز">
+          <div class="lp-float one"><b>قوة عمل نشطة</b><span>موظفون رقميون متخصصون</span></div>
+          <div class="lp-stage-card">
+            <div class="lp-stage-top"><span class="lp-live"><i></i> ENJAZ OPERATING SYSTEM · LIVE</span><span class="lp-window"><i></i><i></i><i></i></span></div>
+            <div class="lp-dashboard">
+              <div class="lp-mainpanel"><span class="lp-label">مركز القيادة</span><div class="lp-big">كل شيء تحت السيطرة.</div><div class="lp-bar"><i></i></div><div class="lp-rows"><div class="lp-row"><span>تحليل المبيعات</span><b class="lp-status">قيد التنفيذ</b></div><div class="lp-row"><span>مراجعة طلب شراء</span><b class="lp-status">بانتظار قرارك</b></div><div class="lp-row"><span>تقرير العمليات</span><b class="lp-status">مكتمل</b></div></div></div>
+              <div><div class="lp-mini"><span class="lp-label">القوة العاملة</span><strong>12</strong><small>موظفًا رقميًا نشطًا</small></div><div class="lp-mini" style="margin-top:12px"><span class="lp-label">معدل الإنجاز</span><strong>94%</strong><small>نتائج مسجلة وقابلة للتتبع</small></div></div>
+            </div>
+          </div>
+          <div class="lp-float two"><b>حوكمة مدمجة</b><span>صلاحيات · موافقات · سجل تدقيق</span></div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="platform">
+        <div class="lp-section-head"><small>ONE OPERATING LAYER</small><h2>من الموظف الرقمي إلى النتيجة.</h2><p>كل طبقة في إنجاز مصممة لتعمل مع الطبقات الأخرى، بدل تجميع أدوات منفصلة تحتاج إلى إدارة يدوية مستمرة.</p></div>
+        <div class="lp-cards" id="workforce">
+          <article class="lp-card"><div class="lp-icon">✦</div><h3>موظفون رقميون</h3><p>أدوار متخصصة لها ذاكرة، نطاق عمل، أهداف وأدوات — ويمكن تفعيلها حسب احتياج المؤسسة والقطاع.</p></article>
+          <article class="lp-card"><div class="lp-icon">↯</div><h3>سير عمل ذاتي</h3><p>حوّل العمليات المتكررة إلى مسارات قابلة للتنفيذ مع حالات، إعادة محاولة، مهلات واسترداد.</p></article>
+          <article class="lp-card"><div class="lp-icon">◇</div><h3>حوكمة وقرارات</h3><p>الموافقات، الصلاحيات، العزل المؤسسي، حدود الإنفاق وسجل التدقيق جزء من النظام نفسه.</p></article>
+        </div>
+      </section>
+
+      <section class="lp-section" id="sectors">
+        <div class="lp-section-head"><small>BUILT FOR OPERATIONS</small><h2>ابدأ من واقع مؤسستك.</h2><p>تُهيّأ القوة العاملة الرقمية وفق طبيعة العمل، بدل فرض نموذج واحد على كل مؤسسة.</p></div>
+        <div class="lp-sectors"><div class="lp-sector">◈<b>الشركات</b></div><div class="lp-sector">◇<b>المطاعم</b></div><div class="lp-sector">✚<b>المستشفيات</b></div><div class="lp-sector">▣<b>الفنادق</b></div><div class="lp-sector">◌<b>الجهات الحكومية</b></div></div>
+      </section>
+
+      <section class="lp-section" id="governance">
+        <div class="lp-cta"><div><h2>القوة الرقمية تحتاج إلى نظام.</h2><p>أنشئ مساحة مؤسستك، ثم دع إنجاز يتولى طبقة التشغيل بينما تبقى القرارات الحساسة تحت إشرافك.</p></div><a class="lp-btn primary" href="?auth=1&signup=1">ابدأ تأسيس المؤسسة ←</a></div>
+      </section>
+    </main>
+
+    <footer class="lp-footer"><strong>ENJAZ · Digital Workforce Operating System</strong><span>قوة عمل رقمية · عمليات · أتمتة · حوكمة</span></footer>
+  </div>
 </div>
-<script type="module" src="./main.js?v=20260922-01"></script>
-<script type="module" src="./enjaz-public-v1.js?v=20260924-01"></script>
-<script type="module" src="./enjaz-live-experience.js?v=20260925-01"></script>\n<script type="module" src="./enjaz-public-v2.js?v=20260925-01"></script>
-<script type="module" src="./enjaz-public-v3.js?v=20260926-01"></script>
-<script type="module" src="./enjaz-public-v4.js?v=20260926-01"></script>
+<script type="module" src="./main.js?v=20260929-01"></script>
 </body>
 </html>
