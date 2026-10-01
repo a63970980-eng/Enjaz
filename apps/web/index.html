@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#04110f">
+<meta name="theme-color" content="#f7fbfa">
 <meta name="application-name" content="إنجاز">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ar_AR">
-<meta property="og:title" content="إنجاز — نظام تشغيل القوة العاملة الرقمية">
-<meta property="og:description" content="قوة عمل رقمية، عمليات، سير عمل وحوكمة تحت نظام تشغيل مؤسسي واحد.">
-<meta property="og:image" content="/favicon.svg">
-<meta name="twitter:card" content="summary">
+<meta property="og:title" content="إنجاز — تشغيل مؤسستك بذكاء">
+<meta property="og:description" content="منصة تشغيل مؤسسية تجمع القوى العاملة والعمليات وسير العمل والذكاء الاصطناعي في منظومة واحدة.">
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="description" content="إنجاز — منصة مؤسسية للقوة العاملة الرقمية والعمليات وسير العمل والحوكمة.">
+<meta name="description" content="إنجاز — منصة تشغيل مؤسسية للقوى العاملة والعمليات وسير العمل والذكاء الاصطناعي.">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co; frame-src 'none'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>إنجاز — نظام تشغيل القوة العاملة الرقمية</title>
+<title>إنجاز — تشغيل مؤسستك بذكاء</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="./enjaz-design-system.css?v=20260909-04">
@@ -37,74 +35,142 @@
 <link rel="stylesheet" href="./enjaz-auth.css?v=20260911-05">
 <link rel="stylesheet" href="./enjaz-workspace-v4.css?v=20260912-02">
 <link rel="stylesheet" href="./enjaz-workspace-v4-override.css?v=20260912-03">
-<link rel="stylesheet" href="./enjaz-public-v5.css?v=20260929-01">
+<link rel="stylesheet" href="./enjaz-public-v5.css?v=20261001-01">
 </head>
 <body>
 <div class="enjaz-root">
-  <div class="lp-page">
-    <div class="lp-grid"></div><div class="lp-orb" aria-hidden="true"></div>
-    <header class="lp-nav">
-      <a class="lp-brand" href="./">
-        <span class="lp-mark">إ</span><span><strong>إنجاز</strong><small>ENJAZ · WORKFORCE OS</small></span>
+  <div class="enjaz-landing">
+    <header class="enjaz-nav">
+      <a class="enjaz-brand" href="./" aria-label="إنجاز">
+        <span class="enjaz-logo">إ</span>
+        <span><strong>إنجاز</strong><small>ENJAZ</small></span>
       </a>
-      <nav class="lp-navlinks" aria-label="التنقل">
-        <a href="#platform">المنصة</a><a href="#workforce">القوة العاملة</a><a href="#sectors">القطاعات</a><a href="#governance">الحوكمة</a>
+      <nav class="enjaz-navlinks" aria-label="التنقل">
+        <a href="#platform">المنصة</a>
+        <a href="#capabilities">الحلول</a>
+        <a href="#workforce">القوة العاملة</a>
+        <a href="#industries">القطاعات</a>
       </nav>
-      <div class="lp-actions">
-        <a class="lp-btn" href="?auth=1">تسجيل الدخول</a>
-        <a class="lp-btn primary" href="?auth=1&signup=1">ابدأ مع إنجاز</a>
+      <div class="enjaz-nav-actions">
+        <a class="enjaz-link-btn" href="?auth=1">تسجيل الدخول</a>
+        <a class="enjaz-primary-btn" href="?auth=1&signup=1">ابدأ الآن</a>
       </div>
     </header>
 
     <main id="content">
-      <section class="lp-hero">
-        <div class="lp-copy">
-          <span class="lp-eyebrow"><i class="lp-dot"></i> نظام تشغيل مؤسسي للقوة العاملة الرقمية</span>
-          <h1>لا تضف أداة جديدة.<br><em>ابنِ طريقة عمل جديدة.</em></h1>
-          <p>إنجاز يحوّل الذكاء الاصطناعي من محادثة منفصلة إلى قوة عمل رقمية تعمل داخل مؤسستك: موظفون، مهام، سير عمل، أدوات، موافقات ونتائج — تحت حوكمة واحدة.</p>
-          <div class="lp-hero-actions">
-            <a class="lp-btn primary" href="?auth=1&signup=1">أنشئ مساحة مؤسستك ←</a>
-            <a class="lp-btn" href="#platform">استكشف المنصة</a>
+      <section class="enjaz-hero">
+        <div class="enjaz-hero-copy">
+          <span class="enjaz-kicker"><i></i> منصة تشغيل مؤسسية للجيل القادم</span>
+          <h1>شغّل مؤسستك<br><em>بذكاء.</em></h1>
+          <p>إنجاز تجمع القوى العاملة والعمليات وسير العمل والذكاء الاصطناعي في منظومة تشغيل واحدة، مصممة لتعمل مع مؤسستك لا بجانبها.</p>
+          <div class="enjaz-hero-actions">
+            <a class="enjaz-primary-btn enjaz-large-btn" href="?auth=1&signup=1">ابدأ الآن</a>
+            <a class="enjaz-outline-btn enjaz-large-btn" href="#platform">استكشف المنصة</a>
           </div>
-          <div class="lp-proof">
-            <div><b>24/7</b><span>تشغيل مستمر</span></div><div><b>Multi‑Tenant</b><span>عزل مؤسسي</span></div><div><b>Human‑in‑the‑Loop</b><span>قرارات تحت سيطرتك</span></div>
-          </div>
+          <div class="enjaz-hero-note"><span>Enterprise-ready architecture</span><span>RTL · Arabic-first</span><span>Human oversight</span></div>
         </div>
-        <div class="lp-stage" aria-label="معاينة مركز قيادة إنجاز">
-          <div class="lp-float one"><b>قوة عمل نشطة</b><span>موظفون رقميون متخصصون</span></div>
-          <div class="lp-stage-card">
-            <div class="lp-stage-top"><span class="lp-live"><i></i> ENJAZ OPERATING SYSTEM · LIVE</span><span class="lp-window"><i></i><i></i><i></i></span></div>
-            <div class="lp-dashboard">
-              <div class="lp-mainpanel"><span class="lp-label">مركز القيادة</span><div class="lp-big">كل شيء تحت السيطرة.</div><div class="lp-bar"><i></i></div><div class="lp-rows"><div class="lp-row"><span>تحليل المبيعات</span><b class="lp-status">قيد التنفيذ</b></div><div class="lp-row"><span>مراجعة طلب شراء</span><b class="lp-status">بانتظار قرارك</b></div><div class="lp-row"><span>تقرير العمليات</span><b class="lp-status">مكتمل</b></div></div></div>
-              <div><div class="lp-mini"><span class="lp-label">القوة العاملة</span><strong>12</strong><small>موظفًا رقميًا نشطًا</small></div><div class="lp-mini" style="margin-top:12px"><span class="lp-label">معدل الإنجاز</span><strong>94%</strong><small>نتائج مسجلة وقابلة للتتبع</small></div></div>
+
+        <div class="enjaz-hero-visual" aria-label="معاينة تجريبية لمنصة إنجاز">
+          <div class="enjaz-orbit enjaz-orbit-a"></div>
+          <div class="enjaz-orbit enjaz-orbit-b"></div>
+          <div class="enjaz-float-card enjaz-float-top"><b>قوة عاملة رقمية</b><span>AI Workers · Demo</span></div>
+          <div class="enjaz-product-window">
+            <div class="enjaz-window-bar"><span>ENJAZ · PLATFORM PREVIEW</span><div><i></i><i></i><i></i></div></div>
+            <div class="enjaz-product-grid">
+              <div class="enjaz-product-main">
+                <small>مركز التشغيل · DEMO</small>
+                <h2>كل عملياتك<br>في مكان واحد.</h2>
+                <div class="enjaz-progress"><i></i></div>
+                <div class="enjaz-task"><span>سير عمل المشتريات</span><b>قيد المراجعة</b></div>
+                <div class="enjaz-task"><span>تقرير العمليات</span><b>جاهز</b></div>
+                <div class="enjaz-task"><span>توزيع المهام</span><b>مجدول</b></div>
+              </div>
+              <div class="enjaz-product-side">
+                <div class="enjaz-mini-card"><small>القوة العاملة</small><strong>AI</strong><span>Digital Workers</span></div>
+                <div class="enjaz-mini-card"><small>سير العمل</small><strong>↗</strong><span>Automated Flow</span></div>
+                <div class="enjaz-mini-card"><small>الحوكمة</small><strong>✓</strong><span>Human Control</span></div>
+              </div>
             </div>
+            <span class="enjaz-demo-badge">DEMO PREVIEW</span>
           </div>
-          <div class="lp-float two"><b>حوكمة مدمجة</b><span>صلاحيات · موافقات · سجل تدقيق</span></div>
+          <div class="enjaz-float-card enjaz-float-bottom"><b>حوكمة مدمجة</b><span>صلاحيات · موافقات · تدقيق</span></div>
         </div>
       </section>
 
-      <section class="lp-section" id="platform">
-        <div class="lp-section-head"><small>ONE OPERATING LAYER</small><h2>من الموظف الرقمي إلى النتيجة.</h2><p>كل طبقة في إنجاز مصممة لتعمل مع الطبقات الأخرى، بدل تجميع أدوات منفصلة تحتاج إلى إدارة يدوية مستمرة.</p></div>
-        <div class="lp-cards" id="workforce">
-          <article class="lp-card"><div class="lp-icon">✦</div><h3>موظفون رقميون</h3><p>أدوار متخصصة لها ذاكرة، نطاق عمل، أهداف وأدوات — ويمكن تفعيلها حسب احتياج المؤسسة والقطاع.</p></article>
-          <article class="lp-card"><div class="lp-icon">↯</div><h3>سير عمل ذاتي</h3><p>حوّل العمليات المتكررة إلى مسارات قابلة للتنفيذ مع حالات، إعادة محاولة، مهلات واسترداد.</p></article>
-          <article class="lp-card"><div class="lp-icon">◇</div><h3>حوكمة وقرارات</h3><p>الموافقات، الصلاحيات، العزل المؤسسي، حدود الإنفاق وسجل التدقيق جزء من النظام نفسه.</p></article>
+      <section class="enjaz-trust">
+        <span>مصممة لتعمل ضمن منظومتك الرقمية</span>
+        <div class="enjaz-marquee"><div class="enjaz-logo-track">
+          <b>AI</b><b>Automation</b><b>Cloud</b><b>GitHub</b><b>Vercel</b><b>Supabase</b><b>APIs</b><b>Workflows</b>
+          <b>AI</b><b>Automation</b><b>Cloud</b><b>GitHub</b><b>Vercel</b><b>Supabase</b><b>APIs</b><b>Workflows</b>
+        </div></div>
+      </section>
+
+      <section class="enjaz-section enjaz-platform" id="platform">
+        <div class="enjaz-section-copy">
+          <span class="enjaz-section-label">THE OPERATING LAYER</span>
+          <h2>منصة واحدة بدل أدوات متفرقة.</h2>
+          <p>تصميم إنجاز يربط الأشخاص والعمليات والذكاء الاصطناعي وسير العمل والحوكمة داخل طبقة تشغيل مؤسسية واحدة.</p>
+        </div>
+        <div class="enjaz-interface">
+          <div class="enjaz-interface-sidebar"><strong>إنجاز</strong><span class="active">نظرة عامة</span><span>القوة العاملة</span><span>العمليات</span><span>سير العمل</span><span>الحوكمة</span><span>الأداء</span></div>
+          <div class="enjaz-interface-body">
+            <div class="enjaz-interface-head"><div><small>مساحة المؤسسة · DEMO</small><h3>مركز التشغيل</h3></div><span>Preview</span></div>
+            <div class="enjaz-interface-cards"><div><small>القوة العاملة</small><strong>Digital Workforce</strong><p>أدوار رقمية متخصصة</p></div><div><small>العمليات</small><strong>Workflows</strong><p>مسارات قابلة للتنفيذ</p></div><div><small>الحوكمة</small><strong>Control</strong><p>صلاحيات وموافقات وسجل تدقيق</p></div></div>
+          </div>
         </div>
       </section>
 
-      <section class="lp-section" id="sectors">
-        <div class="lp-section-head"><small>BUILT FOR OPERATIONS</small><h2>ابدأ من واقع مؤسستك.</h2><p>تُهيّأ القوة العاملة الرقمية وفق طبيعة العمل، بدل فرض نموذج واحد على كل مؤسسة.</p></div>
-        <div class="lp-sectors"><div class="lp-sector">◈<b>الشركات</b></div><div class="lp-sector">◇<b>المطاعم</b></div><div class="lp-sector">✚<b>المستشفيات</b></div><div class="lp-sector">▣<b>الفنادق</b></div><div class="lp-sector">◌<b>الجهات الحكومية</b></div></div>
+      <section class="enjaz-section enjaz-capabilities" id="capabilities">
+        <div class="enjaz-section-copy centered">
+          <span class="enjaz-section-label">WHAT ENJAZ DOES</span>
+          <h2>كل طبقة تؤدي دورًا واضحًا.</h2>
+        </div>
+        <div class="enjaz-capability-grid">
+          <article><span>01</span><h3>القوى العاملة</h3><p>أدوار وصلاحيات وموظفون رقميون منظمون داخل هيكل المؤسسة.</p></article>
+          <article><span>02</span><h3>العمليات</h3><p>تشغيل الأعمال اليومية من خلال مسارات واضحة وقابلة للمتابعة.</p></article>
+          <article><span>03</span><h3>الذكاء الاصطناعي</h3><p>AI Agents وDigital Workers لدعم وتنفيذ الأعمال ضمن حدود المؤسسة.</p></article>
+          <article><span>04</span><h3>الحوكمة</h3><p>الموافقات والصلاحيات والتدقيق والإشراف البشري في صميم التشغيل.</p></article>
+        </div>
       </section>
 
-      <section class="lp-section" id="governance">
-        <div class="lp-cta"><div><h2>القوة الرقمية تحتاج إلى نظام.</h2><p>أنشئ مساحة مؤسستك، ثم دع إنجاز يتولى طبقة التشغيل بينما تبقى القرارات الحساسة تحت إشرافك.</p></div><a class="lp-btn primary" href="?auth=1&signup=1">ابدأ تأسيس المؤسسة ←</a></div>
+      <section class="enjaz-section enjaz-workforce" id="workforce">
+        <div class="enjaz-workforce-visual">
+          <div class="enjaz-agent-card primary"><small>AI OPERATIONS WORKER</small><strong>تحليل العمليات</strong><span>● Working · Demo</span></div>
+          <div class="enjaz-agent-card"><small>AI COORDINATOR</small><strong>تنسيق المهام</strong><span>Ready · Demo</span></div>
+          <div class="enjaz-agent-card"><small>AI ANALYST</small><strong>تحليل البيانات</strong><span>Completed · Demo</span></div>
+        </div>
+        <div class="enjaz-section-copy">
+          <span class="enjaz-section-label">DIGITAL WORKFORCE</span>
+          <h2>قوة عاملة رقمية تعمل مع فريقك.</h2>
+          <p>تصوّر تشغيلي للـAI Agents والـDigital Workers داخل المؤسسة، مع حالات عمل واضحة وإشراف بشري على القرارات الحساسة.</p>
+          <div class="enjaz-flow"><span>البيانات</span><i>→</i><span>الذكاء</span><i>→</i><span>القرار</span><i>→</i><span>التنفيذ</span></div>
+        </div>
+      </section>
+
+      <section class="enjaz-section enjaz-industries" id="industries">
+        <div class="enjaz-section-copy">
+          <span class="enjaz-section-label">BUILT FOR YOUR BUSINESS</span>
+          <h2>مصممة لطريقة عمل مؤسستك.</h2>
+          <p>تتكيّف طبقة التشغيل مع طبيعة القطاع بدل فرض نموذج واحد على الجميع.</p>
+        </div>
+        <div class="enjaz-industry-grid">
+          <div><strong>المطاعم</strong><span>الفروع · الطلبات · المخزون</span></div>
+          <div><strong>المستشفيات</strong><span>الفرق · العمليات · سير العمل</span></div>
+          <div><strong>الفنادق</strong><span>الخدمات · الفرق · التشغيل</span></div>
+          <div><strong>الشركات</strong><span>الفرق · المشاريع · العمليات</span></div>
+          <div><strong>الجهات الحكومية</strong><span>الخدمات · الحوكمة · الإجراءات</span></div>
+        </div>
+      </section>
+
+      <section class="enjaz-cta">
+        <div><span class="enjaz-section-label">NEXT STEP</span><h2>حوّل تشغيل مؤسستك إلى إنجاز.</h2><p>ابدأ ببناء مساحة مؤسستك واكتشف طبقة التشغيل الجديدة.</p></div>
+        <a class="enjaz-primary-btn enjaz-large-btn" href="?auth=1&signup=1">ابدأ الآن ←</a>
       </section>
     </main>
 
-    <footer class="lp-footer"><strong>ENJAZ · Digital Workforce Operating System</strong><span>قوة عمل رقمية · عمليات · أتمتة · حوكمة</span></footer>
+    <footer class="enjaz-footer"><strong>إنجاز · ENJAZ</strong><span>منصة تشغيل مؤسسية للقوى العاملة والعمليات والذكاء الاصطناعي</span><nav><a href="#platform">المنصة</a><a href="#industries">القطاعات</a><a href="?auth=1">تسجيل الدخول</a></nav></footer>
   </div>
 </div>
-<script type="module" src="./main.js?v=20260929-01"></script>
+<script type="module" src="./main.js?v=20261001-01"></script>
 </body>
 </html>
