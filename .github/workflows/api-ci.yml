@@ -8,9 +8,6 @@ on:
 jobs:
   test-api:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/api
     services:
       postgres:
         image: postgres:16
@@ -31,11 +28,16 @@ jobs:
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+          run_install: false
       - uses: actions/setup-node@v5
         with:
           node-version: 24
           package-manager-cache: false
-      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm lint
       - name: Prepare Supabase-compatible auth roles for RLS tests
         run: |
           PGPASSWORD=enjaz psql -h 127.0.0.1 -U enjaz -d enjaz_test -v ON_ERROR_STOP=1 <<'SQL'
@@ -66,6 +68,6 @@ jobs:
           docker exec "$POSTGRES_CONTAINER" bash -lc 'apt-get update && apt-get install -y --no-install-recommends postgresql-16-pgvector'
           docker exec "$POSTGRES_CONTAINER" bash -lc 'test -f /usr/share/postgresql/16/extension/vector.control'
       - name: Apply database migrations
-        run: npm run migrate
+        run: pnpm --filter @enjaz/api migrate
       - name: Run API tests
-        run: npm test
+        run: pnpm --filter @enjaz/api test

@@ -16,12 +16,13 @@
     "dev": "pnpm --parallel --filter './apps/*' dev",
     "build": "pnpm --recursive build",
     "test": "pnpm --recursive test",
-    "lint": "pnpm --recursive lint",
-    "typecheck": "pnpm --recursive typecheck",
+    "lint": "eslint .",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
-    "@axe-core/playwright": "^4.13.0"
+    "eslint": "^10.11.0",
+    "globals": "^17.13.0"
   }
 }

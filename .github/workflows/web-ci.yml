@@ -8,6 +8,10 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'eslint.config.js'
+      - 'vercel.json'
+      - 'api/**'
+      - 'services/api/**'
       - 'tests/e2e/**'
   pull_request:
     branches: [main, chore/reset-public-ui]
@@ -17,6 +21,10 @@ on:
       - 'pnpm-workspace.yaml'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'eslint.config.js'
+      - 'vercel.json'
+      - 'api/**'
+      - 'services/api/**'
       - 'tests/e2e/**'
   workflow_dispatch:
 
@@ -33,9 +41,14 @@ jobs:
         with:
           node-version: 24
           package-manager-cache: false
-      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
       - run: pnpm --filter @enjaz/web test
       - run: pnpm --filter @enjaz/web build
+      - name: Verify Vercel API bundle
+        run: |
+          pnpm --filter @enjaz/api exec esbuild src/index.js --bundle --platform=node --format=cjs --outfile=../../api/server.cjs
+          node --check api/server.cjs
       - run: pnpm exec playwright install --with-deps chromium
       - name: Start production preview
         run: pnpm --filter @enjaz/web exec vite preview --host 127.0.0.1 --port 4173 > /tmp/enjaz-vite.log 2>&1 &

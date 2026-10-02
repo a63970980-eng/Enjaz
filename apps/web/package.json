@@ -2,6 +2,7 @@
   "name": "@enjaz/web",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "description": "ENJAZ AI Workforce web application",
   "scripts": {
     "dev": "vite",
