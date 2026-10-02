@@ -12,6 +12,8 @@ The production foundation includes PostgreSQL persistence, Supabase Auth, tenant
 
 ## Product surface
 
+The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTURE.md`](docs/ENJAZ_PLATFORM_ARCHITECTURE.md). The canonical public entry is the RTL-first `apps/web/landing.js` / `landing.css` experience; the authenticated product remains the V4 workspace shell.
+
 - Executive operations dashboard
 - AI employee builder with role, goal, model strategy, autonomy, skills, tools, budget, policy and schedule
 - Task planning and execution

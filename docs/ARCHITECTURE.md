@@ -1,5 +1,7 @@
 # ENJAZ Architecture
 
+> The implementation map and current release boundaries live in [`ENJAZ_PLATFORM_ARCHITECTURE.md`](./ENJAZ_PLATFORM_ARCHITECTURE.md). This document summarizes the stable domain layers.
+
 ## Layers
 
 ### Product Layer
