@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { createEmployee,listEmployees,getEmployee,updateEmployee,setEmployeeStatus,createTask,listTasks,getTask,cancelTask,createApproval,decideApproval,listApprovals,listAudit,getWorkspaceAccess,listDepartments,createDepartment,listEmployeeGoals,createEmployeeGoal,listEmployeeKnowledge,createEmployeeKnowledge,listTaskComments,createTaskComment,listHandoffs,createHandoff } from './workforce-repository.js';
+import { createEmployee,listEmployees,getEmployee,updateEmployee,setEmployeeStatus,createTask,listTasks,getTask,cancelTask,createApproval,decideApproval,listApprovals,listAudit,getWorkspaceAccess,listDepartments,createDepartment,listEmployeeGoals,createEmployeeGoal,listEmployeeKnowledge,createEmployeeKnowledge,listTaskComments,createTaskComment,listHandoffs,createHandoff,listWorkforceRoles,listWorkforceIndustryContexts } from './workforce-repository.js';
 import { bootstrapWorkspace,getUserByAuthId,listUserWorkspaces } from './onboarding-repository.js';
 import { runEmployeeTask,executeApprovedTask } from './agent-runtime.js';
 import { planEmployeeTask } from './brain-orchestrator.js';
@@ -48,6 +48,8 @@ if(req.method==='GET'&&url.pathname==='/api/v1/runtime/summary')return json(res,
 if(req.method==='GET'&&url.pathname==='/api/v1/runtime/ops'){requireManager(user);return json(res,200,{data:await getOpsSnapshot({workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/tools')return json(res,200,{data:listTools()},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/departments')return json(res,200,{data:await listDepartments(workspaceId)},origin,context.id);
+if(req.method==='GET'&&url.pathname==='/api/v1/workforce/roles')return json(res,200,{data:await listWorkforceRoles()},origin,context.id);
+if(req.method==='GET'&&url.pathname==='/api/v1/workforce/industry-contexts')return json(res,200,{data:await listWorkforceIndustryContexts(url.searchParams.get('industryCode'))},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/departments'){requireManager(user);return json(res,201,{data:await createDepartment({...await body(req),workspaceId})},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/employees')return json(res,200,{data:await listEmployees(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/employees'){requireManager(user);await assertWorkspaceLimit(workspaceId,'employees');return json(res,201,{data:await createEmployee({...await body(req),workspaceId})},origin,context.id);}
