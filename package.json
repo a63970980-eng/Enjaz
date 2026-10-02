@@ -14,10 +14,10 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
-    "build": "pnpm --recursive build",
-    "test": "pnpm --recursive test",
-    "lint": "pnpm --recursive lint",
-    "typecheck": "pnpm --recursive typecheck",
+    "build": "npm run build --prefix apps/web",
+    "test": "npm test --prefix apps/web && npm test --prefix services/api",
+    "lint": "node scripts/verify-source.mjs lint",
+    "typecheck": "node scripts/verify-source.mjs typecheck",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

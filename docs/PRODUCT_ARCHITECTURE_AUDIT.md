@@ -6,7 +6,7 @@ _Date: 2026-10-02_
 
 `Supabase Auth → workspace membership → authenticated web shell → workspace-scoped API → PostgreSQL/RLS → queue/worker → governed tools → audit`
 
-- **Web:** Vite and framework-free ES modules under `apps/web`. `main.js` separates the public/auth route from the authenticated application. `auth-gate-v2.js` restores Supabase sessions and membership; `app-entry-v2.js` waits for an authenticated workspace; `workspace-app-v4.js` is the canonical workspace UI.
+- **Web:** Vite and framework-free ES modules under `apps/web`. `main.js` separates the public/auth route from the authenticated application. `landing.js` + `landing.css` are the canonical public experience; `auth-gate-v2.js` restores Supabase sessions and membership; `app-entry-v2.js` waits for an authenticated workspace; `workspace-app-v4.js` is the canonical workspace UI.
 - **API:** Node HTTP service under `services/api/src/index.js`, with server-side authentication, role checks and workspace scoping. The root `api/` files adapt this service to serverless deployment.
 - **Persistence:** PostgreSQL migrations in `services/api/db/migrations` plus Supabase deployment migrations. Tenant records use workspace scope and RLS. Runtime, billing, workforce, approvals, integrations and audit are persisted rather than inferred in the browser.
 - **Execution:** tasks move through planning, policy, approval, queue, execution graph and audit modules. Tools are registered separately from model reasoning and pass through policy/security gateways.
@@ -26,6 +26,8 @@ This phase does not modify authentication, Supabase configuration, database sche
 ## Legacy visual-layer findings
 
 The previous public experience was assembled by `enjaz-public-v1` and then mutated by v2/v3/v4 scripts plus a remote Three.js/GSAP/Lenis/postprocessing runtime. It contained illustrative values presented as live results and loaded several remote runtime dependencies. Those modules remain in the repository for traceability, but are no longer loaded by `index.html`.
+
+The current public experience is isolated in the canonical `landing.js` / `landing.css` pair and intentionally uses a labelled product preview rather than customer metrics. `landing.html` is a direct standalone entry for design and browser verification; the main `/` route still enters the same experience through the auth gate.
 
 The authenticated workspace still depends on the existing workspace, workforce, employee 360, auth and compatibility styles/modules. They were intentionally retained. A later cleanup should remove a file only after an import/reference graph and authenticated E2E coverage prove it is unused.
 

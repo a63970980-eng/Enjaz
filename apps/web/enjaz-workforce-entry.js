@@ -1,6 +1,6 @@
 /* Enjaz Workforce Entry
  * The primary workforce action is the canonical sector-based ready workforce library.
- * Manual employee creation is intentionally not exposed from the product UI.
+ * Manual employee creation is available from the governed AI Employee Builder; this entry remains the sector-catalog shortcut.
  */
 function openLibrary(){
   const library=document.querySelector('[data-enjaz-library]');

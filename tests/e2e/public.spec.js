@@ -8,6 +8,17 @@ test('public landing page boots and exposes working authentication CTAs',async({
   await expect(page.locator('[data-public-login]').first()).toBeVisible();
   await expect(page.locator('[data-public-signup]').first()).toBeVisible();
   await expect(page.locator('.sf-command-card')).toBeVisible();
+  await page.getByRole('button',{name:'ابدأ مع إنجاز'}).first().click();
+  await expect(page.locator('#auth-gate #auth-form')).toBeVisible();
+});
+
+test('public landing remains usable on a mobile viewport without horizontal overflow',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/landing.html',{waitUntil:'networkidle'});
+  await expect(page.locator('#enjaz-public')).toBeVisible();
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  await expect(page.getByText('معاينة المنتج · PREVIEW')).toBeVisible();
 });
 
 test('public landing page has no serious automated accessibility violations',async({page})=>{
