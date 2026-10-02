@@ -7,3 +7,4 @@
 @media(prefers-reduced-motion:reduce){.public-platform *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 /* High-contrast accents on deep enterprise surfaces. */
 .dark .pp-kicker,.pp-cta-box .pp-kicker{color:#7ce0b5}.dark .pp-kicker:before,.pp-cta-box .pp-kicker:before{background:#7ce0b5}
+.pp-cta .pp-btn{color:#fff}
