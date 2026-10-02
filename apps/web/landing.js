@@ -144,7 +144,46 @@ export function renderLanding(root,{onLogin=()=>{},onSignup=()=>{}}={}) {
 
   root.querySelectorAll('[data-public-login]').forEach(b=>b.addEventListener('click',()=>onLogin()));
   root.querySelectorAll('[data-public-signup]').forEach(b=>b.addEventListener('click',()=>onSignup()));
-  const nav=document.querySelector('.sfx-nav-wrap');
+
+  const nav=root.querySelector('.sfx-nav-wrap');
   const onScroll=()=>nav?.classList.toggle('scrolled',window.scrollY>12);
   window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+
+  const sections=[...root.querySelectorAll('main[id], section[id]')];
+  const navLinks=[...root.querySelectorAll('.pp-links a[href^="#"]')];
+  const syncActive=(id)=>{
+    navLinks.forEach(link=>link.classList.toggle('active',link.getAttribute('href')===`#${id}`));
+  };
+  if('IntersectionObserver' in window){
+    const observer=new IntersectionObserver((entries)=>{
+      const visible=entries.filter(entry=>entry.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(visible?.target?.id) syncActive(visible.target.id);
+    },{rootMargin:'-28% 0px -58% 0px',threshold:[0,.15,.4,.7]});
+    sections.forEach(section=>observer.observe(section));
+  }
+
+  const revealTargets=root.querySelectorAll('.sfx-statement-grid,.sfx-card,.sfx-worker-copy,.sfx-worker-stage,.sfx-loop article,.industry,.sfx-governance-grid,.sfx-final-box');
+  if('IntersectionObserver' in window){
+    const reveal=new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){entry.target.classList.add('is-visible');reveal.unobserve(entry.target);}
+      });
+    },{threshold:.12});
+    revealTargets.forEach(el=>{el.classList.add('reveal');reveal.observe(el);});
+  }
+
+  const stage=root.querySelector('.sfx-hero-stage');
+  if(stage && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.matchMedia('(pointer:fine)').matches){
+    stage.addEventListener('pointermove',(event)=>{
+      const rect=stage.getBoundingClientRect();
+      const x=(event.clientX-rect.left)/rect.width-.5;
+      const y=(event.clientY-rect.top)/rect.height-.5;
+      stage.style.setProperty('--mx',`${x*10}px`);
+      stage.style.setProperty('--my',`${y*8}px`);
+    });
+    stage.addEventListener('pointerleave',()=>{stage.style.setProperty('--mx','0px');stage.style.setProperty('--my','0px');});
+  }
+
+  const cleanup=()=>window.removeEventListener('scroll',onScroll);
+  root.__enjazLandingCleanup=cleanup;
 }
