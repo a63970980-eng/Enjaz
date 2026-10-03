@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "installCommand": "pnpm install --no-frozen-lockfile --filter enjaz-platform",
   "buildCommand": "pnpm --filter enjaz-platform build",
   "outputDirectory": "apps/web/dist",
   "rewrites": [{ "source": "/api/v1/:path*", "destination": "/api?__enjaz_path=/api/v1/:path*" }],
