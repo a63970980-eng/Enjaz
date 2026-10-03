@@ -48,3 +48,4 @@ function App(){return <div className="overflow-hidden">
  <footer className="bg-[#041c14] text-white"><div className="mx-auto flex max-w-[1240px] flex-col gap-5 px-5 py-8 text-[10px] text-white/45 sm:flex-row sm:items-center sm:justify-between"><span>© ENJAZ — Intelligent Operating Platform</span><div className="flex gap-5"><a href="#">الخصوصية</a><a href="#">الشروط</a><a href="/login">تسجيل الدخول</a></div></div></footer>
  <style>{`@keyframes marquee{to{transform:translateX(-50%)}}@media(prefers-reduced-motion:reduce){.animate-\\[marquee_28s_linear_infinite\\],.animate-\\[spin_24s_linear_infinite\\],.animate-\\[spin_16s_linear_infinite_reverse\\]{animation:none}}`}</style>
  </div>}
+export default App;
