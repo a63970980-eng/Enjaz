@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install --no-frozen-lockfile --ignore-scripts --filter enjaz-platform --filter @enjaz/api",
-  "buildCommand": "pnpm --filter enjaz-platform build || (echo WEB_BUILD_FAILED && exit 31); pnpm --filter @enjaz/api exec esbuild src/index.js --bundle --platform=node --format=cjs --outfile=../../api/server.cjs || (echo API_BUILD_FAILED && exit 32)",
-  "outputDirectory": "apps/web/dist",
+  "buildCommand": "pnpm --filter enjaz-platform build && pnpm --filter @enjaz/api exec esbuild src/index.js --bundle --platform=node --format=cjs --outfile=../../api/server.cjs",
+  "outputDirectory": "dist",
   "rewrites": [{ "source": "/api/v1/:path*", "destination": "/api?__enjaz_path=/api/v1/:path*" }],
   "functions": {
     "api/index.js": { "maxDuration": 30 },
