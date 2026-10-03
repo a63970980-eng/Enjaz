@@ -322,3 +322,10 @@ html,body{margin:0;min-width:0;background:#fff}body{font-family:"IBM Plex Sans A
     transition:none!important;
   }
 }
+
+.public-platform .pp-capability-marquee{overflow:hidden;display:block;position:relative;padding:0;border:0;background:transparent;box-shadow:none}
+.public-platform .pp-marquee-track{display:flex;width:max-content;gap:10px;animation:pp-marquee 28s linear infinite;direction:ltr}
+.public-platform .pp-marquee-track span{direction:rtl;white-space:nowrap}
+@keyframes pp-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.public-platform .pp-capability-marquee:hover .pp-marquee-track{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){.public-platform .pp-marquee-track{animation:none!important}}
