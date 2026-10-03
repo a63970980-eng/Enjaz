@@ -14,7 +14,8 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
-    "build": "pnpm --filter enjaz-platform build && if [ -d apps/web/dist ]; then rm -rf dist && cp -R apps/web/dist dist; fi && pnpm --filter @enjaz/api exec esbuild src/index.js --bundle --platform=node --format=cjs --outfile=../../api/server.cjs",
+    "build": "pnpm --filter enjaz-platform build && if [ -d apps/web/dist ]; then rm -rf dist && cp -R apps/web/dist dist; fi",
+    "build:api": "pnpm --filter @enjaz/api exec esbuild src/index.js --bundle --platform=node --format=cjs --outfile=../../api/server.cjs",
     "test": "npm test --prefix apps/web && npm test --prefix services/api",
     "lint": "node scripts/verify-source.mjs lint",
     "typecheck": "node scripts/verify-source.mjs typecheck",
@@ -22,7 +23,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "@axe-core/playwright": "^4.13.0"
+    "@axe-core/playwright": "^4.13.0
   },
   "workspaces": [
     "apps/web"
