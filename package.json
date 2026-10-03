@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
-    "build": "npm run build --workspace @enjaz/web && npx --yes esbuild services/api/src/index.js --bundle --platform=node --format=cjs --outfile=api/server.cjs",
+    "build": "npm run build --workspace enjaz-platform && npx --yes esbuild services/api/src/index.js --bundle --platform=node --format=cjs --outfile=api/server.cjs",
     "test": "npm test --prefix apps/web && npm test --prefix services/api",
     "lint": "node scripts/verify-source.mjs lint",
     "typecheck": "node scripts/verify-source.mjs typecheck",
