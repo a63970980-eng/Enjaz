@@ -19,7 +19,8 @@
     "test": "npm test --prefix apps/web && npm test --prefix services/api",
     "lint": "node scripts/verify-source.mjs lint",
     "typecheck": "node scripts/verify-source.mjs typecheck",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "vercel-build": "npm install --prefix apps/web --workspaces=false --ignore-scripts --legacy-peer-deps && npm run build --prefix apps/web && npm install --prefix services/api --workspaces=false --ignore-scripts --legacy-peer-deps && npx --yes esbuild@0.25.0 services/api/src/index.js --bundle --platform=node --format=cjs --outfile=api/server.cjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"
