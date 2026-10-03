@@ -412,3 +412,16 @@ html,body{margin:0;min-width:0;background:#fff}body{font-family:"IBM Plex Sans A
 @media(prefers-reduced-motion:reduce){
   .public-platform .pp-orbit{transform:none}
 }
+
+/* Workforce composition: visual catalog + role stack behave as one premium module. */
+.public-platform .pp-workforce{grid-template-columns:.82fr 1.18fr;align-items:start}
+.public-platform .pp-workforce-copy{grid-column:1;grid-row:1;align-self:center}
+.public-platform .pp-workforce-right{grid-column:2;grid-row:1;display:grid;gap:14px}
+.public-platform .pp-workforce-visual{margin:0}
+.public-platform .pp-role-list{margin:0}
+@media(max-width:900px){
+  .public-platform .pp-workforce{grid-template-columns:1fr}
+  .public-platform .pp-workforce-copy,
+  .public-platform .pp-workforce-right{grid-column:1;grid-row:auto}
+  .public-platform .pp-workforce-right{gap:22px}
+}
