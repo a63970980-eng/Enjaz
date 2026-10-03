@@ -329,3 +329,86 @@ html,body{margin:0;min-width:0;background:#fff}body{font-family:"IBM Plex Sans A
 @keyframes pp-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .public-platform .pp-capability-marquee:hover .pp-marquee-track{animation-play-state:paused}
 @media(prefers-reduced-motion:reduce){.public-platform .pp-marquee-track{animation:none!important}}
+
+/* ========================================================================
+   ENJAZ VISUAL REFINEMENT — Workforce visualization + mobile navigation
+   ======================================================================== */
+.public-platform .pp-workforce{grid-template-columns:1fr 1.05fr;gap:42px}
+.public-platform .pp-workforce-copy{position:relative;z-index:2}
+.public-platform .pp-workforce-visual{
+  min-height:260px;
+  position:relative;
+  display:grid;
+  place-items:center;
+  margin-bottom:18px;
+  overflow:hidden;
+  border:1px solid rgba(125,204,169,.14);
+  border-radius:24px;
+  background:radial-gradient(circle at center,rgba(11,154,112,.13),transparent 48%),rgba(255,255,255,.018);
+}
+.public-platform .pp-core{
+  width:112px;height:112px;border-radius:50%;
+  display:grid;place-items:center;text-align:center;
+  background:linear-gradient(145deg,#0b9a70,#063d2d);
+  border:1px solid rgba(150,239,203,.42);
+  box-shadow:0 0 0 10px rgba(11,154,112,.06),0 20px 45px rgba(0,0,0,.22);
+  position:relative;z-index:3;
+}
+.public-platform .pp-core span{font-size:30px;font-weight:800;line-height:1}
+.public-platform .pp-core small{font-size:8px;line-height:1.2;color:#c4efdc;letter-spacing:.6px}
+.public-platform .pp-orbit{
+  position:absolute;border:1px solid rgba(116,219,174,.22);border-radius:50%;
+  transform:rotate(-18deg);
+}
+.public-platform .pp-orbit-a{width:205px;height:112px}
+.public-platform .pp-orbit-b{width:285px;height:170px;transform:rotate(24deg)}
+.public-platform .pp-node{
+  position:absolute;z-index:4;
+  display:grid;place-items:center;
+  padding:7px 10px;border-radius:10px;
+  border:1px solid rgba(125,204,169,.2);
+  background:#0b2f25;color:#bcebd6;
+  font-size:9px;font-weight:700;
+  box-shadow:0 7px 20px rgba(0,0,0,.14);
+}
+.public-platform .pp-node.n1{top:26px;right:25%}
+.public-platform .pp-node.n2{top:45%;right:7%}
+.public-platform .pp-node.n3{bottom:22px;right:31%}
+.public-platform .pp-node.n4{bottom:35px;left:8%}
+.public-platform .pp-node.n5{top:31%;left:17%}
+.public-platform .pp-role-list{position:relative;z-index:2}
+@media(min-width:901px){
+  .public-platform .pp-workforce-visual{grid-column:1;grid-row:1}
+  .public-platform .pp-role-list{grid-column:2;grid-row:1}
+  .public-platform .pp-workforce-copy{grid-column:1;grid-row:2}
+}
+.public-platform .pp-mobile{color:var(--ej-deep);cursor:pointer;padding:6px 8px}
+@media(max-width:900px){
+  .public-platform .pp-nav{position:relative}
+  .public-platform .pp-mobile{display:block}
+  .public-platform .pp-links{
+    display:none;position:absolute;top:68px;right:0;left:0;z-index:20;
+    padding:10px;background:#fff;border:1px solid var(--ej-line);
+    border-radius:14px;box-shadow:0 18px 38px rgba(10,47,35,.12);
+  }
+  .public-platform .pp-links.is-open{display:grid;gap:2px}
+  .public-platform .pp-links a{padding:12px 14px;border-radius:9px}
+  .public-platform .pp-links a:after{display:none}
+  .public-platform .pp-workforce{gap:28px}
+}
+@media(max-width:600px){
+  .public-platform .pp-workforce-visual{min-height:225px;border-radius:20px}
+  .public-platform .pp-core{width:92px;height:92px}
+  .public-platform .pp-core span{font-size:26px}
+  .public-platform .pp-orbit-a{width:170px;height:94px}
+  .public-platform .pp-orbit-b{width:235px;height:145px}
+  .public-platform .pp-node{font-size:8px;padding:6px 8px}
+  .public-platform .pp-node.n1{right:22%;top:20px}
+  .public-platform .pp-node.n2{right:4%;top:44%}
+  .public-platform .pp-node.n3{right:28%;bottom:15px}
+  .public-platform .pp-node.n4{left:5%;bottom:25px}
+  .public-platform .pp-node.n5{left:13%;top:27%}
+}
+@media(prefers-reduced-motion:reduce){
+  .public-platform .pp-orbit{transform:none}
+}
