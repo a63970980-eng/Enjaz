@@ -444,3 +444,64 @@ html,body{margin:0;min-width:0;background:#fff}body{font-family:"IBM Plex Sans A
 @media(max-width:900px){.public-platform .pp-container{width:min(100% - 32px,1220px)}.public-platform .pp-nav{height:68px;position:relative}.public-platform .pp-mobile{display:block}.public-platform .pp-actions .ghost{display:none}.public-platform .pp-links{display:none;position:absolute;top:68px;right:0;left:0;z-index:30;padding:10px;background:#fff;border:1px solid var(--ej-line);border-radius:14px;box-shadow:0 18px 38px rgba(10,47,35,.12)}.public-platform .pp-links.is-open{display:grid;gap:2px}.public-platform .pp-links a{padding:12px 14px;border-radius:9px}.public-platform .pp-links a:after{display:none}.public-platform .pp-hero{grid-template-columns:1fr;gap:48px;padding:64px 0 76px}.public-platform .pp-platform-grid{grid-template-columns:1fr 1fr}.public-platform .pp-platform-grid .pp-surface:first-child{grid-column:1/-1}.public-platform .pp-workforce{grid-template-columns:1fr;gap:28px}.public-platform .pp-process{grid-template-columns:1fr 1fr}.public-platform .pp-industries{grid-template-columns:1fr 1fr}.public-platform .pp-cta-box{padding:38px;align-items:flex-start;flex-direction:column}}
 @media(max-width:600px){.public-platform .pp-container{width:calc(100% - 24px)}.public-platform .pp-hero{padding:48px 0 62px}.public-platform .pp-hero h1{font-size:42px;letter-spacing:-1.8px}.public-platform .pp-hero-copy>p{font-size:16px}.public-platform .pp-hero-actions{flex-direction:column}.public-platform .pp-hero-actions .pp-btn{width:100%}.public-platform .pp-window{transform:none;border-radius:20px}.public-platform .pp-console{grid-template-columns:78px 1fr;min-height:340px}.public-platform .pp-console-main{padding:16px}.public-platform .pp-flow{display:grid;grid-template-columns:1fr 1fr}.public-platform .pp-flow>b{display:none}.public-platform .pp-activity{display:none}.public-platform .pp-platform-grid,.public-platform .pp-process,.public-platform .pp-industries{grid-template-columns:1fr}.public-platform .pp-section{padding:72px 0}.public-platform .pp-workforce-visual{min-height:225px;border-radius:20px}.public-platform .pp-core{width:92px;height:92px}.public-platform .pp-core span{font-size:26px}.public-platform .pp-orbit-a{width:170px;height:94px}.public-platform .pp-orbit-b{width:235px;height:145px}.public-platform .pp-node{font-size:8px;padding:6px 8px}.public-platform .pp-node.n1{right:22%;top:20px}.public-platform .pp-node.n2{right:4%;top:44%}.public-platform .pp-node.n3{right:28%;bottom:15px}.public-platform .pp-node.n4{left:5%;bottom:25px}.public-platform .pp-node.n5{left:13%;top:27%}.public-platform .pp-role{grid-template-columns:38px 1fr}.public-platform .pp-role em{display:none}.public-platform .pp-cta{padding:60px 0}.public-platform .pp-cta-box{padding:30px 23px}.public-platform .pp-cta h2{font-size:29px}.public-platform .pp-footer-inner{align-items:flex-start;gap:20px;flex-direction:column}.public-platform .pp-footer-links{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.public-platform .pp-btn,.public-platform .pp-links a,.public-platform .pp-flow article,.public-platform .pp-ecosystem span,.public-platform .pp-surface,.public-platform .pp-role,.public-platform .pp-step,.public-platform .pp-industry{transition:none!important}.public-platform .pp-orbit{transform:none}}
+
+/* Product-led demo layer — inspired by enterprise product storytelling, not a Salesforce clone. */
+.public-platform .pp-live-demo{
+  margin:0 0 24px;
+  padding:30px;
+  border:1px solid #d7e7df;
+  border-radius:26px;
+  background:#fff;
+  box-shadow:0 18px 45px rgba(6,61,45,.06);
+}
+.public-platform .pp-live-demo-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:22px}
+.public-platform .pp-live-demo-head h3{margin:9px 0 5px;font-size:27px;letter-spacing:-.8px;color:var(--ej-ink)}
+.public-platform .pp-live-demo-head p{margin:0;color:var(--ej-muted);font-size:13px}
+.public-platform .pp-demo-status{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #cfe8db;border-radius:999px;background:#f0faf5;color:var(--ej-green);font-size:10px;font-weight:800;white-space:nowrap}
+.public-platform .pp-demo-status i{width:6px;height:6px;border-radius:50%;background:#16a36a;box-shadow:0 0 0 4px rgba(22,163,106,.1)}
+.public-platform .pp-demo-tabs{display:flex;gap:5px;border-bottom:1px solid #e1ebe6;margin-bottom:16px}
+.public-platform .pp-demo-tabs button{border:0;background:transparent;color:#708078;padding:10px 14px;border-radius:9px 9px 0 0;font-size:12px;font-weight:700;cursor:pointer;position:relative}
+.public-platform .pp-demo-tabs button.is-active{color:var(--ej-deep);background:#f1f8f4}
+.public-platform .pp-demo-tabs button.is-active:after{content:"";position:absolute;bottom:-1px;right:10px;left:10px;height:2px;background:var(--ej-green)}
+.public-platform .pp-demo-stage{min-height:250px;border:1px solid #dce9e3;border-radius:18px;overflow:hidden;background:#f7faf8}
+.public-platform .pp-demo-panel{display:none;min-height:250px}
+.public-platform .pp-demo-panel.is-active{display:block;animation:pp-demo-in .28s ease}
+@keyframes pp-demo-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.public-platform .pp-demo-panel[data-demo-panel="command"]{display:none;grid-template-columns:112px 1fr}
+.public-platform .pp-demo-panel[data-demo-panel="command"].is-active{display:grid}
+.public-platform .pp-demo-sidebar{background:linear-gradient(180deg,#073b2c,#062e23);padding:22px 12px;color:#9eb8ad;font-size:9px}
+.public-platform .pp-demo-sidebar b{display:block;color:#fff;font-size:13px;margin-bottom:20px}
+.public-platform .pp-demo-sidebar span{display:block;padding:8px 7px;border-radius:7px;margin-bottom:3px}
+.public-platform .pp-demo-sidebar .active{background:rgba(11,154,112,.16);color:#80e1ba}
+.public-platform .pp-demo-body{padding:24px}
+.public-platform .pp-demo-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.public-platform .pp-demo-top small,.pp-demo-grid small,.pp-demo-workforce small{display:block;color:#84958e;font-size:9px;letter-spacing:.8px}
+.public-platform .pp-demo-top strong{display:block;font-size:17px;margin-top:4px}
+.public-platform .pp-demo-top em{font-style:normal;color:var(--ej-green);background:#e6f6ef;padding:6px 9px;border-radius:8px;font-size:9px}
+.public-platform .pp-demo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.public-platform .pp-demo-grid article{padding:15px;border:1px solid #dce8e2;border-radius:12px;background:#fff}
+.public-platform .pp-demo-grid article.wide{grid-column:1/-1}
+.public-platform .pp-demo-grid b{display:block;font-size:25px;color:var(--ej-deep);margin:5px 0 1px}
+.public-platform .pp-demo-grid article>span{font-size:10px;color:#74857e}
+.public-platform .pp-demo-line{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid #edf2ef;font-size:10px}
+.public-platform .pp-demo-line:first-of-type{margin-top:7px}
+.public-platform .pp-demo-line i{width:6px;height:6px;border-radius:50%;background:var(--ej-green)}
+.public-platform .pp-demo-line time{margin-right:auto;color:#9aa9a3}
+.public-platform .pp-demo-workforce{min-height:250px;padding:35px;display:flex;align-items:center;gap:28px;background:radial-gradient(circle at 20% 50%,rgba(8,124,88,.11),transparent 30%),#f7faf8}
+.public-platform .pp-demo-avatar{width:92px;height:92px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(145deg,#0b9a70,#063d2d);color:#fff;font-size:24px;font-weight:800;box-shadow:0 18px 38px rgba(6,61,45,.2)}
+.public-platform .pp-demo-workforce strong{display:block;font-size:21px;color:var(--ej-deep);margin:8px 0}
+.public-platform .pp-demo-workforce p{color:#64756e;font-size:12px;margin:0 0 18px}
+.public-platform .pp-demo-role-chips{display:flex;flex-wrap:wrap;gap:7px}
+.public-platform .pp-demo-role-chips span{padding:7px 10px;border:1px solid #cfe0d8;border-radius:8px;background:#fff;color:#315248;font-size:10px;font-weight:700}
+.public-platform .pp-demo-workflow{height:250px;display:flex;align-items:center;justify-content:center;gap:10px;padding:25px}
+.public-platform .pp-demo-flow-step{min-width:130px;padding:18px 14px;border:1px solid #d9e6e0;border-radius:14px;background:#fff;box-shadow:0 7px 18px rgba(10,47,35,.04)}
+.public-platform .pp-demo-flow-step b{color:#8b9b94;font-size:9px}
+.public-platform .pp-demo-flow-step strong{display:block;margin:7px 0 3px;color:var(--ej-deep)}
+.public-platform .pp-demo-flow-step small{color:#71827b;font-size:9px}
+.public-platform .pp-demo-flow-step.done{border-color:#b9dcca}
+.public-platform .pp-demo-flow-step.done b,.pp-demo-flow-step.active b{color:var(--ej-green)}
+.public-platform .pp-demo-flow-step.active{border-color:#78c7a5;box-shadow:0 10px 25px rgba(8,124,88,.09)}
+.public-platform .pp-demo-workflow>i{color:#98aaa2;font-style:normal}
+@media(max-width:900px){.public-platform .pp-live-demo{padding:23px}.public-platform .pp-live-demo-head{flex-direction:column;gap:12px}.public-platform .pp-demo-workflow{overflow:auto;justify-content:flex-start}.public-platform .pp-demo-flow-step{min-width:120px}.public-platform .pp-demo-workforce{padding:28px;flex-direction:column;align-items:flex-start}}
+@media(max-width:600px){.public-platform .pp-live-demo{border-radius:20px;padding:18px}.public-platform .pp-live-demo-head h3{font-size:22px}.public-platform .pp-demo-tabs{overflow:auto}.public-platform .pp-demo-tabs button{white-space:nowrap}.public-platform .pp-demo-panel[data-demo-panel="command"]{grid-template-columns:78px 1fr}.public-platform .pp-demo-sidebar{padding:18px 8px}.public-platform .pp-demo-body{padding:14px}.public-platform .pp-demo-grid{grid-template-columns:1fr}.public-platform .pp-demo-grid article.wide{grid-column:auto}.public-platform .pp-demo-avatar{width:72px;height:72px;border-radius:18px}.public-platform .pp-demo-workforce strong{font-size:18px}.public-platform .pp-demo-workflow{justify-content:flex-start;gap:8px;padding:18px}.public-platform .pp-demo-flow-step{min-width:110px}}
+@media(prefers-reduced-motion:reduce){.public-platform .pp-demo-panel.is-active{animation:none!important}}
