@@ -14,14 +14,16 @@
   },
   "scripts": {
     "dev": "pnpm --parallel --filter './apps/*' dev",
-    "build": "npm run build --prefix apps/web",
-    "test": "npm test --prefix apps/web && npm test --prefix services/api",
-    "lint": "node scripts/verify-source.mjs lint",
+    "build": "pnpm --recursive build",
+    "test": "pnpm --recursive test",
+    "lint": "node scripts/verify-source.mjs lint && eslint .",
     "typecheck": "node scripts/verify-source.mjs typecheck",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
-    "@axe-core/playwright": "^4.13.0"
+    "eslint": "^10.11.0",
+    "globals": "^17.13.0"
   }
 }
