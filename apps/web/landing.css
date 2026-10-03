@@ -10,3 +10,315 @@ html,body{margin:0;min-width:0;background:#fff}body{font-family:"IBM Plex Sans A
 /* High-contrast accents on deep enterprise surfaces. */
 .dark .pp-kicker,.pp-cta-box .pp-kicker{color:#7ce0b5}.dark .pp-kicker:before,.pp-cta-box .pp-kicker:before{background:#7ce0b5}
 .pp-cta .pp-btn{color:#fff}
+
+
+/* ========================================================================
+   ENJAZ VISUAL REFINEMENT — Enterprise UI pass
+   Reference direction: disciplined enterprise SaaS UI; ENJAZ identity remains
+   original. This layer is public-landing only and does not touch auth/runtime.
+   ======================================================================== */
+.public-platform{
+  --ej-green:#087c58;
+  --ej-green-2:#0b9a70;
+  --ej-deep:#063d2d;
+  --ej-ink:#0a2119;
+  --ej-muted:#5c7069;
+  --ej-line:#dbe8e2;
+  --ej-soft:#f4f8f6;
+  background:
+    radial-gradient(circle at 86% 7%,rgba(11,154,112,.055),transparent 24rem),
+    #fff;
+}
+.public-platform .pp-container{width:min(1220px,calc(100% - 48px))}
+.public-platform .pp-nav{
+  height:82px;
+  border-bottom:1px solid rgba(219,232,226,.82);
+}
+.public-platform .pp-brand{font-size:21px;letter-spacing:-.035em}
+.public-platform .pp-mark{
+  background:linear-gradient(145deg,#087c58,#0b9a70);
+  box-shadow:0 8px 22px rgba(8,124,88,.18);
+}
+.public-platform .pp-brand small{
+  color:#7a8c85;
+  letter-spacing:1.35px;
+}
+.public-platform .pp-links{gap:30px;font-size:13px}
+.public-platform .pp-links a{
+  position:relative;
+  transition:color .2s ease;
+}
+.public-platform .pp-links a:after{
+  content:"";
+  position:absolute;
+  right:0;
+  left:0;
+  bottom:-10px;
+  height:2px;
+  border-radius:2px;
+  background:var(--ej-green);
+  transform:scaleX(0);
+  transform-origin:center;
+  transition:transform .2s ease;
+}
+.public-platform .pp-links a:hover:after,
+.public-platform .pp-links a:focus-visible:after{transform:scaleX(1)}
+.public-platform .pp-btn{
+  border-radius:10px;
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease,border-color .2s ease;
+}
+.public-platform .pp-btn:hover{transform:translateY(-1px)}
+.public-platform .pp-btn.primary{
+  background:var(--ej-deep);
+  box-shadow:0 9px 24px rgba(6,61,45,.15);
+}
+.public-platform .pp-btn.primary:hover{
+  background:var(--ej-green);
+  box-shadow:0 12px 28px rgba(8,124,88,.2);
+}
+
+/* Hero: stronger editorial hierarchy, less generic AI-dashboard feeling. */
+.public-platform .pp-hero{
+  min-height:690px;
+  grid-template-columns:.9fr 1.1fr;
+  gap:72px;
+  padding:92px 0 104px;
+}
+.public-platform .pp-kicker{
+  color:var(--ej-green);
+  letter-spacing:1.55px;
+}
+.public-platform .pp-hero h1{
+  font-size:clamp(46px,5.35vw,76px);
+  line-height:1.06;
+  letter-spacing:-3.2px;
+  max-width:760px;
+}
+.public-platform .pp-hero h1 em{
+  color:var(--ej-green);
+}
+.public-platform .pp-hero-copy>p{
+  max-width:650px;
+  font-size:17px;
+  line-height:1.95;
+  color:#526861;
+}
+.public-platform .pp-hero-actions{margin-top:34px}
+.public-platform .pp-trust{
+  gap:20px;
+  padding-top:3px;
+}
+.public-platform .pp-trust span:before{font-weight:800}
+
+/* Product preview: make it feel like a real product surface, not a decorative card. */
+.public-platform .pp-preview{filter:drop-shadow(0 26px 55px rgba(10,47,35,.11))}
+.public-platform .pp-preview:before{
+  background:
+    radial-gradient(circle at 52% 40%,rgba(8,124,88,.17),transparent 52%),
+    radial-gradient(circle at 78% 20%,rgba(49,116,91,.11),transparent 38%);
+  filter:blur(24px);
+}
+.public-platform .pp-window{
+  border:1px solid #d5e4dd;
+  border-radius:26px;
+  background:#f7faf8;
+  box-shadow:0 30px 85px rgba(10,42,32,.16),0 2px 0 rgba(255,255,255,.9) inset;
+  transform:rotateY(-2.2deg) rotateX(.7deg);
+}
+.public-platform .pp-window-top{
+  height:54px;
+  padding:0 20px;
+}
+.public-platform .pp-preview-label{
+  background:#e4f5ee;
+  color:var(--ej-green);
+  border:1px solid #cce9dc;
+}
+.public-platform .pp-console{grid-template-columns:118px 1fr;min-height:405px}
+.public-platform .pp-console aside{
+  background:linear-gradient(180deg,#073b2c,#062e23);
+  padding:25px 13px;
+}
+.public-platform .pp-console aside span{
+  padding:10px 9px;
+  border-radius:8px;
+}
+.public-platform .pp-console aside .active{
+  background:rgba(11,154,112,.16);
+  color:#7be0b8;
+  box-shadow:inset 2px 0 #58c99a;
+}
+.public-platform .pp-console-main{padding:27px}
+.public-platform .pp-console-head h3{
+  font-size:22px;
+  letter-spacing:-.04em;
+}
+.public-platform .pp-live{
+  color:var(--ej-green);
+  background:#e7f6ef;
+  border:1px solid #cdeadd;
+}
+.public-platform .pp-flow article{
+  border-color:#d9e6e0;
+  box-shadow:0 5px 16px rgba(10,47,35,.035);
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.public-platform .pp-flow article:hover{
+  transform:translateY(-2px);
+  border-color:#b9d9ca;
+  box-shadow:0 12px 26px rgba(10,47,35,.07);
+}
+.public-platform .pp-flow i{background:var(--ej-green)}
+.public-platform .pp-activity{
+  border-color:#d9e6e0;
+  box-shadow:0 7px 20px rgba(10,47,35,.04);
+}
+.public-platform .pp-activity-row i{
+  background:#e6f5ee;
+  color:var(--ej-green);
+}
+
+/* Section rhythm and cards. */
+.public-platform .pp-section{padding:104px 0}
+.public-platform .pp-section.soft{background:#f5f9f7}
+.public-platform .pp-section-head{max-width:760px}
+.public-platform .pp-section h2{
+  font-size:clamp(34px,3.9vw,52px);
+  letter-spacing:-1.9px;
+}
+.public-platform .pp-section-head p{color:#5a6f67}
+.public-platform .pp-ecosystem{
+  gap:9px;
+}
+.public-platform .pp-ecosystem span{
+  border-color:#d9e6e0;
+  background:#fff;
+  box-shadow:0 3px 12px rgba(10,47,35,.025);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.public-platform .pp-ecosystem span:hover{
+  transform:translateY(-2px);
+  border-color:#b9d9ca;
+  box-shadow:0 10px 24px rgba(10,47,35,.055);
+}
+
+/* Platform cards: one clear focal card + supporting surfaces. */
+.public-platform .pp-platform-grid{gap:16px}
+.public-platform .pp-surface{
+  border-color:#d9e6e0;
+  border-radius:20px;
+  box-shadow:0 7px 24px rgba(10,47,35,.035);
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.public-platform .pp-surface:hover{
+  transform:translateY(-3px);
+  border-color:#b9d9ca;
+  box-shadow:0 16px 34px rgba(10,47,35,.075);
+}
+.public-platform .pp-surface:first-child{
+  background:linear-gradient(145deg,#063d2d,#087c58);
+  box-shadow:0 18px 42px rgba(6,61,45,.18);
+}
+.public-platform .pp-surface .num{color:var(--ej-green)}
+.public-platform .pp-surface:first-child .num{color:#8be5bf}
+
+/* Workforce: restrained dark section with clear role hierarchy. */
+.public-platform .pp-section.dark{
+  background:
+    radial-gradient(circle at 15% 15%,rgba(11,154,112,.13),transparent 25rem),
+    linear-gradient(145deg,#06251c,#06382a 58%,#064532);
+}
+.public-platform .pp-role{
+  border-color:rgba(125,204,169,.16);
+  background:rgba(255,255,255,.045);
+  box-shadow:0 7px 22px rgba(0,0,0,.08);
+  transition:transform .2s ease,background .2s ease,border-color .2s ease;
+}
+.public-platform .pp-role:hover{
+  transform:translateX(-3px);
+  background:rgba(255,255,255,.065);
+  border-color:rgba(125,204,169,.3);
+}
+.public-platform .pp-role>span{
+  background:rgba(72,198,146,.13);
+  color:#79dfb4;
+}
+.public-platform .pp-role em{color:#73dcb0}
+.public-platform .pp-equation span{
+  border-color:rgba(125,204,169,.22);
+  background:rgba(255,255,255,.025);
+}
+
+/* Process and industry cards should read as one system, not five unrelated boxes. */
+.public-platform .pp-process{gap:10px}
+.public-platform .pp-step{
+  border-top-color:var(--ej-green);
+  box-shadow:0 5px 18px rgba(10,47,35,.03);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.public-platform .pp-step:hover{
+  transform:translateY(-3px);
+  box-shadow:0 14px 30px rgba(10,47,35,.07);
+}
+.public-platform .pp-step b{color:var(--ej-green)}
+.public-platform .pp-industries{gap:12px}
+.public-platform .pp-industry{
+  border-color:#d9e6e0;
+  box-shadow:0 5px 18px rgba(10,47,35,.025);
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.public-platform .pp-industry:hover{
+  transform:translateY(-3px);
+  border-color:#b9d9ca;
+  box-shadow:0 14px 30px rgba(10,47,35,.07);
+}
+.public-platform .pp-industry i{color:var(--ej-green)}
+
+/* Governance / CTA / footer finish. */
+.public-platform .pp-cta-box{
+  background:linear-gradient(120deg,#087c58,#063d2d);
+  box-shadow:0 28px 65px rgba(6,61,45,.2);
+}
+.public-platform .pp-cta .pp-btn{
+  background:#fff;
+  color:#063d2d;
+}
+.public-platform .pp-cta .pp-btn:hover{
+  background:#e9f7f0;
+}
+.public-platform .pp-footer{
+  background:#fff;
+}
+
+/* Accessibility and motion discipline. */
+.public-platform button:focus-visible,
+.public-platform a:focus-visible{
+  outline:3px solid rgba(8,124,88,.24);
+  outline-offset:3px;
+}
+@media(max-width:900px){
+  .public-platform .pp-container{width:min(100% - 32px,1220px)}
+  .public-platform .pp-hero{gap:48px;padding:64px 0 76px}
+}
+@media(max-width:600px){
+  .public-platform .pp-container{width:calc(100% - 24px)}
+  .public-platform .pp-nav{height:68px}
+  .public-platform .pp-hero{padding:48px 0 62px}
+  .public-platform .pp-hero h1{font-size:42px;letter-spacing:-1.8px}
+  .public-platform .pp-section{padding:72px 0}
+  .public-platform .pp-window{transform:none;border-radius:20px}
+  .public-platform .pp-console{grid-template-columns:78px 1fr}
+  .public-platform .pp-console-main{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .public-platform .pp-btn,
+  .public-platform .pp-links a,
+  .public-platform .pp-flow article,
+  .public-platform .pp-ecosystem span,
+  .public-platform .pp-surface,
+  .public-platform .pp-role,
+  .public-platform .pp-step,
+  .public-platform .pp-industry{
+    transition:none!important;
+  }
+}
