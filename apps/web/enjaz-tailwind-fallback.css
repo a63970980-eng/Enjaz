@@ -1,0 +1,80 @@
+/* ENJAZ public landing — deterministic layout fallback.
+   Intentionally independent of Tailwind so the public experience cannot collapse
+   when utility generation changes. */
+.public-platform,.public-platform *{box-sizing:border-box}
+.public-platform{font-family:'IBM Plex Sans Arabic','Inter',sans-serif;line-height:1.5}
+.public-platform a{color:inherit;text-decoration:none}
+.public-platform button{font:inherit;cursor:pointer}
+.public-platform img,.public-platform svg{display:block}
+.public-platform .flex{display:flex}.public-platform .inline-flex{display:inline-flex}.public-platform .grid{display:grid}.public-platform .block{display:block}.public-platform .hidden{display:none}.public-platform .relative{position:relative}.public-platform .absolute{position:absolute}.public-platform .sticky{position:sticky}
+.public-platform .inset-0{inset:0}.public-platform .top-0{top:0}.public-platform .left-0{left:0}.public-platform .right-0{right:0}.public-platform .bottom-0{bottom:0}.public-platform .z-50{z-index:50}
+.public-platform .mx-auto{margin-inline:auto}.public-platform .mt-1{margin-top:.25rem}.public-platform .mt-2{margin-top:.5rem}.public-platform .mt-3{margin-top:.75rem}.public-platform .mt-4{margin-top:1rem}.public-platform .mt-5{margin-top:1.25rem}.public-platform .mt-6{margin-top:1.5rem}.public-platform .mt-7{margin-top:1.75rem}.public-platform .mt-8{margin-top:2rem}.public-platform .mt-10{margin-top:2.5rem}.public-platform .mt-12{margin-top:3rem}.public-platform .mt-16{margin-top:4rem}.public-platform .mt-20{margin-top:5rem}
+.public-platform .mb-1{margin-bottom:.25rem}.public-platform .mb-5{margin-bottom:1.25rem}.public-platform .mb-7{margin-bottom:1.75rem}
+.public-platform .p-2{padding:.5rem}.public-platform .p-3{padding:.75rem}.public-platform .p-4{padding:1rem}.public-platform .p-5{padding:1.25rem}.public-platform .p-6{padding:1.5rem}.public-platform .p-7{padding:1.75rem}
+.public-platform .px-2{padding-inline:.5rem}.public-platform .px-3{padding-inline:.75rem}.public-platform .px-4{padding-inline:1rem}.public-platform .px-5{padding-inline:1.25rem}.public-platform .px-6{padding-inline:1.5rem}
+.public-platform .py-1{padding-block:.25rem}.public-platform .py-2{padding-block:.5rem}.public-platform .py-2\.5{padding-block:.625rem}.public-platform .py-3{padding-block:.75rem}.public-platform .py-4{padding-block:1rem}.public-platform .py-5{padding-block:1.25rem}
+.public-platform .pb-20{padding-bottom:5rem}.public-platform .pb-28{padding-bottom:7rem}.public-platform .pt-16{padding-top:4rem}.public-platform .pt-24{padding-top:6rem}
+.public-platform .h-2{height:.5rem}.public-platform .h-7{height:1.75rem}.public-platform .h-9{height:2.25rem}.public-platform .h-10{height:2.5rem}.public-platform .h-11{height:2.75rem}.public-platform .h-12{height:3rem}.public-platform .h-full{height:100%}.public-platform .w-2{width:.5rem}.public-platform .w-7{width:1.75rem}.public-platform .w-10{width:2.5rem}.public-platform .w-12{width:3rem}.public-platform .w-44{width:11rem}.public-platform .w-48{width:12rem}.public-platform .w-full{width:100%}
+.public-platform .min-w-0{min-width:0}.public-platform .min-w-max{min-width:max-content}.public-platform .flex-1{flex:1 1 0%}.public-platform .shrink-0{flex-shrink:0}.public-platform .max-w-xl{max-width:36rem}.public-platform .max-w-2xl{max-width:42rem}.public-platform .max-w-md{max-width:28rem}.public-platform .max-w-lg{max-width:32rem}.public-platform .max-w-[1280px]{max-width:1280px}.public-platform .max-w-[720px]{max-width:720px}.public-platform .max-w-[650px]{max-width:650px}.public-platform .max-w-[600px]{max-width:600px}
+.public-platform .items-center{align-items:center}.public-platform .items-start{align-items:flex-start}.public-platform .justify-center{justify-content:center}.public-platform .justify-between{justify-content:space-between}.public-platform .text-center{text-align:center}.public-platform .text-right{text-align:right}.public-platform .flex-col{flex-direction:column}.public-platform .flex-wrap{flex-wrap:wrap}
+.public-platform .gap-0{gap:0}.public-platform .gap-2{gap:.5rem}.public-platform .gap-3{gap:.75rem}.public-platform .gap-4{gap:1rem}.public-platform .gap-8{gap:2rem}.public-platform .gap-14{gap:3.5rem}.public-platform .gap-20{gap:5rem}.public-platform .gap-x-6{column-gap:1.5rem}.public-platform .gap-y-2{row-gap:.5rem}
+.public-platform .space-y-3>:not([hidden])~:not([hidden]){margin-top:.75rem}
+.public-platform .overflow-hidden{overflow:hidden}.public-platform .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.public-platform .rounded-full{border-radius:9999px}.public-platform .rounded-lg{border-radius:.5rem}.public-platform .rounded-xl{border-radius:.75rem}.public-platform .rounded-2xl{border-radius:1rem}.public-platform .rounded-3xl{border-radius:1.5rem}.public-platform .rounded-[13px]{border-radius:13px}.public-platform .rounded-[22px]{border-radius:22px}.public-platform .rounded-[25px]{border-radius:25px}.public-platform .rounded-[28px]{border-radius:28px}.public-platform .rounded-[30px]{border-radius:30px}.public-platform .rounded-[34px]{border-radius:34px}
+.public-platform .border{border-width:1px;border-style:solid}.public-platform .border-b{border-bottom:1px solid}.public-platform .border-y{border-block:1px solid}
+.public-platform .bg-white{background:#fff}.public-platform .bg-transparent{background:transparent}.public-platform .text-white{color:#fff}.public-platform .text-slate-400{color:#94a3b8}.public-platform .text-slate-500{color:#64748b}.public-platform .text-slate-600{color:#475569}.public-platform .text-slate-700{color:#334155}.public-platform .text-emerald-700{color:#047857}.public-platform .text-emerald-800{color:#065f46}.public-platform .text-emerald-300{color:#6ee7b7}.public-platform .text-emerald-200{color:#a7f3d0}
+.public-platform .bg-[#f7fbf9]{background:#f7fbf9}.public-platform .bg-[#063d2d]{background:#063d2d}.public-platform .bg-[#03271d]{background:#03271d}.public-platform .bg-[#041c14]{background:#041c14}.public-platform .bg-[#e6f5ee]{background:#e6f5ee}.public-platform .bg-[#eef6f2]{background:#eef6f2}.public-platform .bg-[#fff4dc]{background:#fff4dc}.public-platform .bg-[#f0eafa]{background:#f0eafa}.public-platform .bg-[#fbfdfc]{background:#fbfdfc}.public-platform .bg-emerald-50{background:#ecfdf5}.public-platform .bg-emerald-400{background:#34d399}.public-platform .bg-slate-100{background:#f1f5f9}
+.public-platform .font-medium{font-weight:500}.public-platform .font-semibold{font-weight:600}.public-platform .font-bold{font-weight:700}.public-platform .font-black{font-weight:900}.public-platform .leading-5{line-height:1.25}.public-platform .leading-6{line-height:1.5}.public-platform .leading-7{line-height:1.75}.public-platform .leading-8{line-height:2}.public-platform .tracking-tight{letter-spacing:-.025em}
+.public-platform .text-xs{font-size:.75rem}.public-platform .text-sm{font-size:.875rem}.public-platform .text-base{font-size:1rem}.public-platform .text-xl{font-size:1.25rem;line-height:1.75rem}.public-platform .text-2xl{font-size:1.5rem;line-height:2rem}.public-platform .text-3xl{font-size:1.875rem;line-height:2.25rem}.public-platform .text-4xl{font-size:2.25rem;line-height:2.5rem}.public-platform .text-6xl{font-size:3.75rem;line-height:1}
+.public-platform .shadow-sm{box-shadow:0 1px 3px rgba(4,57,42,.08)}.public-platform .shadow-lg{box-shadow:0 12px 30px rgba(4,57,42,.12)}.public-platform .shadow-xl{box-shadow:0 20px 50px rgba(4,57,42,.16)}.public-platform .shadow-2xl{box-shadow:0 25px 70px rgba(0,0,0,.18)}
+.public-platform .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.public-platform .grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.public-platform .grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.public-platform .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.public-platform .max-w-none{max-width:none}
+.public-platform [class*="md:grid-cols-12"]{grid-template-columns:repeat(12,minmax(0,1fr))}.public-platform [class*="md:col-span-7"]{grid-column:span 7}.public-platform [class*="md:col-span-5"]{grid-column:span 5}.public-platform [class*="md:col-span-4"]{grid-column:span 4}
+.public-platform [class*="lg:grid-cols-[.9fr_1.1fr]"]{grid-template-columns:.9fr 1.1fr}.public-platform [class*="lg:grid-cols-[.8fr_1.2fr]"]{grid-template-columns:.8fr 1.2fr}.public-platform [class*="lg:gap-20"]{gap:5rem}
+.public-platform [class*="h-[74px]"]{height:74px}.public-platform [class*="h-[190px]"]{min-height:190px}.public-platform [class*="min-h-[300px]"]{min-height:300px}.public-platform [class*="min-h-[390px]"]{min-height:390px}.public-platform [class*="min-h-[480px]"]{min-height:480px}
+.public-platform [class*="max-w-[1280px]"]{max-width:1280px}.public-platform [class*="max-w-[720px]"]{max-width:720px}
+.public-platform [class*="px-5"]{padding-inline:1.25rem}.public-platform [class*="py-24"]{padding-block:6rem}.public-platform [class*="py-32"]{padding-block:8rem}.public-platform [class*="py-20"]{padding-block:5rem}.public-platform [class*="py-28"]{padding-block:7rem}
+.public-platform [class*="pb-20"]{padding-bottom:5rem}.public-platform [class*="pt-16"]{padding-top:4rem}.public-platform [class*="pt-24"]{padding-top:6rem}
+.public-platform [class*="w-[78%]"]{width:78%}.public-platform [class*="h-px"]{height:1px}
+.public-platform [class*="aspect-square"]{aspect-ratio:1/1}
+.public-platform [class*="min-h-screen"]{min-height:100vh}
+.public-platform [class*="text-[8px]"]{font-size:8px}.public-platform [class*="text-[9px]"]{font-size:9px}.public-platform [class*="text-[10px]"]{font-size:10px}.public-platform [class*="text-[11px]"]{font-size:11px}.public-platform [class*="text-[12px]"]{font-size:12px}.public-platform [class*="text-[15px]"]{font-size:15px}.public-platform [class*="text-[18px]"]{font-size:18px}.public-platform [class*="text-[clamp"]{font-size:clamp(45px,6.4vw,86px)}
+.public-platform [class*="place-items-center"]{place-items:center}
+.public-platform [class*="backdrop-blur"]{backdrop-filter:blur(18px)}
+.public-platform [class*="animate-[marquee"]{animation:marquee 30s linear infinite}
+.public-platform [class*="transition"]{transition:all .22s ease}
+.public-platform [class*="hover:-translate-y-0.5"]:hover{transform:translateY(-2px)}
+.public-platform [class*="hover:-translate-y-1"]:hover{transform:translateY(-4px)}
+.public-platform [class*="bg-gradient-to-br"]{background:linear-gradient(135deg,#0b9568,#063d2d)}
+.public-platform [class*="bg-gradient-to-l"]{background:linear-gradient(90deg,#087c58,#15a875,#063d2d)}
+.public-platform [class*="bg-clip-text"]{background-clip:text;-webkit-background-clip:text}
+.public-platform [class*="text-transparent"]{color:transparent}
+.public-platform [class*="from-[#"]{color:inherit}
+.public-platform [class*="shadow-["]{box-shadow:0 20px 55px rgba(4,57,42,.14)}
+.public-platform [class*="border-emerald-"]{border-color:rgba(4,120,87,.15)}
+.public-platform [class*="border-[#"]{border-color:#d5e5de}
+.public-platform header{position:sticky!important;top:0}
+.public-platform main>section{position:relative}
+.public-platform main>section:first-child{min-height:720px}
+.public-platform footer{margin-top:0}
+@media(max-width:1024px){
+ .public-platform [class*="lg:grid-cols-"]{grid-template-columns:1fr!important}
+ .public-platform [class*="lg:flex"]{display:flex}
+ .public-platform [class*="lg:hidden"]{display:none}
+ .public-platform main>section:first-child{min-height:auto}
+ .public-platform [class*="md:grid-cols-12"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .public-platform [class*="md:col-span-7"],.public-platform [class*="md:col-span-5"]{grid-column:span 1}
+}
+@media(max-width:768px){
+ .public-platform .hidden{display:none!important}
+ .public-platform [class*="sm:flex-row"]{flex-direction:column}
+ .public-platform [class*="sm:grid-cols-2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .public-platform [class*="md:grid-cols-"]{grid-template-columns:1fr}
+ .public-platform [class*="md:col-span-"]{grid-column:span 1}
+ .public-platform [class*="md:block"]{display:block}
+ .public-platform [class*="md:hidden"]{display:none}
+ .public-platform [class*="md:text-6xl"]{font-size:2.7rem}
+ .public-platform main>section:first-child{padding-top:3rem}
+ .public-platform [class*="px-5"]{padding-inline:1rem}
+}
+@media(prefers-reduced-motion:reduce){.public-platform *{animation:none!important;transition:none!important}}
