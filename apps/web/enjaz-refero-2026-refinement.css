@@ -1,0 +1,103 @@
+/* ENJAZ 2026 enterprise refinement — synthesized from current enterprise SaaS references.
+   Visual-only layer. No auth, Supabase, workspace, API or business logic changes. */
+.public-platform{
+  --ejx-ink:#06281d;--ejx-deep:#031b14;--ejx-green:#078a61;--ejx-bright:#19b980;
+  --ejx-mint:#eaf8f2;--ejx-line:#d9e9e2;--ejx-paper:#fbfdfc;
+  background:
+    radial-gradient(circle at 75% 8%,rgba(25,185,128,.10),transparent 26rem),
+    radial-gradient(circle at 5% 30%,rgba(6,40,29,.045),transparent 24rem),
+    #f7fbf9;
+}
+.public-platform header{box-shadow:0 1px 0 rgba(3,27,20,.04)}
+.public-platform main>section:first-child{min-height:760px}
+.public-platform .hero-proof-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;max-width:620px
+}
+.public-platform .hero-proof-strip>*{
+  padding:11px 13px;border:1px solid var(--ejx-line);border-radius:14px;background:rgba(255,255,255,.78);
+  box-shadow:0 10px 30px rgba(3,27,20,.035)
+}
+.public-platform article{
+  border-color:var(--ejx-line)
+}
+.public-platform [class*="rounded-[30px]"]{border-radius:28px}
+.public-platform [class*="rounded-[22px]"]{border-radius:20px}
+.public-platform [class*="rounded-2xl"]{border-radius:17px}
+.public-platform .product-proof-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px
+}
+.public-platform .product-proof-row>div{
+  border:1px solid var(--ejx-line);background:#fff;border-radius:15px;padding:13px
+}
+.public-platform .product-proof-row strong{display:block;font-size:10px;color:#173a2e}
+.public-platform .product-proof-row span{display:block;margin-top:5px;font-size:8px;color:#7b9189}
+.public-platform .enterprise-rule{
+  width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--ejx-line),transparent)
+}
+.public-platform [class*="bg-[#063d2d]"]{
+  background:
+    radial-gradient(circle at 85% 15%,rgba(25,185,128,.16),transparent 28%),
+    linear-gradient(145deg,#07533d,#031f17)
+}
+.public-platform .public-platform-glow{filter:blur(40px)}
+@media(max-width:700px){
+  .public-platform main>section:first-child{min-height:auto}
+  .public-platform .hero-proof-strip,.public-platform .product-proof-row{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .public-platform *{scroll-behavior:auto!important}
+}
+
+/* Premium interaction and hierarchy pass — visual-only. */
+.public-platform{--ejx-max:1280px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+.public-platform section{scroll-margin-top:88px}
+.public-platform header{backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%)}
+.public-platform header a,.public-platform header button{transition:color .2s ease,background-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.public-platform main>section:first-child{
+  background:linear-gradient(rgba(7,138,97,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(7,138,97,.025) 1px,transparent 1px);
+  background-size:56px 56px;background-position:center top;
+}
+.public-platform main>section:first-child>div.relative{isolation:isolate}
+.public-platform main>section:first-child>div.relative:before{
+  content:"";position:absolute;inset:6% 2% auto 48%;height:520px;pointer-events:none;
+  background:radial-gradient(circle,rgba(25,185,128,.16),transparent 68%);filter:blur(8px);z-index:-1;
+}
+.public-platform main>section:nth-child(2){box-shadow:inset 0 1px rgba(3,27,20,.035),inset 0 -1px rgba(3,27,20,.035)}
+.public-platform article{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease}
+.public-platform article:hover{border-color:rgba(7,138,97,.20)}
+.public-platform .rounded-\[30px\],.public-platform .rounded-\[34px\]{box-shadow:0 22px 70px rgba(3,27,20,.055)}
+.public-platform img{user-select:none}
+.public-platform [class*="animate-[marquee"]{will-change:transform}
+.public-platform a:focus-visible,.public-platform button:focus-visible{outline:3px solid rgba(25,185,128,.45);outline-offset:3px}
+@media(max-width:700px){.public-platform main>section:first-child{background-size:42px 42px}}
+@media(prefers-reduced-motion:reduce){.public-platform article,.public-platform main>section:first-child>div.relative:before{transition:none!important}}
+
+/* Final enterprise polish — visual-only, no product/backend changes. */
+.public-platform .ejx-section-label{
+  display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ejx-line);border-radius:999px;
+  background:rgba(255,255,255,.72);padding:7px 11px;font-size:9px;font-weight:800;letter-spacing:.14em;color:#3b6256;
+}
+.public-platform .ejx-section-label:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ejx-green);box-shadow:0 0 0 4px rgba(25,185,128,.10)}
+.public-platform main>section h2{letter-spacing:-.035em}
+.public-platform main>section h3{letter-spacing:-.018em}
+.public-platform button[class*="bg-[#07845e]"],.public-platform a[class*="bg-[#07845e]"]{
+  box-shadow:0 12px 28px rgba(7,132,94,.18);transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;
+}
+.public-platform button[class*="bg-[#07845e]"]:hover,.public-platform a[class*="bg-[#07845e]"]:hover{
+  transform:translateY(-2px);box-shadow:0 16px 34px rgba(7,132,94,.24);filter:saturate(1.08)
+}
+.public-platform .group:hover .group-hover\:scale-105{transform:scale(1.025)}
+.public-platform main>section:nth-child(3) article,
+.public-platform main>section:nth-child(4) article{overflow:hidden}
+.public-platform main>section:nth-child(3) article:after,
+.public-platform main>section:nth-child(4) article:after{
+  content:"";position:absolute;inset:auto -15% -45% auto;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(25,185,128,.09),transparent 70%);pointer-events:none;
+}
+.public-platform footer{border-top:1px solid rgba(217,233,226,.8)}
+@media(max-width:900px){
+  .public-platform main>section:first-child h1{letter-spacing:-.04em}
+}
+@media(prefers-reduced-motion:reduce){
+  .public-platform button[class*="bg-[#07845e]"],.public-platform a[class*="bg-[#07845e]"]{transition:none}
+}
