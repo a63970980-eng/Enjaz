@@ -1,6 +1,6 @@
 import React from 'react';
 import {ArrowLeft,ArrowRight, Bot, Check, Command, Database, GitBranch, Globe2, LockKeyhole, Play, ShieldCheck, Sparkles, Workflow, Zap} from 'lucide-react';
-import EnterpriseMarquee from './EnterpriseMarquee';
+import EnterpriseMarquee from '../ui/EnterpriseMarquee';
 import SpotlightCard from '../ui/SpotlightCard';
 
 const roles=[['AI Manager','الأهداف والقرارات'],['AI Analyst','البيانات والرؤى'],['AI Operations Worker','التنفيذ التشغيلي'],['AI Coordinator','التنسيق والتوجيه'],['AI Customer Service Worker','خدمة العملاء'],['AI Automation Worker','الأتمتة والتكامل']];
