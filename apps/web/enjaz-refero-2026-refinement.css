@@ -107,3 +107,43 @@
 .public-platform .ejx-proof-cell:hover{background:rgba(255,255,255,.9);transform:translateY(-1px)}
 @media(max-width:767px){.public-platform .ejx-proof-cell{min-height:auto}}
 @media(prefers-reduced-motion:reduce){.public-platform .ejx-proof-cell{transition:none}}
+
+
+/* Full enterprise presentation pass — Salesforce-grade information hierarchy. */
+.public-platform .ejx-section-label{
+  display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ejx-line,#d9e9e2);
+  border-radius:999px;background:rgba(255,255,255,.72);padding:7px 11px;font-size:9px;
+  font-weight:800;letter-spacing:.14em;color:#3b6256;
+}
+.public-platform .ejx-section-label:before{
+  content:"";width:6px;height:6px;border-radius:50%;background:#078a61;
+  box-shadow:0 0 0 4px rgba(25,185,128,.10);
+}
+.public-platform .ejx-section-label-dark{border-color:rgba(126,226,188,.14);background:rgba(255,255,255,.045);color:#a7d9c5}
+.public-platform .ejx-section-label-dark:before{background:#19b980;box-shadow:0 0 0 4px rgba(25,185,128,.08)}
+.public-platform .ejx-capability-tab{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:13px;width:100%;
+  padding:14px;border:1px solid transparent;border-radius:18px;background:transparent;text-align:right;
+  transition:background .25s ease,border-color .25s ease,transform .25s ease;
+}
+.public-platform .ejx-capability-tab:hover{background:#fff;border-color:#d9e9e2;transform:translateX(-2px)}
+.public-platform .ejx-capability-tab.is-active{background:#fff;border-color:#cfe3da;box-shadow:0 12px 32px rgba(3,27,20,.06)}
+.public-platform .ejx-operating-step{min-height:290px}
+.public-platform .ejx-operating-step:before{
+  content:"";position:absolute;inset:0;border-radius:inherit;border-top:2px solid #19b980;
+  opacity:0;transform:translateY(5px);transition:opacity .25s ease,transform .25s ease;
+}
+.public-platform .ejx-operating-step:hover:before{opacity:1;transform:translateY(0)}
+.public-platform .ejx-sector-card{border-color:#d9e9e2}
+.public-platform .ejx-sector-card.is-open{border-color:rgba(7,138,97,.35);box-shadow:0 20px 55px rgba(3,27,20,.08)}
+.public-platform .ejx-governance-tile{min-height:135px}
+.public-platform .ejx-enterprise-seal{box-shadow:inset 0 1px rgba(255,255,255,.06),0 30px 80px rgba(0,0,0,.16)}
+.public-platform footer a{transition:color .2s ease}
+@media(max-width:767px){
+  .public-platform .ejx-capability-tab{grid-template-columns:auto 1fr auto}
+  .public-platform .ejx-operating-step{min-height:230px}
+  .public-platform .ejx-governance-tile{min-height:120px}
+}
+@media(prefers-reduced-motion:reduce){
+  .public-platform .ejx-capability-tab,.public-platform .ejx-operating-step:before,.public-platform .ejx-sector-card{transition:none}
+}
