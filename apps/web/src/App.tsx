@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useState,type ReactNode} from 'react';
 import {motion,useReducedMotion} from 'motion/react';
 import {ArrowLeft,ArrowUpLeft,Check,ChevronLeft,Command,LockKeyhole,Menu,Network,Play,ShieldCheck,Sparkles,Workflow,Zap} from 'lucide-react';
 
@@ -16,7 +16,7 @@ const integrations=[
   ['APIs','API','text-blue-700'],['SQL','DB','text-cyan-700']
 ];
 
-function Reveal({children,className='',delay=0}:{children:React.ReactNode;className?:string;delay?:number}){
+function Reveal({children,className='',delay=0}:{children:ReactNode;className?:string;delay?:number}){
  const reduced=useReducedMotion();
  return <motion.div className={className} initial={reduced?false:{opacity:0,y:28}} whileInView={reduced?undefined:{opacity:1,y:0}} viewport={{once:true,amount:.14}} transition={reduced?{duration:0}:{duration:.7,delay,ease:[.22,1,.36,1]}}>{children}</motion.div>;
 }
