@@ -101,3 +101,9 @@
 @media(prefers-reduced-motion:reduce){
   .public-platform button[class*="bg-[#07845e]"],.public-platform a[class*="bg-[#07845e]"]{transition:none}
 }
+
+/* Global-enterprise proof band — visual-only. */
+.public-platform .ejx-proof-cell{min-height:116px;transition:background-color .25s ease,transform .25s ease}
+.public-platform .ejx-proof-cell:hover{background:rgba(255,255,255,.9);transform:translateY(-1px)}
+@media(max-width:767px){.public-platform .ejx-proof-cell{min-height:auto}}
+@media(prefers-reduced-motion:reduce){.public-platform .ejx-proof-cell{transition:none}}
