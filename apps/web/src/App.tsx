@@ -74,7 +74,7 @@ function App(){
  const [menuOpen,setMenuOpen]=useState(false);
  const nav=useMemo(()=>[['المنصة','#platform'],['القوى العاملة','#workforce'],['كيف تعمل','#how'],['القطاعات','#sectors'],['الحوكمة','#governance']],[]);
  if(new URLSearchParams(window.location.search).has('auth'))return <AuthBridge/>;
- return <div dir="rtl" className="min-h-screen overflow-hidden bg-[#f7fbf9] text-[#08251b]">
+ return <div dir="rtl" className="public-platform min-h-screen overflow-hidden bg-[#f7fbf9] text-[#08251b]">
   <header className="sticky top-0 z-50 border-b border-emerald-950/10 bg-white/80 backdrop-blur-xl">
    <div className="mx-auto flex h-[74px] max-w-[1280px] items-center justify-between px-4 sm:px-6">
     <a href="#" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-[13px] bg-gradient-to-br from-[#0b9568] to-[#063d2d] text-white shadow-[0_10px_30px_rgba(7,132,94,.2)]"><Command size={18}/></span><span><b className="block text-[18px] tracking-tight">إنجاز</b><small className="text-[8px] font-semibold tracking-[.24em] text-emerald-700">ENJAZ</small></span></a>
