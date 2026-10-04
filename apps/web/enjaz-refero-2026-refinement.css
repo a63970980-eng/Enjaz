@@ -1,0 +1,49 @@
+/* ENJAZ 2026 enterprise refinement — synthesized from current enterprise SaaS references.
+   Visual-only layer. No auth, Supabase, workspace, API or business logic changes. */
+.public-platform{
+  --ejx-ink:#06281d;--ejx-deep:#031b14;--ejx-green:#078a61;--ejx-bright:#19b980;
+  --ejx-mint:#eaf8f2;--ejx-line:#d9e9e2;--ejx-paper:#fbfdfc;
+  background:
+    radial-gradient(circle at 75% 8%,rgba(25,185,128,.10),transparent 26rem),
+    radial-gradient(circle at 5% 30%,rgba(6,40,29,.045),transparent 24rem),
+    #f7fbf9;
+}
+.public-platform header{box-shadow:0 1px 0 rgba(3,27,20,.04)}
+.public-platform main>section:first-child{min-height:760px}
+.public-platform .hero-proof-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px;max-width:620px
+}
+.public-platform .hero-proof-strip>*{
+  padding:11px 13px;border:1px solid var(--ejx-line);border-radius:14px;background:rgba(255,255,255,.78);
+  box-shadow:0 10px 30px rgba(3,27,20,.035)
+}
+.public-platform article{
+  border-color:var(--ejx-line)
+}
+.public-platform [class*="rounded-[30px]"]{border-radius:28px}
+.public-platform [class*="rounded-[22px]"]{border-radius:20px}
+.public-platform [class*="rounded-2xl"]{border-radius:17px}
+.public-platform .product-proof-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px
+}
+.public-platform .product-proof-row>div{
+  border:1px solid var(--ejx-line);background:#fff;border-radius:15px;padding:13px
+}
+.public-platform .product-proof-row strong{display:block;font-size:10px;color:#173a2e}
+.public-platform .product-proof-row span{display:block;margin-top:5px;font-size:8px;color:#7b9189}
+.public-platform .enterprise-rule{
+  width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--ejx-line),transparent)
+}
+.public-platform [class*="bg-[#063d2d]"]{
+  background:
+    radial-gradient(circle at 85% 15%,rgba(25,185,128,.16),transparent 28%),
+    linear-gradient(145deg,#07533d,#031f17)
+}
+.public-platform .public-platform-glow{filter:blur(40px)}
+@media(max-width:700px){
+  .public-platform main>section:first-child{min-height:auto}
+  .public-platform .hero-proof-strip,.public-platform .product-proof-row{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .public-platform *{scroll-behavior:auto!important}
+}
