@@ -160,3 +160,29 @@
 .public-platform section[id]{scroll-margin-top:100px}
 @media(max-width:767px){.public-platform .ejx-loop-step{min-height:170px}}
 @media(prefers-reduced-motion:reduce){.public-platform .ejx-suite-card:after,.public-platform .ejx-loop-step,.public-platform nav a:after{transition:none}}
+
+/* Local enterprise interaction library — dependency-free, adapted for ENJAZ. */
+.public-platform .ejx-spotlight-card{
+  position:relative;
+  isolation:isolate;
+  border-radius:var(--spot-radius,32px);
+}
+.public-platform .ejx-spotlight-card:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(360px circle at var(--spot-x,50%) var(--spot-y,50%),rgba(25,185,128,.14),transparent 62%);
+  transition:opacity .25s ease;
+}
+.public-platform .ejx-spotlight-card:hover:before{opacity:1}
+.public-platform .ejx-marquee{overflow:hidden;position:relative;width:100%;mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent)}
+.public-platform .ejx-marquee-track{display:flex;width:max-content;animation:ejx-marquee var(--marquee-duration,30s) linear infinite}
+@keyframes ejx-marquee{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){
+  .public-platform .ejx-spotlight-card:before{transition:none}
+  .public-platform .ejx-marquee-track{animation:none}
+}
