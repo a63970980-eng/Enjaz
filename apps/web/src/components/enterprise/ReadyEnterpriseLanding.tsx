@@ -1,4 +1,5 @@
-import React from 'react';\nimport {ArrowLeft,ArrowRight, Bot, Check, Command, Database, GitBranch, Globe2, LockKeyhole, Play, ShieldCheck, Sparkles, Workflow, Zap} from 'lucide-react';
+import React from 'react';
+import {ArrowLeft,ArrowRight, Bot, Check, Command, Database, GitBranch, Globe2, LockKeyhole, Play, ShieldCheck, Sparkles, Workflow, Zap} from 'lucide-react';
 import EnterpriseMarquee from './EnterpriseMarquee';
 import SpotlightCard from '../ui/SpotlightCard';
 
