@@ -1,6 +1,8 @@
-@import "../enjaz-refero-enterprise.css";
-@import "../enjaz-tailwind-fallback.css";
-@import "../enjaz-refero-2026-refinement.css";
-:root{font-family:'IBM Plex Sans Arabic','Inter',sans-serif;color:#08251b;background:#f7fbf9;font-synthesis:none}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-width:320px;background:#f7fbf9}button,a{font:inherit}button{cursor:pointer}@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
-@keyframes enjaz-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}\n
+:root{font-family:'IBM Plex Sans Arabic','Cairo',sans-serif;color:#08251b;background:#fff;font-synthesis:none}
+*{box-sizing:border-box}
+html,body,#root{margin:0;min-width:320px;min-height:100%;width:100%}
+body{background:#fff}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.enjaz-clean-root{min-height:100vh;background:#fff}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
