@@ -5,6 +5,8 @@ import {
   Network,Play,ShieldCheck,Sparkles,Workflow,Zap,Database,BrainCircuit,
   Bot,Users,Layers3,Route,FileCheck2,Building2,Activity,Globe2,Settings2
 } from 'lucide-react';
+import SpotlightCard from './components/ui/SpotlightCard';
+import EnterpriseMarquee from './components/ui/EnterpriseMarquee';
 
 const roles=[
   ['AI Manager','الأهداف والقرارات التشغيلية','MG','قرارات وأولويات'],
@@ -55,7 +57,8 @@ function ProductPreview(){
   ['مراجعة مطلوبة','Human Reviewer','قرار بشري قبل الإجراء الحساس',ShieldCheck],
   ['سجل التدقيق','Governance Engine','كل خطوة موثقة وقابلة للتتبع',LockKeyhole]
  ];
- return <div id="demo" className="relative mx-auto w-full max-w-[750px]">
+ return <SpotlightCard className="relative mx-auto w-full max-w-[750px]">
+  <div id="demo" className="relative w-full">
   <div className="absolute -inset-12 rounded-[70px] bg-[radial-gradient(circle_at_50%_45%,rgba(16,185,129,.25),transparent_62%)] blur-3xl"/>
   <div className="relative rounded-[32px] border border-[#cbded5] bg-white p-2 shadow-[0_45px_120px_rgba(4,57,42,.18)] [transform:perspective(1600px)_rotateY(-2deg)_rotateX(1deg)]">
    <div className="flex h-11 items-center justify-between rounded-[23px] bg-[#f5f9f7] px-4 text-[9px] text-slate-400">
@@ -95,7 +98,8 @@ function ProductPreview(){
   </div>
   <div className="absolute -bottom-8 -left-5 hidden w-56 rounded-2xl border border-[#d6e5df] bg-white p-4 shadow-[0_20px_60px_rgba(4,57,42,.14)] md:block"><div className="flex items-center gap-2"><span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-50 text-emerald-700"><ShieldCheck size={13}/></span><div><b className="block text-[9px] text-slate-700">GOVERNED BY DESIGN</b><span className="text-[8px] text-slate-400">Policy · Approval · Audit</span></div></div></div>
   <div className="absolute -right-4 -top-5 hidden w-48 rounded-2xl border border-emerald-300/10 bg-[#063d2d] p-4 text-white shadow-2xl md:block"><span className="text-[8px] tracking-[.16em] text-emerald-300">DIGITAL WORKER</span><b className="mt-2 block text-sm">AI Coordinator</b><span className="mt-1 block text-[9px] text-white/45">Planning · Routing · Approval</span></div>
- </div>
+  </div>
+ </SpotlightCard>
 }
 
 function WorkforceVisual(){
@@ -172,7 +176,7 @@ function App(){
      <ProductPreview/>
     </div>
    </section>
-   <section className="border-y border-emerald-950/5 bg-white"><div className="mx-auto flex max-w-[1280px] items-center gap-8 overflow-hidden px-5 py-5"><span className="hidden shrink-0 text-[9px] font-bold tracking-[.18em] text-slate-400 lg:block">CONNECTED TOOLS</span><div className="flex min-w-max gap-3 animate-[marquee_30s_linear_infinite]">{[...integrations,...integrations].map(([name,type,icon],i)=><span key={i} className="flex items-center gap-2 rounded-full border border-emerald-900/10 bg-[#f7fbf9] px-4 py-2.5 shadow-sm"><span className="grid h-6 w-6 place-items-center rounded-lg bg-white shadow-sm"><img src={icon} alt={name} width="15" height="15" loading="lazy" decoding="async"/></span><b className="text-[9px] text-slate-600">{name}</b><span className="text-[7px] font-semibold tracking-[.12em] text-slate-300">{type}</span></span>)}</div></div></section>
+   <section className="border-y border-emerald-950/5 bg-white"><div className="mx-auto flex max-w-[1280px] items-center gap-8 overflow-hidden px-5 py-5"><span className="hidden shrink-0 text-[9px] font-bold tracking-[.18em] text-slate-400 lg:block">CONNECTED TOOLS</span><EnterpriseMarquee duration={28} className="min-w-0"><div className="flex min-w-max gap-3">{integrations.map(([name,type,icon],i)=><span key={i} className="flex items-center gap-2 rounded-full border border-emerald-900/10 bg-[#f7fbf9] px-4 py-2.5 shadow-sm"><span className="grid h-6 w-6 place-items-center rounded-lg bg-white shadow-sm"><img src={icon} alt={name} width="15" height="15" loading="lazy" decoding="async"/></span><b className="text-[9px] text-slate-600">{name}</b><span className="text-[7px] font-semibold tracking-[.12em] text-slate-300">{type}</span></span>)}</div></EnterpriseMarquee></div></section>
    <section className="border-b border-emerald-950/5 bg-white"><div className="mx-auto max-w-[1280px] px-5 py-7 md:py-9"><div className="grid overflow-hidden rounded-[22px] border border-emerald-900/10 bg-[#f7fbf9] md:grid-cols-4">{[
     ['AI-NATIVE','ذكاء اصطناعي داخل مسار العمل','من الفهم إلى القرار والتنفيذ.'],
     ['HUMAN-GOVERNED','قرار بشري عند الحاجة','الموافقة والسياسات جزء من المسار.'],
