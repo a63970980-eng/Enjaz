@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,Bot,Check,ChevronLeft,Command,Database,GitBranch,Globe2,LockKeyhole,Play,ShieldCheck,Sparkles,Workflow,Zap} from 'lucide-react';
 
 const roles=[['AI Manager','الأهداف والقرارات'],['AI Analyst','البيانات والرؤى'],['AI Operations Worker','التنفيذ التشغيلي'],['AI Coordinator','التنسيق والتوجيه'],['AI Customer Service Worker','خدمة العملاء'],['AI Automation Worker','الأتمتة والتكامل']];
