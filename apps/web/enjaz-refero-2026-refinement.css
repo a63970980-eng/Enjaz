@@ -47,3 +47,27 @@
 @media(prefers-reduced-motion:reduce){
   .public-platform *{scroll-behavior:auto!important}
 }
+
+/* Premium interaction and hierarchy pass — visual-only. */
+.public-platform{--ejx-max:1280px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+.public-platform section{scroll-margin-top:88px}
+.public-platform header{backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%)}
+.public-platform header a,.public-platform header button{transition:color .2s ease,background-color .2s ease,transform .2s ease,box-shadow .2s ease}
+.public-platform main>section:first-child{
+  background:linear-gradient(rgba(7,138,97,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(7,138,97,.025) 1px,transparent 1px);
+  background-size:56px 56px;background-position:center top;
+}
+.public-platform main>section:first-child>div.relative{isolation:isolate}
+.public-platform main>section:first-child>div.relative:before{
+  content:"";position:absolute;inset:6% 2% auto 48%;height:520px;pointer-events:none;
+  background:radial-gradient(circle,rgba(25,185,128,.16),transparent 68%);filter:blur(8px);z-index:-1;
+}
+.public-platform main>section:nth-child(2){box-shadow:inset 0 1px rgba(3,27,20,.035),inset 0 -1px rgba(3,27,20,.035)}
+.public-platform article{transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease,border-color .35s ease}
+.public-platform article:hover{border-color:rgba(7,138,97,.20)}
+.public-platform .rounded-\[30px\],.public-platform .rounded-\[34px\]{box-shadow:0 22px 70px rgba(3,27,20,.055)}
+.public-platform img{user-select:none}
+.public-platform [class*="animate-[marquee"]{will-change:transform}
+.public-platform a:focus-visible,.public-platform button:focus-visible{outline:3px solid rgba(25,185,128,.45);outline-offset:3px}
+@media(max-width:700px){.public-platform main>section:first-child{background-size:42px 42px}}
+@media(prefers-reduced-motion:reduce){.public-platform article,.public-platform main>section:first-child>div.relative:before{transition:none!important}}
