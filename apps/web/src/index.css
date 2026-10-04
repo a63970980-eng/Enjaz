@@ -39,3 +39,4 @@ a:focus-visible,button:focus-visible{
     transition-duration:.01ms!important;
   }
 }
+\n@keyframes enjazShimmer{0%,55%{background-position:180% 0}100%{background-position:-20% 0}}\n.enjaz-gradient-text{background:linear-gradient(105deg,#087c58 35%,#4ade80 48%,#087c58 62%);background-size:220% auto;background-clip:text;-webkit-background-clip:text;color:transparent;animation:enjazShimmer 8s ease-in-out infinite}\n@media(prefers-reduced-motion:reduce){.enjaz-gradient-text{animation:none}}\n
