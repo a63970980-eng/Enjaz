@@ -186,3 +186,12 @@
   .public-platform .ejx-spotlight-card:before{transition:none}
   .public-platform .ejx-marquee-track{animation:none}
 }
+
+.public-platform .ejx-showcase-tab{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid transparent;border-radius:18px;text-align:right;transition:all .25s ease}
+.public-platform .ejx-showcase-tab:hover{background:#fff;border-color:#d9e9e2}
+.public-platform .ejx-showcase-tab.is-active{background:#fff;border-color:#cfe3da;box-shadow:0 12px 30px rgba(3,27,20,.07);transform:translateX(-2px)}
+.public-platform .ejx-role-card{position:relative;overflow:hidden}
+.public-platform .ejx-role-card:after{content:"";position:absolute;right:-35px;bottom:-35px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(25,185,128,.10),transparent 70%);transition:transform .45s ease}
+.public-platform .ejx-role-card:hover:after{transform:scale(1.8)}
+@media(max-width:767px){.public-platform .ejx-showcase-tab{grid-template-columns:auto 1fr auto}.public-platform .ejx-role-card:after{display:none}}
+@media(prefers-reduced-motion:reduce){.public-platform .ejx-showcase-tab,.public-platform .ejx-role-card:after{transition:none}}
