@@ -147,3 +147,16 @@
 @media(prefers-reduced-motion:reduce){
   .public-platform .ejx-capability-tab,.public-platform .ejx-operating-step:before,.public-platform .ejx-sector-card{transition:none}
 }
+
+/* Global enterprise expansion — product suite, operating loop, and navigation density. */
+.public-platform .ejx-suite-card{isolation:isolate}
+.public-platform .ejx-suite-card:after{content:"";position:absolute;right:-70px;top:-70px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(25,185,128,.12),transparent 70%);pointer-events:none;z-index:-1}
+.public-platform .ejx-suite-card:hover:after{transform:scale(1.45);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.public-platform .ejx-loop-step{min-height:210px;transition:background .25s ease,transform .25s ease}
+.public-platform .ejx-loop-step:hover{background:#f7fbf9;transform:translateY(-2px)}
+.public-platform nav a{position:relative}
+.public-platform nav a:after{content:"";position:absolute;right:0;bottom:-9px;width:0;height:2px;border-radius:2px;background:#19b980;transition:width .22s ease}
+.public-platform nav a:hover:after{width:100%}
+.public-platform section[id]{scroll-margin-top:100px}
+@media(max-width:767px){.public-platform .ejx-loop-step{min-height:170px}}
+@media(prefers-reduced-motion:reduce){.public-platform .ejx-suite-card:after,.public-platform .ejx-loop-step,.public-platform nav a:after{transition:none}}
