@@ -110,6 +110,16 @@ function App(){
    <section className="border-y border-emerald-950/5 bg-white">
     <div className="mx-auto flex max-w-[1280px] items-center gap-8 overflow-hidden px-5 py-5"><span className="hidden shrink-0 text-[9px] font-bold tracking-[.18em] text-slate-400 lg:block">CONNECTED TOOLS</span><div className="flex min-w-max gap-3 animate-[marquee_30s_linear_infinite]">{[...integrations,...integrations].map(([name,type,icon],i)=><span key={i} className="flex items-center gap-2 rounded-full border border-emerald-900/10 bg-[#f7fbf9] px-4 py-2.5 shadow-sm"><span className="grid h-6 w-6 place-items-center rounded-lg bg-white shadow-sm"><img src={icon} alt="" width="15" height="15" loading="lazy" decoding="async"/></span><b className="text-[9px] text-slate-600">{name}</b><span className="text-[7px] font-semibold tracking-[.12em] text-slate-300">{type}</span></span>)}</div></div>
    </section>
+   <section className="border-b border-emerald-950/5 bg-white">
+    <div className="mx-auto max-w-[1280px] px-5 py-7 md:py-9">
+      <div className="grid overflow-hidden rounded-[22px] border border-emerald-900/10 bg-[#f7fbf9] md:grid-cols-4">
+        <div className="ejx-proof-cell border-emerald-900/10 p-5 md:p-6"><span className="text-[8px] font-bold tracking-[.16em] text-emerald-700">AI-NATIVE</span><b className="mt-2 block text-[12px] text-[#173a2e]">ذكاء اصطناعي داخل مسار العمل</b><span className="mt-1 block text-[9px] leading-5 text-slate-400">من الفهم إلى القرار والتنفيذ.</span></div>
+        <div className="ejx-proof-cell border-t border-emerald-900/10 p-5 md:border-r md:border-t-0 md:p-6"><span className="text-[8px] font-bold tracking-[.16em] text-emerald-700">HUMAN-GOVERNED</span><b className="mt-2 block text-[12px] text-[#173a2e]">قرار بشري عند الحاجة</b><span className="mt-1 block text-[9px] leading-5 text-slate-400">الموافقة والسياسات جزء من المسار.</span></div>
+        <div className="ejx-proof-cell border-t border-emerald-900/10 p-5 md:border-r md:border-t-0 md:p-6"><span className="text-[8px] font-bold tracking-[.16em] text-emerald-700">CROSS-INDUSTRY</span><b className="mt-2 block text-[12px] text-[#173a2e]">سياق يتكيّف مع المؤسسة</b><span className="mt-1 block text-[9px] leading-5 text-slate-400">نفس القوة، معرفة وسياسات مختلفة.</span></div>
+        <div className="ejx-proof-cell border-t border-emerald-900/10 p-5 md:border-t-0 md:p-6"><span className="text-[8px] font-bold tracking-[.16em] text-emerald-700">AUDIT-READY</span><b className="mt-2 block text-[12px] text-[#173a2e]">أثر تشغيلي واضح</b><span className="mt-1 block text-[9px] leading-5 text-slate-400">كل خطوة يمكن تتبعها ومراجعتها.</span></div>
+      </div>
+    </div>
+   </section>
    <section id="platform" className="mx-auto max-w-[1280px] px-5 py-24 md:py-32">
     <div className="max-w-2xl"><span className="inline-flex rounded-full border border-emerald-800/10 bg-emerald-50 px-3 py-1.5 text-[9px] font-bold tracking-[.2em] text-emerald-700">THE PLATFORM</span><h2 className="mt-4 text-4xl font-semibold tracking-[-1.8px] md:text-6xl">ليست مجموعة أدوات.<br/>إنها طبقة تشغيل.</h2><p className="mt-5 text-sm leading-8 text-slate-500">كل جزء من إنجاز مصمم ليعمل داخل مسار واحد: سياق، قرار، تنفيذ، ثم أثر قابل للتدقيق.</p></div>
     <div className="mt-12 grid gap-4 md:grid-cols-12">
