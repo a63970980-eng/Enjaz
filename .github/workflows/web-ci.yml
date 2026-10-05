@@ -34,11 +34,10 @@ jobs:
           node-version: 24
           package-manager-cache: false
       - run: pnpm install --no-frozen-lockfile
-      - run: pnpm --filter @enjaz/web test
-      - run: pnpm --filter @enjaz/web build
+      - run: pnpm --filter enjaz-platform build
       - run: pnpm exec playwright install --with-deps chromium
       - name: Start production preview
-        run: pnpm --filter @enjaz/web exec vite preview --host 127.0.0.1 --port 4173 > /tmp/enjaz-vite.log 2>&1 &
+        run: pnpm --filter enjaz-platform exec vite preview --host 127.0.0.1 --port 4173 > /tmp/enjaz-vite.log 2>&1 &
       - name: Wait for production preview
         run: |
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done

@@ -91,6 +91,41 @@ export default function ReadyEnterpriseLanding() {
           <div className="worker-grid">{workers.map(([name,text,Icon])=><article key={name}><div className="worker-icon"><Icon size={19}/></div><span>AI EMPLOYEE</span><h3>{name}</h3><p>{text}</p><ArrowUpRight size={17}/></article>)}</div>
         </section>
 
+        <section id="workforce-model" className="enjaz-section workforce-model-section">
+          <div className="enjaz-section-head centered">
+            <span className="enjaz-kicker">WORKFORCE MODEL</span>
+            <h2>ابدأ بموظف. ابنِ فريقًا. وسّع إلى قوة عاملة كاملة.</h2>
+            <p>إنجاز لا يفرض عليك نموذجًا واحدًا. اختر مستوى التشغيل الذي يناسب مؤسستك، ثم توسّع دون إعادة بناء النظام.</p>
+          </div>
+          <div className="workforce-model-grid">
+            <article className="workforce-model-card">
+              <div className="model-top"><span className="model-index">01</span><Bot size={21}/></div>
+              <span className="model-kicker">AI EMPLOYEE</span>
+              <h3>موظف رقمي واحد</h3>
+              <p>ابدأ بمهمة أو وظيفة محددة: تحليل، محاسبة، تشغيل، خدمة عملاء أو تنسيق.</p>
+              <ul><li><Check size={14}/> موظف متخصص</li><li><Check size={14}/> أدوات وصلاحيات محددة</li><li><Check size={14}/> يعمل داخل سياق المؤسسة</li></ul>
+              <a href="?auth=login" className="model-link">ابدأ بموظف <ArrowLeft size={15}/></a>
+            </article>
+            <article className="workforce-model-card featured">
+              <div className="model-top"><span className="model-index">02</span><Network size={21}/></div>
+              <span className="model-kicker">AI TEAM</span>
+              <h3>فريق رقمي جاهز</h3>
+              <p>مجموعة موظفين رقميين يتعاونون لإنجاز عملية كاملة بدل تشغيل وكلاء منفصلين.</p>
+              <ul><li><Check size={14}/> أدوار متكاملة</li><li><Check size={14}/> تنسيق بين الموظفين</li><li><Check size={14}/> سير عمل مشترك</li></ul>
+              <a href="?auth=login" className="model-link">استكشف الفرق <ArrowLeft size={15}/></a>
+            </article>
+            <article className="workforce-model-card">
+              <div className="model-top"><span className="model-index">03</span><Sparkles size={21}/></div>
+              <span className="model-kicker">ENJAZ WORKFORCE</span>
+              <h3>قوة عاملة رقمية كاملة</h3>
+              <p>للمؤسسات التي تريد تشغيل وظائف متعددة عبر فرق وعمليات وقطاعات مختلفة.</p>
+              <ul><li><Check size={14}/> كتالوج 48 موظفًا عند الإطلاق</li><li><Check size={14}/> فرق وسير عمل متعددة</li><li><Check size={14}/> حوكمة وصلاحيات مؤسسية</li></ul>
+              <a href="?auth=login" className="model-link">ابنِ القوة العاملة <ArrowLeft size={15}/></a>
+            </article>
+          </div>
+          <div className="workforce-model-note"><ShieldCheck size={16}/><span>نفس الموظف الرقمي يمكنه العمل عبر القطاعات المختلفة؛ التخصص يأتي من السياق والمهارات والمعرفة والأدوات والسياسات والصلاحيات.</span></div>
+        </section>
+
         <section id="sectors" className="enjaz-section sectors-section">
           <div className="enjaz-section-head centered"><span className="enjaz-kicker">INDUSTRIES</span><h2>مصمم لواقع المؤسسات.</h2><p>السياق الصناعي يتغير، بينما منصة التشغيل تبقى واحدة.</p></div>
           <div className="sector-grid">{sectors.map(({icon:Icon,title,text})=><article key={title}><Icon/><h3>{title}</h3><p>{text}</p><ArrowLeft size={16}/></article>)}</div>
