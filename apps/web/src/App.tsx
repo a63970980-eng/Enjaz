@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import ReadyEnterpriseLanding from "./components/ReadyEnterpriseLanding";
 
 function AuthBridge(){
   useEffect(()=>{
@@ -14,5 +13,5 @@ function AuthBridge(){
 
 export default function App(){
   if(new URLSearchParams(window.location.search).has("auth")) return <AuthBridge/>;
-  return <ReadyEnterpriseLanding/>;
+  return null;
 }
