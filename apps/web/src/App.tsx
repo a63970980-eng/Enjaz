@@ -153,6 +153,26 @@ function AuthBridge(){
 
 function App(){
   if(new URLSearchParams(window.location.search).has('auth')) return <AuthBridge/>;
-  return <ReadyEnterpriseLanding/>;
+  return <div dir="rtl" className="public-platform min-h-screen overflow-x-hidden">
+    <header className="sticky top-0 z-50 border-b border-emerald-900/10 bg-white/90 backdrop-blur-xl">
+      <div className="mx-auto flex h-[74px] max-w-[1280px] items-center justify-between px-5 lg:px-8">
+        <a href="#" className="flex items-center gap-3 font-semibold text-[#06281d]"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[#063d2d] text-sm font-black text-emerald-200 shadow-lg">E</span><span className="text-xl tracking-[-.04em]">إنجاز</span></a>
+        <nav className="hidden items-center gap-7 text-sm text-slate-500 lg:flex"><a href="#platform">المنصة</a><a href="#workforce">القوة العاملة</a><a href="#sectors">القطاعات</a><a href="#governance">الحوكمة</a></nav>
+        <div className="flex items-center gap-2"><a href="?auth=login" className="hidden rounded-xl px-4 py-2.5 text-sm text-slate-600 sm:block">تسجيل الدخول</a><a href="?auth=signup" className="rounded-xl bg-[#063d2d] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/10">ابدأ الآن</a></div>
+      </div>
+    </header>
+    <main>
+      <section className="relative mx-auto grid max-w-[1280px] items-center gap-14 px-5 pb-28 pt-20 lg:grid-cols-[.82fr_1.18fr] lg:px-8 lg:pt-28">
+        <div className="order-2 lg:order-1"><span className="ejx-section-label">ENJAZ · AI OPERATING PLATFORM</span><h1 className="mt-7 max-w-3xl text-5xl font-semibold leading-[1.02] tracking-[-3px] text-[#06281d] md:text-7xl">شغّل مؤسستك بقوة <span className="text-emerald-600">الذكاء الاصطناعي.</span></h1><p className="mt-6 max-w-xl text-base leading-8 text-slate-500 md:text-lg">قوة عاملة رقمية وسير عمل وحوكمة تعمل معًا داخل منصة واحدة.</p><div className="mt-8 flex flex-wrap gap-3"><a href="#demo" className="rounded-xl bg-[#063d2d] px-6 py-3.5 text-sm font-semibold text-white shadow-xl">شاهد العرض التفاعلي</a><a href="#platform" className="rounded-xl border border-emerald-900/10 bg-white px-6 py-3.5 text-sm font-semibold text-[#173a2e]">اكتشف المنصة</a></div><div className="mt-7 flex flex-wrap gap-3 text-[10px] text-slate-400"><span>صلاحيات</span><span>•</span><span>سياسات</span><span>•</span><span>موافقات</span><span>•</span><span>سجل تدقيق</span></div></div>
+        <div className="order-1 lg:order-2"><ProductPreview/></div>
+      </section>
+      <section id="platform" className="border-y border-emerald-900/10 bg-white px-5 py-24 lg:px-8"><div className="mx-auto max-w-[1280px]"><SectionIntro eyebrow="ENJAZ PLATFORM" title="منصة تشغيل مؤسسية، وليست مجرد مساعد ذكي." copy="المنتج يجمع القيادة والقوة العاملة الرقمية وسير العمل والمعرفة والتكامل والحوكمة في طبقة تشغيل واحدة."/><EnterpriseProductShowcase/><EnterpriseSuite/><CapabilityMatrix/></div></section>
+      <section id="workforce" className="bg-[#03291f] px-5 py-24 text-white lg:px-8"><div className="mx-auto grid max-w-[1280px] items-center gap-14 lg:grid-cols-[.9fr_1.1fr]"><div><SectionIntro dark eyebrow="DIGITAL WORKFORCE" title="48 موظفًا رقميًا عالميًا." copy="الدور نفسه يعمل عبر القطاعات، ويتخصص عبر سياق الصناعة والمهارات والمعرفة والأدوات والسياسات والصلاحيات."/><div className="mt-8"><EnterpriseWorkforceCatalog/></div></div><WorkforceVisual/></div></section>
+      <section id="sectors" className="px-5 py-24 lg:px-8"><div className="mx-auto max-w-[1280px]"><SectionIntro eyebrow="FIVE SECTORS" title="مصمم لعمليات المؤسسات المختلفة."/><div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">{sectors.map(([name,desc,code])=><article key={code} className="group min-h-[230px] rounded-[24px] border bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl"><span className="text-[9px] font-bold tracking-[.18em] text-emerald-700">{code}</span><h3 className="mt-12 text-xl font-semibold text-[#173a2e]">{name}</h3><p className="mt-3 text-xs leading-6 text-slate-400">{desc}</p></article>)}</div></div></section>
+      <section id="governance" className="bg-[#f2f8f5] px-5 py-24 lg:px-8"><div className="mx-auto max-w-[1280px]"><SectionIntro eyebrow="OPERATIONS & GOVERNANCE" title="الاستقلالية داخل حدود المؤسسة."/><EnterpriseLoop/></div></section>
+      <section className="px-5 py-24 lg:px-8"><div className="mx-auto max-w-[1280px] overflow-hidden rounded-[32px] bg-[#063d2d] p-8 text-white shadow-2xl md:p-14"><span className="text-[9px] font-bold tracking-[.18em] text-emerald-300">ENJAZ</span><h2 className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-1.8px] md:text-6xl">ابنِ نظام تشغيل مؤسستك حول العمل الفعلي.</h2><p className="mt-5 max-w-2xl text-sm leading-8 text-white/55">ابدأ من العمليات التي تريد تشغيلها، ثم امنح كل موظف رقمي السياق والأدوات والسياسات التي يحتاجها.</p><a href="?auth=signup" className="mt-8 inline-flex rounded-xl bg-emerald-400 px-6 py-3.5 text-sm font-bold text-[#03291f]">ابدأ الآن</a></div></section>
+    </main>
+    <footer className="border-t border-emerald-900/10 bg-white px-5 py-8 lg:px-8"><div className="mx-auto flex max-w-[1280px] flex-col gap-3 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between"><span>إنجاز — AI Operating Platform</span><span>صلاحيات · سياسات · موافقات · تدقيق</span></div></footer>
+  </div>;
 }
 export default App;
