@@ -1,0 +1,6 @@
+import React from "react";
+import { cn } from "../../lib/utils";
+export function ColumnLines({columnWidth=80,columnCount=16,radialFadeStart=25,radialFadeEnd=65,noiseOpacity=0.035,className,children}:{columnWidth?:number;columnCount?:number;radialFadeStart?:number;radialFadeEnd?:number;noiseOpacity?:number;className?:string;children?:React.ReactNode}){
+ const id=React.useId().replace(/:/g,""); const mask=`radial-gradient(circle at center,white 0%,white ${radialFadeStart}%,transparent ${radialFadeEnd}%)`;
+ return <div className={cn("relative overflow-hidden",className)}><svg width="0" height="0" className="absolute"><filter id={`noise-${id}`}><feTurbulence type="fractalNoise" baseFrequency=".65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg><div className="pointer-events-none absolute inset-0 z-0" style={{opacity:noiseOpacity,filter:`url(#noise-${id})`}}/><div className="pointer-events-none absolute inset-0 z-0 flex" style={{WebkitMaskImage:mask,maskImage:mask}}>{Array.from({length:columnCount}).map((_,i)=><div key={i} className="h-full shrink-0 bg-gradient-to-r from-emerald-50/50 to-white shadow-[2px_0_0_0_rgba(6,61,45,.06)]" style={{width:columnWidth}}/>)}</div>{children&&<div className="relative z-10">{children}</div>}</div>
+}
