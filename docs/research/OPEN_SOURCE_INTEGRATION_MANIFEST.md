@@ -94,3 +94,10 @@ ENJAZ remains the system of record:
 - Existing approvals, audit, execution graph and integrations remain ENJAZ
 
 Imported components are reusable building blocks, not a replacement platform.
+
+
+## 2026-10-07 — Agent Studio brand assets
+- Imported `apps/web/src/components/reference/AgentStudioBrandLogos.tsx` from `devhimanshuu/Agent-Studio` (MIT-licensed repository).
+- Asset scope: reusable SVG brand marks for n8n, Dify, Smithery, Groq, and OpenRouter.
+- Purpose: provide real integration-logo building blocks for the ENJAZ public experience without importing Agent Studio runtime code.
+- The source repository README identifies the project as MIT licensed; no Agent Studio runtime/auth/backend was imported.
