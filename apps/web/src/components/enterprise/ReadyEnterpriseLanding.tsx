@@ -1,61 +1,110 @@
-import React from 'react';
-import {ArrowLeft, Bot, Check, Command, Database, GitBranch, Globe2, LockKeyhole, Play, ShieldCheck, Sparkles, Workflow, Zap} from 'lucide-react';
-import EnterpriseMarquee from '../ui/EnterpriseMarquee';
-import SpotlightCard from '../ui/SpotlightCard';
-import {ColumnLines} from '../ui/ColumnLines';
-import {ShinyButton} from '../ui/ShinyButton';
-import {BentoGrid,BentoCard} from '../ui/BentoGrid';
-import {FadeIn,Stagger,StaggerItem} from '../ui/FadeIn';
-import {FlowingLogos} from '../ui/FlowingLogos';
+import { ArrowLeft, ArrowUpRight, Bot, BrainCircuit, Check, ChevronDown, GitBranch, Hospital, Hotel, Landmark, Network, Play, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 
-const roles=[['AI Manager','الأهداف والقرارات'],['AI Analyst','البيانات والرؤى'],['AI Operations Worker','التنفيذ التشغيلي'],['AI Coordinator','التنسيق والتوجيه'],['AI Customer Service Worker','خدمة العملاء'],['AI Automation Worker','الأتمتة والتكامل']];
-const sectors=[['المطاعم','الطلبات · الفروع · المخزون · الجودة'],['المستشفيات','العمليات · الخدمات · الموافقات · التنسيق'],['الفنادق','الضيافة · التشغيل · الطلبات · الأقسام'],['الشركات','المبيعات · المالية · العمليات · التقنية'],['الجهات الحكومية','الخدمات · الإجراءات · الامتثال · التدقيق']];
-const tabs=['مركز القيادة','القوى العاملة','سير العمل','الحوكمة'];
+const integrations = ["OpenAI", "GitHub", "Vercel", "Supabase", "n8n", "Slack"];
 
-function ProductWindow(){
- const [tab,setTab]=React.useState(0);
- return <FadeIn><div id="demo" className="relative mx-auto max-w-[1160px]"><div className="absolute -inset-20 rounded-[90px] bg-emerald-400/15 blur-3xl"/>
-  <div className="relative overflow-hidden rounded-[34px] border border-[#cfe1d9] bg-white shadow-[0_55px_150px_rgba(2,45,32,.2)]">
-   <div className="flex items-center justify-between border-b border-[#e6eee9] bg-[#fbfdfc] px-5 py-4"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-[#063d2d] text-emerald-200"><Command size={16}/></span><div><b className="block text-xs">ENJAZ OS</b><span className="text-[8px] text-slate-400">Intelligent Operating Platform</span></div></div><span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[9px] font-bold tracking-widest text-emerald-700">PREVIEW</span></div>
-   <div className="grid md:grid-cols-[210px_1fr]">
-    <aside className="hidden bg-[#052b20] p-4 md:block"><div className="mb-7 px-3 pt-2 text-[8px] tracking-[.18em] text-emerald-300">WORKSPACE</div>{tabs.map((x,i)=><button key={x} onClick={()=>setTab(i)} className={`mb-1 w-full rounded-xl px-3 py-3 text-right text-[10px] transition ${tab===i?'bg-emerald-400/15 text-emerald-200':'text-white/40 hover:bg-white/5 hover:text-white'}`}>{x}</button>)}</aside>
-    <main className="min-h-[470px] bg-[#f8fbfa] p-5 md:p-9"><div className="mb-5 flex gap-2 overflow-auto md:hidden">{tabs.map((x,i)=><button key={x} onClick={()=>setTab(i)} className={`shrink-0 rounded-xl px-3 py-2 text-[9px] ${tab===i?'bg-[#063d2d] text-white':'bg-white text-slate-500'}`}>{x}</button>)}</div><span className="text-[8px] font-bold tracking-[.2em] text-emerald-700">INTELLIGENT OPERATING PLATFORM</span><h3 className="mt-2 text-2xl font-semibold tracking-tight">{tabs[tab]}</h3>
-    {tab===0&&<div className="mt-8 grid gap-3 sm:grid-cols-3">{[['CONTEXT','Operational request'],['DECISION','AI Coordinator'],['CONTROL','Human approval']].map((x,i)=><SpotlightCard key={x[0]} className="rounded-2xl border border-[#dce9e4] bg-white p-5 shadow-sm"><span className="text-[7px] font-bold tracking-widest text-slate-400">{x[0]}</span><b className="mt-4 block text-[11px]">{x[1]}</b><span className="mt-3 block text-[8px] text-emerald-700">{i===2?'CHECKPOINT':'READY'}</span></SpotlightCard>)}</div>}
-    {tab===1&&<div className="mt-8 grid gap-3 sm:grid-cols-2">{roles.slice(0,4).map(x=><SpotlightCard key={x[0]} className="rounded-2xl border border-[#dce9e4] bg-white p-5"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#063d2d] text-emerald-200"><Bot size={14}/></span><b className="mt-5 block text-[10px]">{x[0]}</b><span className="mt-1 block text-[9px] text-slate-400">{x[1]}</span></SpotlightCard>)}</div>}
-    {tab===2&&<div className="mt-9"><div className="grid grid-cols-4 gap-2">{['Signal','Context','Decision','Action'].map((x,i)=><div key={x} className="text-center"><span className={`mx-auto grid h-12 w-12 place-items-center rounded-2xl border ${i<3?'border-emerald-200 bg-emerald-50 text-emerald-700':'border-[#dce9e4] bg-white text-slate-400'}`}>{i<3?<Check size={16}/>:<Play size={14}/>}</span><b className="mt-3 block text-[8px] text-slate-500">{x}</b></div>)}</div><div className="mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-5"><span className="text-[8px] font-bold tracking-widest text-emerald-700">OPERATING TRACE</span><p className="mt-2 text-[10px] leading-6 text-[#31584b]">من الإشارة إلى القرار والتنفيذ، كل مرحلة لها سياق واضح ونقطة تحكم.</p></div></div>}
-    {tab===3&&<div className="mt-7 grid gap-3">{['Identity & Permissions','Policies','Human Approval','Audit Trail'].map((x,i)=><div key={x} className="flex items-center gap-3 rounded-2xl border border-[#dce9e4] bg-white p-4"><ShieldCheck size={16} className="text-emerald-700"/><b className="text-[10px]">{x}</b><span className="mr-auto rounded-full bg-emerald-50 px-2 py-1 text-[7px] text-emerald-700">{i===2?'REVIEW':'PASS'}</span></div>)}</div>}
-    </main>
-   </div>
-  </div>
- </div></FadeIn>
-}
+const sectors = [
+  { icon: Hospital, title: "المستشفيات", text: "تشغيل منسق للفرق والعمليات والخدمات الحرجة." },
+  { icon: Hotel, title: "الفنادق", text: "ربط التشغيل والخدمة والمخزون والمهام في منظومة واحدة." },
+  { icon: Landmark, title: "الجهات الحكومية", text: "حوكمة واضحة، سير عمل، واعتمادات قابلة للتتبع." },
+  { icon: Network, title: "الشركات", text: "تنسيق الأعمال والبيانات والقوى العاملة الرقمية." },
+  { icon: Workflow, title: "المطاعم", text: "تشغيل الفروع والطلبات والمخزون والجودة." },
+];
 
-export default function ReadyEnterpriseLanding(){
- const logos=[['OpenAI','AI'],['GitHub','DEV'],['Vercel','DEPLOY'],['Supabase','DATA'],['n8n','AUTO'],['MCP','TOOLS'],['OpenAPI','API'],['PostgreSQL','DB']].map(([name,tag])=>({name,icon:<span className="grid size-5 place-items-center rounded-md bg-emerald-50 text-[7px] font-bold text-emerald-700">{tag}</span>}));
- const cards=[
-  ['Command Center','رؤية موحّدة للأهداف والطلبات والقرارات',Command],
-  ['Digital Workforce','48 دورًا رقميًا عالميًا ضمن سياق المؤسسة',Bot],
-  ['Workflow Engine','مسارات قابلة للتنفيذ والمراجعة',Workflow],
-  ['Knowledge Layer','المعرفة والسياسات داخل مسار العمل',Database],
-  ['Integration Fabric','الأدوات والأنظمة متصلة بالعمل',GitBranch],
-  ['Governance Plane','صلاحيات وموافقات وأثر تدقيقي',ShieldCheck]
- ];
- return <div dir="rtl" className="min-h-screen overflow-hidden bg-[#f8fbf9] text-[#08251b]">
-  <header className="sticky top-0 z-50 border-b border-emerald-950/10 bg-white/85 backdrop-blur-xl"><div className="mx-auto flex h-[72px] max-w-[1320px] items-center justify-between px-5"><a href="#" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-[13px] bg-[#063d2d] text-emerald-200"><Command size={18}/></span><span><b className="block text-[17px]">إنجاز</b><small className="text-[7px] tracking-[.2em] text-slate-400">INTELLIGENT OPERATING PLATFORM</small></span></a><nav className="hidden items-center gap-8 text-[11px] text-slate-500 lg:flex"><a href="#platform">المنصة</a><a href="#workforce">القوى العاملة</a><a href="#how">كيف تعمل</a><a href="#sectors">القطاعات</a><a href="#governance">الحوكمة</a></nav><div className="flex items-center gap-2"><a href="/?auth=1" className="hidden px-4 py-2 text-[10px] text-slate-500 sm:block">تسجيل الدخول</a><ShinyButton href="/?auth=1&signup=1" className="px-4 py-3 text-[10px]">ابدأ الآن</ShinyButton></div></div></header>
-  <main>
-   <section className="relative overflow-hidden px-5 pb-24 pt-16 md:pb-32 md:pt-24"><ColumnLines className="pointer-events-none absolute inset-0 -z-10 h-full"/><div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_70%_10%,rgba(20,184,130,.14),transparent_32%)]"/>
-    <div className="mx-auto max-w-[1320px]"><FadeIn><div className="mx-auto max-w-5xl text-center"><span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-4 py-2 text-[9px] font-bold tracking-[.16em] text-emerald-700 shadow-sm"><Sparkles size={11}/> THE INTELLIGENT OPERATING PLATFORM</span><h1 className="mt-7 text-5xl font-semibold tracking-[-.06em] md:text-7xl lg:text-[82px]">قوة عمل رقمية.<br/><span className="text-emerald-700">مؤسسة تتحرك بذكاء.</span></h1><p className="mx-auto mt-7 max-w-2xl text-sm leading-8 text-slate-500 md:text-base">إنجاز تجمع الموظفين الرقميين والعمليات وسير العمل والحوكمة في طبقة تشغيل واحدة — من الطلب إلى القرار، ثم التنفيذ، ثم الأثر القابل للتدقيق.</p><div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><ShinyButton href="/?auth=1&signup=1" className="px-7 py-4">ابدأ مع إنجاز <ArrowLeft size={15}/></ShinyButton><a href="#demo" className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#cfe2da] bg-white px-7 py-4 text-xs font-bold text-[#173a2e] shadow-sm"><Play size={14}/> شاهد المنتج</a></div></div></FadeIn>
-     <div className="mt-16"><ProductWindow/></div>
-     <div className="mx-auto mt-14 max-w-[1160px] overflow-hidden rounded-2xl border border-[#dce9e4] bg-white py-2 shadow-sm"><FlowingLogos logos={logos} speed="30s" className="h-14"/></div>
+const workers = [
+  ["AI Manager", "يدير الأولويات والقرارات التشغيلية", BrainCircuit],
+  ["AI Analyst", "يحلل البيانات ويكشف ما يحتاج إلى قرار", Sparkles],
+  ["AI Operations Worker", "ينفذ الأعمال المتكررة عبر الأدوات", Workflow],
+  ["AI Coordinator", "ينسق المهام بين الفرق والأنظمة", Network],
+  ["AI Customer Service Worker", "يتعامل مع الخدمة والمتابعة", Bot],
+];
+
+export default function ReadyEnterpriseLanding() {
+  return (
+    <div className="enjaz-page" dir="rtl">
+      <header className="enjaz-nav">
+        <a className="enjaz-brand" href="#" aria-label="إنجاز">
+          <span className="enjaz-mark">إ</span><span>إنجاز</span>
+        </a>
+        <nav>
+          <a href="#platform">المنصة</a>
+          <a href="#workforce">القوة العاملة</a>
+          <a href="#sectors">القطاعات</a>
+          <a href="#governance">الحوكمة</a>
+        </nav>
+        <div className="enjaz-nav-actions">
+          <a href="?auth=login" className="enjaz-login">تسجيل الدخول</a>
+          <a href="#contact" className="enjaz-button enjaz-button-small">ابدأ الآن <ArrowLeft size={15}/></a>
+        </div>
+      </header>
+
+      <main>
+        <section className="enjaz-hero">
+          <div className="enjaz-hero-copy">
+            <div className="enjaz-eyebrow"><span className="enjaz-live-dot"/> منصة تشغيل مؤسسية مدعومة بالذكاء الاصطناعي</div>
+            <h1>شغّل مؤسستك بقوة <span>الذكاء الاصطناعي.</span></h1>
+            <p>إنجاز يوحّد القوى العاملة البشرية والرقمية والعمليات وسير العمل والحوكمة في منصة واحدة مصممة للتشغيل الفعلي.</p>
+            <div className="enjaz-actions">
+              <a href="#contact" className="enjaz-button">ابدأ مع إنجاز <ArrowLeft size={17}/></a>
+              <a href="#preview" className="enjaz-button enjaz-button-ghost"><Play size={15} fill="currentColor"/> شاهد المنصة</a>
+            </div>
+            <div className="enjaz-trust-line"><ShieldCheck size={16}/> صلاحيات • سياسات • موافقات • سجل تدقيق</div>
+          </div>
+          <div className="enjaz-hero-visual">
+            <div className="enjaz-glow"/>
+            <div className="enjaz-orbit orbit-one"/>
+            <div className="enjaz-orbit orbit-two"/>
+            <div className="enjaz-dashboard">
+              <div className="dash-top"><span>ENJAZ OPERATIONS</span><span className="dash-status"><i/> النظام جاهز</span></div>
+              <div className="dash-grid">
+                <div className="dash-main">
+                  <div className="dash-title">مركز التشغيل</div>
+                  <div className="dash-sub">توجيه الأعمال بين البشر والوكلاء والأنظمة</div>
+                  <div className="flow-row"><div className="flow-node active"><BrainCircuit size={18}/><b>AI Manager</b><small>تخطيط</small></div><div className="flow-line"/><div className="flow-node"><Workflow size={18}/><b>Workflow</b><small>تنفيذ</small></div><div className="flow-line"/><div className="flow-node"><Check size={18}/><b>Approval</b><small>اعتماد</small></div></div>
+                </div>
+                <div className="dash-side"><span>PREVIEW</span><strong>48</strong><small>Digital Workers</small><div className="mini-bars"><i/><i/><i/><i/><i/></div></div>
+              </div>
+              <div className="dash-footer"><span>Human Workforce</span><span>Digital Workforce</span><span>Integrations</span><span>Governance</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section className="enjaz-logo-strip" aria-label="تكاملات">
+          <span>يتصل إنجاز بأدوات عملك الحالية</span>
+          <div>{integrations.map((name)=><b key={name}>{name}</b>)}</div>
+        </section>
+
+        <section id="preview" className="enjaz-section enjaz-preview-section">
+          <div className="enjaz-section-head"><div><span className="enjaz-kicker">PRODUCT PREVIEW</span><h2>من الفكرة إلى التشغيل في مساحة واحدة.</h2></div><p>واجهة توضح كيف تتعاون القوى العاملة البشرية والرقمية مع العمليات والأدوات والحوكمة.</p></div>
+          <div className="enjaz-preview">
+            <aside><div className="preview-brand">إنجاز</div>{["نظرة عامة","القوة العاملة","العمليات","سير العمل","الحوكمة"].map((x,i)=><div className={i===0?"active":""} key={x}>{x}</div>)}<div className="preview-user">المؤسسة<br/><b>مساحة العمل</b></div></aside>
+            <div className="preview-body"><div className="preview-header"><div><small>الأحد، 4 أكتوبر</small><h3>مركز القيادة</h3></div><button><Sparkles size={15}/> اسأل إنجاز</button></div><div className="preview-cards"><article><small>WORKFLOWS</small><strong>12</strong><span>سير عمل قيد التشغيل</span></article><article><small>DIGITAL WORKFORCE</small><strong>48</strong><span>موظفًا رقميًا متاحًا</span></article><article><small>GOVERNANCE</small><strong>ACTIVE</strong><span>السياسات والموافقات مفعلة</span></article></div><div className="preview-table"><div><b>مهمة تشغيلية</b><span>المسؤول</span><span>الحالة</span></div>{["مراجعة طلبات الفرع","تحليل المخزون","تحديث تقرير الإدارة","اعتماد سير العمل"].map((x,i)=><div key={x}><b>{x}</b><span>{["AI Analyst","AI Operations","AI Manager","Human Approval"][i]}</span><span className="pill">قيد المعالجة</span></div>)}</div></div>
+          </div>
+        </section>
+
+        <section id="platform" className="enjaz-section">
+          <div className="enjaz-section-head centered"><span className="enjaz-kicker">ENJAZ PLATFORM</span><h2>كل ما تحتاجه المؤسسة للتشغيل.</h2><p>طبقة تشغيل واحدة تربط الأشخاص والذكاء الاصطناعي والعمليات والبيانات والأدوات.</p></div>
+          <div className="enjaz-bento"><article className="bento-wide dark"><div><Sparkles/><span>AI OPERATING LAYER</span><h3>ذكاء يفهم سياق المؤسسة، لا مجرد أوامر منفصلة.</h3></div><div className="agent-stack"><i>AI Manager</i><i>AI Analyst</i><i>AI Operations</i><i>AI Coordinator</i></div></article><article><GitBranch/><span>WORKFLOWS</span><h3>حوّل العمل إلى سير عمل قابل للتنفيذ.</h3><p>خطوات، شروط، أدوات، موافقات ومسارات واضحة.</p></article><article><ShieldCheck/><span>GOVERNANCE</span><h3>تحكم مؤسسي من البداية.</h3><p>سياسات وصلاحيات واعتمادات وسجل تدقيق.</p></article></div>
+        </section>
+
+        <section id="workforce" className="enjaz-section workforce-section">
+          <div className="enjaz-section-head"><div><span className="enjaz-kicker">DIGITAL WORKFORCE</span><h2>48 موظفًا رقميًا. منظومة واحدة.</h2></div><p>الموظف نفسه يعمل عبر القطاعات، ويتخصص حسب السياق والمهارات والمعرفة والأدوات والسياسات والصلاحيات.</p></div>
+          <div className="worker-grid">{workers.map(([name,text,Icon])=><article key={name}><div className="worker-icon"><Icon size={19}/></div><span>AI EMPLOYEE</span><h3>{name}</h3><p>{text}</p><ArrowUpRight size={17}/></article>)}</div>
+        </section>
+
+        <section id="sectors" className="enjaz-section sectors-section">
+          <div className="enjaz-section-head centered"><span className="enjaz-kicker">INDUSTRIES</span><h2>مصمم لواقع المؤسسات.</h2><p>السياق الصناعي يتغير، بينما منصة التشغيل تبقى واحدة.</p></div>
+          <div className="sector-grid">{sectors.map(({icon:Icon,title,text})=><article key={title}><Icon/><h3>{title}</h3><p>{text}</p><ArrowLeft size={16}/></article>)}</div>
+        </section>
+
+        <section id="governance" className="enjaz-governance">
+          <div><span className="enjaz-kicker">OPERATIONS & GOVERNANCE</span><h2>الذكاء الاصطناعي بقوة المؤسسة، وبانضباطها.</h2><p>كل تنفيذ يمكن أن يمر عبر السياسة المناسبة، والصلاحية المناسبة، والموافقة المناسبة، مع أثر قابل للمراجعة.</p><a href="#contact" className="enjaz-text-link">اكتشف الحوكمة <ArrowLeft size={16}/></a></div>
+          <div className="governance-card"><div className="shield"><ShieldCheck size={34}/></div><b>Execution Control</b><span>Policy → Permission → Approval → Execution → Audit</span><div className="control-line"><i/><i/><i/><i/><i/></div></div>
+        </section>
+
+        <section id="contact" className="enjaz-cta"><div className="enjaz-kicker">ENJAZ</div><h2>اجعل مؤسستك جاهزة للعمل بطريقة جديدة.</h2><p>ابدأ ببنية تشغيل واحدة، ثم وسّعها عبر الفرق والقطاعات والعمليات.</p><a href="?auth=login" className="enjaz-button">ابدأ الآن <ArrowLeft size={17}/></a></section>
+      </main>
+
+      <footer className="enjaz-footer"><div><a className="enjaz-brand" href="#"><span className="enjaz-mark">إ</span><span>إنجاز</span></a><p>منصة تشغيل مؤسسية للقوى العاملة والعمليات والذكاء الاصطناعي.</p></div><div><b>المنصة</b><a href="#platform">المنصة</a><a href="#workforce">القوة العاملة</a><a href="#governance">الحوكمة</a></div><div><b>القطاعات</b>{sectors.slice(0,3).map(s=><a href="#sectors" key={s.title}>{s.title}</a>)}</div><div><b>تواصل</b><a href="?auth=login">تسجيل الدخول</a><a href="#contact">ابدأ الآن</a></div><div className="footer-bottom">© {new Date().getFullYear()} ENJAZ. جميع الحقوق محفوظة.</div></footer>
     </div>
-   </section>
-   <section id="platform" className="border-y border-[#dce9e4] bg-white px-5 py-24 md:py-32"><div className="mx-auto max-w-[1320px]"><FadeIn><span className="text-[9px] font-bold tracking-[.18em] text-emerald-700">ENJAZ PLATFORM</span><h2 className="mt-5 text-4xl font-semibold tracking-tight md:text-6xl">كل ما تحتاجه المؤسسة.<br/><span className="text-emerald-700">في طبقة تشغيل واحدة.</span></h2></FadeIn><BentoGrid className="mt-14">{cards.map(([t,d,I],i)=>{const Icon=I;return <BentoCard key={t as string} colSpan={i===0?2:1} rowSpan={i===0?2:1}><span className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-50 text-emerald-700"><Icon size={19}/></span><h3 className="mt-8 text-xl font-semibold">{t as string}</h3><p className="mt-3 max-w-sm text-[11px] leading-6 text-slate-400">{d as string}</p><ArrowLeft className="absolute left-6 top-6 text-slate-200" size={17}/></BentoCard>})}</BentoGrid></div></section>
-   <section id="workforce" className="bg-[#052b20] px-5 py-24 text-white md:py-32"><div className="mx-auto grid max-w-[1320px] gap-16 lg:grid-cols-[.85fr_1.15fr] lg:items-center"><div><FadeIn><span className="text-[9px] font-bold tracking-[.18em] text-emerald-300">DIGITAL WORKFORCE</span><h2 className="mt-5 text-4xl font-semibold md:text-6xl">48 دورًا عالميًا.<br/><span className="text-emerald-300">تخصص بلا نسخ.</span></h2><p className="mt-6 max-w-lg text-sm leading-8 text-white/50">الموظف الرقمي نفسه يعمل عبر القطاعات. التخصص يأتي من سياق الصناعة والمهارات والمعرفة والأدوات والسياسات والصلاحيات.</p></FadeIn><Stagger className="mt-8 grid grid-cols-2 gap-3">{roles.map(x=><StaggerItem key={x[0]}><SpotlightCard className="rounded-2xl border border-white/10 bg-white/[.045] p-4 text-white"><span className="text-[7px] tracking-widest text-emerald-300">DIGITAL ROLE</span><b className="mt-4 block text-[10px]">{x[0]}</b><span className="mt-1 block text-[8px] text-white/35">{x[1]}</span></SpotlightCard></StaggerItem>)}</Stagger></div><div className="relative mx-auto aspect-square w-full max-w-[520px]"><div className="absolute inset-[5%] rounded-full border border-emerald-200/10 [transform:rotateX(65deg)_rotateZ(-15deg)]"/><div className="absolute inset-[18%] rounded-full border border-emerald-200/15 [transform:rotateX(65deg)_rotateZ(20deg)]"/><div className="absolute inset-[30%] rounded-full bg-[radial-gradient(circle_at_35%_25%,#35d8a0,#063d2d_70%)] shadow-[0_0_120px_rgba(25,185,128,.28)]"/><div className="absolute inset-0 grid place-items-center text-center"><div><b className="block text-7xl">48</b><span className="text-[8px] tracking-[.25em] text-emerald-200">GLOBAL DIGITAL ROLES</span></div></div></div></div></section>
-   <section id="how" className="px-5 py-24 md:py-32"><div className="mx-auto max-w-[1320px]"><FadeIn><span className="text-[9px] font-bold tracking-[.18em] text-emerald-700">HOW ENJAZ WORKS</span><h2 className="mt-5 text-4xl font-semibold md:text-6xl">من الإشارة إلى الأثر.<br/>بدون فقدان السيطرة.</h2></FadeIn><div className="mt-14 grid overflow-hidden rounded-[30px] border border-[#dce9e4] bg-white shadow-xl md:grid-cols-5">{[['01','Signal','الطلب أو الحدث'],['02','Context','السياق والمعرفة'],['03','Decision','القرار والخطة'],['04','Action','التنفيذ المنضبط'],['05','Evidence','الأثر والتدقيق']].map((x,i)=><div key={x[0]} className="relative border-b border-[#dce9e4] p-7 md:border-b-0 md:border-l"><span className="text-[9px] font-bold tracking-widest text-emerald-700">{x[0]}</span><h3 className="mt-12 text-lg font-semibold">{x[1]}</h3><p className="mt-2 text-[9px] text-slate-400">{x[2]}</p></div>)}</div></div></section>
-   <section id="sectors" className="border-y border-[#dce9e4] bg-[#f1f7f4] px-5 py-24 md:py-32"><div className="mx-auto max-w-[1320px]"><FadeIn><span className="text-[9px] font-bold tracking-[.18em] text-emerald-700">CROSS-INDUSTRY</span><h2 className="mt-5 text-4xl font-semibold md:text-6xl">نفس القوة.<br/><span className="text-emerald-700">سياق مختلف.</span></h2></FadeIn><div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-5">{sectors.map(x=><BentoCard key={x[0]} className="min-h-[260px]"><span className="text-[8px] font-bold tracking-widest text-emerald-700">ENJAZ</span><h3 className="mt-16 text-xl font-semibold">{x[0]}</h3><p className="mt-2 text-[9px] leading-5 text-slate-400">{x[1]}</p></BentoCard>)}</div></div></section>
-   <section id="governance" className="bg-white px-5 py-24 md:py-32"><div className="mx-auto max-w-[1320px]"><FadeIn><span className="text-[9px] font-bold tracking-[.18em] text-emerald-700">OPERATIONS & GOVERNANCE</span><h2 className="mt-5 text-4xl font-semibold md:text-6xl">الاستقلالية<br/><span className="text-emerald-700">داخل حدودك.</span></h2></FadeIn><div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{['Identity','Permissions','Policies','Human Approval','Audit Trail'].map((x,i)=><div key={x} className="rounded-2xl border border-[#dce9e4] bg-[#f8fbfa] p-5"><LockKeyhole size={16} className="text-emerald-700"/><b className="mt-8 block text-[10px]">{x}</b><span className="mt-2 block text-[7px] text-slate-400">CONTROL 0{i+1}</span></div>)}</div></div></section>
-   <section className="px-5 py-20"><div className="mx-auto max-w-[1320px] overflow-hidden rounded-[36px] bg-[#063d2d] px-6 py-20 text-center text-white shadow-2xl"><Globe2 className="mx-auto text-emerald-300" size={24}/><h2 className="mt-6 text-4xl font-semibold md:text-6xl">اجعل العمل يتحرك.<br/><span className="text-emerald-300">واجعل القرار واضحًا.</span></h2><p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/45">ابدأ من طبقة التشغيل، ثم وسّع القوة العاملة والعمليات والتكاملات وفق سياق مؤسستك.</p><ShinyButton href="/?auth=1&signup=1" className="mt-8 bg-white !text-[#063d2d]">ابدأ مع إنجاز <ArrowLeft size={15}/></ShinyButton></div></section>
-  </main>
-  <footer className="border-t border-white/10 bg-[#041c14] px-5 py-12 text-white"><div className="mx-auto flex max-w-[1320px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500 text-[#063d2d]"><Command size={16}/></span><b>إنجاز</b></div><span className="text-[9px] text-white/30">© ENJAZ — Intelligent Operating Platform</span></div></footer>
- </div>
+  );
 }
