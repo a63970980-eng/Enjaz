@@ -26,7 +26,7 @@ It contains:
 - An additive schema migration for `role_code` and the workforce metadata columns.
 - A Vercel Content-Security-Policy response header.
 
-At commit `c15010d`, GitHub Actions passed both web CI (install, test, Vite build, preview and browser smoke tests) and API CI (database migration and API test suite). Later changes add the document CSP alignment, a web contract test, and a TypeScript CI step; the newest run must pass before this PR is considered ready to merge.
+At commit `cd38bf0`, GitHub Actions passed both web CI (install, web contract tests, TypeScript validation, Vite build, preview and browser smoke tests) and API CI (database migration and API test suite). The later deployment-configuration change switches Vercel and Netlify to the workspace package manager. This was prompted by Vercel logs showing `vite: command not found` because the custom npm install omitted development tools. The newest checks and fresh deployment must be verified before this PR is considered ready to merge.
 
 No production database has been modified directly. No live deployment has been confirmed by this audit.
 
