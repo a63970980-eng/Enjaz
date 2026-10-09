@@ -35,6 +35,7 @@ jobs:
           package-manager-cache: false
       - run: pnpm install --no-frozen-lockfile
       - run: pnpm --filter enjaz-platform test
+      - run: pnpm --filter enjaz-platform typecheck
       - run: pnpm --filter enjaz-platform build
       - run: pnpm exec playwright install --with-deps chromium
       - name: Start production preview
@@ -44,7 +45,7 @@ jobs:
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0; sleep 1; done
           cat /tmp/enjaz-vite.log
           exit 1
-      - name: Run public E2E and accessibility gates
+      - name: Run public E2E and accessibility smoke tests
         env:
           ENJAZ_E2E_BASE_URL: http://127.0.0.1:4173
         run: pnpm exec playwright test
