@@ -10,12 +10,35 @@ function positiveInteger(value, fallback, name) {
   return parsed;
 }
 
+function booleanSetting(value, fallback, name) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const normalized = String(value).toLowerCase();
+  if (normalized === 'true') return true;
+  if (normalized === 'false') return false;
+  throw new Error(`${name} must be "true" or "false"`);
+}
+
 export function buildPoolOptions(env = process.env) {
   if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required');
   const sslMode = String(env.DATABASE_SSL || '').toLowerCase();
-  // Verify database TLS certificates by default. Prefer DATABASE_CA for private CAs;
-  // only disable TLS or certificate verification through explicit environment settings.
-  const rejectUnauthorized = String(env.DATABASE_SSL_REJECT_UNAUTHORIZED ?? 'true').toLowerCase() === 'true';
+  if (sslMode && sslMode !== 'true' && sslMode !== 'false') {
+    throw new Error('DATABASE_SSL must be "true" or "false" when provided');
+  }
+  const rejectUnauthorized = booleanSetting(
+    env.DATABASE_SSL_REJECT_UNAUTHORIZED,
+    true,
+    'DATABASE_SSL_REJECT_UNAUTHORIZED',
+  );
+  const production = String(env.NODE_ENV || '').toLowerCase() === 'production';
+  if (production && sslMode === 'false') {
+    throw new Error('DATABASE_SSL=false is forbidden in production');
+  }
+  if (production && !rejectUnauthorized) {
+    throw new Error('DATABASE_SSL_REJECT_UNAUTHORIZED=false is forbidden in production');
+  }
+
+  // Verify database TLS certificates by default. Prefer DATABASE_CA for private CAs.
+  // Production cannot disable TLS or certificate verification.
   const ssl = sslMode === 'false'
     ? false
     : { rejectUnauthorized, ...(env.DATABASE_CA ? { ca: env.DATABASE_CA } : {}) };
