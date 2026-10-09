@@ -143,7 +143,7 @@ function App() {
 
       <section className="closing-cta section-wrap" id="contact">
         <div className="cta-pattern" aria-hidden="true"><div /><div /><div /></div>
-        <div className="cta-content"><span className="cta-eyebrow"><Zap size={15} /> ابدأ ببناء طريقة عمل أفضل</span><h2>امنح فريقك مساحة<br />للعمل الأكثر قيمة.</h2><p>استكشف كيف يمكن للموظفين الرقميين دعم عمليات مؤسستك، مع بقاء التحكم والقرار في يد فريقك.</p><a className="button button-white" href="mailto:hello@enjaz.ai">تواصل مع فريق إنجاز <ArrowLeft size={16} /></a></div>
+        <div className="cta-content"><span className="cta-eyebrow"><Zap size={15} /> ابدأ ببناء طريقة عمل أفضل</span><h2>امنح فريقك مساحة<br />للعمل الأكثر قيمة.</h2><p>استكشف كيف يمكن للموظفين الرقميين دعم عمليات مؤسستك، مع بقاء التحكم والقرار في يد فريقك.</p><a className="button button-white" href="#platform">استكشف معاينة المنصة <ArrowLeft size={16} /></a></div>
         <div className="cta-seal"><Command size={54} /><span>إنجاز</span><small>العمل يتحرك بوضوح</small></div>
       </section>
 
