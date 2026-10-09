@@ -35,11 +35,12 @@ function App() {
     window.addEventListener('hashchange', syncRoute);
     return () => window.removeEventListener('hashchange', syncRoute);
   }, []);
-  if (appRoute) return <Suspense fallback={<div className="wa-full-loader">جارٍ تحميل مساحة العمل…</div>}><WorkspaceApp onBack={() => { window.location.hash = '#home'; }} /></Suspense>;
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSector, setActiveSector] = useState('الشركات');
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  if (appRoute) return <Suspense fallback={<div className="wa-full-loader">جارٍ تحميل مساحة العمل…</div>}><WorkspaceApp onBack={() => { window.location.hash = '#home'; }} /></Suspense>;
+
 
   const closeMenu = () => setMenuOpen(false);
 
