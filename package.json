@@ -28,5 +28,10 @@
   },
   "workspaces": [
     "apps/web"
-  ]
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
 }
