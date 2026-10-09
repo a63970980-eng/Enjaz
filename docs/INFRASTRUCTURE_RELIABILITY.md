@@ -21,16 +21,21 @@ These are architectural components, not proof that every production path has bee
    - Set statement, query, connection, and idle-transaction timeouts to prevent runaway database work.
    - Fail fast for invalid pool configuration instead of silently accepting malformed values.
 
-2. **API response hardening**
+2. **Failure-data redaction**
+   - Reject production database configurations that disable TLS or certificate verification.
+   - Fail closed on malformed TLS boolean flags instead of treating typos as permission to skip certificate verification.
+   - Persist stable queue error identifiers rather than raw exception messages in job failure records, attempt history, or worker responses; this reduces the risk of credentials, internal URLs, and provider response details leaking into operational tables.
+
+3. **API response hardening**
    - Add a restrictive Content Security Policy appropriate for JSON API responses.
    - Mark API responses `Cache-Control: no-store` to reduce accidental caching of sensitive workspace data.
    - Add contract assertions for the required security headers.
 
-3. **CI responsibility boundaries**
+4. **CI responsibility boundaries**
    - Keep API security tests independent from the web entry-point files so backend CI can validate backend contracts without coupling to a UI file.
    - Validate deployment security headers against the Vercel configuration in the web package.
 
-4. **Supply-chain security baseline**
+5. **Supply-chain security baseline**
    - Add scheduled CodeQL analysis for JavaScript/TypeScript.
    - Add weekly Dependabot updates for the pnpm workspace and GitHub Actions.
 
