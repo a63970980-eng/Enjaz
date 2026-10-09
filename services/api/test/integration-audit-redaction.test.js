@@ -8,5 +8,5 @@ test('integration failure audit events do not persist raw external error message
   assert.match(gateway, /errorType:error instanceof Error \? error\.name : 'UnknownError'/);
   assert.match(integrations, /errorType:error instanceof Error \? error\.name : 'UnknownError'/);
   assert.doesNotMatch(gateway, /error:error\.message/);
-  assert.doesNotMatch(integrations, /error:String\(error\?\.message\|\|'\)/);
+  assert.doesNotMatch(integrations, /responseMeta:\{error:String\(error\?\.message\|\|error\)/);
 });
