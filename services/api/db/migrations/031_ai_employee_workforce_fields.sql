@@ -12,7 +12,3 @@ ALTER TABLE public.ai_employees
   ADD COLUMN IF NOT EXISTS industry_context jsonb NOT NULL
     DEFAULT '{"supported":["restaurant","hospital","hotel","enterprise","government"],"current":null}'::jsonb,
   ADD COLUMN IF NOT EXISTS workforce_version integer NOT NULL DEFAULT 1;
-
-CREATE INDEX IF NOT EXISTS idx_ai_employees_workspace_role_code_active
-  ON public.ai_employees (workspace_id, role_code)
-  WHERE status = 'active' AND role_code IS NOT NULL;
