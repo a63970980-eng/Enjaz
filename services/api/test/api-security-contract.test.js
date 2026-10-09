@@ -10,6 +10,8 @@ test('API source keeps security boundaries explicit', async () => {
   assert.match(source, /Access-Control-Allow-Origin/);
   assert.match(source, /X-Content-Type-Options/);
   assert.match(source, /X-Frame-Options/);
+  assert.match(source, /Content-Security-Policy/);
+  assert.match(source, /Cache-Control/);
   assert.match(source, /Referrer-Policy/);
   assert.match(source, /Permissions-Policy/);
   assert.match(source, /Rate limit exceeded/);
