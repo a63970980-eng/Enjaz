@@ -5,7 +5,7 @@ export async function listBillingPlans() {
 }
 
 export async function getBillingSubscription(workspaceId) {
-  const r = await query(`select s.*,p.name as plan_name,p.description as plan_description,p.monthly_price_cents,p.max_employees,p.max_tasks_month,p.max_integrations,p.included_ai_cost_cents,p.features from workspace_subscriptions s join billing_plans p on p.id=s.plan_id where s.workspace_id=$1`, [workspaceId]);
+  const r = await query(`select s.*,p.code as plan_code,p.name as plan_name,p.description as plan_description,p.monthly_price_cents,p.max_employees,p.max_tasks_month,p.max_integrations,p.included_ai_cost_cents,p.features from workspace_subscriptions s join billing_plans p on p.id::text=s.plan_id::text where s.workspace_id=$1`, [workspaceId]);
   return r.rows[0] || null;
 }
 
@@ -16,7 +16,7 @@ export async function getBillingUsage(workspaceId) {
   const tasks = (await query("select count(*)::int as count from tasks where workspace_id=$1 and created_at >= date_trunc('month', now())", [workspaceId])).rows[0]?.count || 0;
   const integrations = (await query("select count(*)::int as count from integration_connections where workspace_id=$1 and status='active'", [workspaceId])).rows[0]?.count || 0;
   const aiCost = (await query("select coalesce(sum(cost_cents),0)::bigint as cents from runtime_metrics where workspace_id=$1 and created_at >= date_trunc('month', now())", [workspaceId])).rows[0]?.cents || 0;
-  return { plan: subscription.plan_id, status: subscription.status, periodStart: subscription.current_period_start, periodEnd: subscription.current_period_end, employees: Number(employees), tasksThisMonth: Number(tasks), integrations: Number(integrations), aiCostCents: Number(aiCost), limits: { employees: subscription.max_employees, tasksMonth: subscription.max_tasks_month, integrations: subscription.max_integrations, includedAiCostCents: subscription.included_ai_cost_cents } };
+  return { plan: subscription.plan_code || subscription.plan_id, status: subscription.status, periodStart: subscription.current_period_start, periodEnd: subscription.current_period_end, employees: Number(employees), tasksThisMonth: Number(tasks), integrations: Number(integrations), aiCostCents: Number(aiCost), limits: { employees: subscription.max_employees, tasksMonth: subscription.max_tasks_month, integrations: subscription.max_integrations, includedAiCostCents: subscription.included_ai_cost_cents } };
 }
 
 export async function assertWorkspaceLimit(workspaceId, resource) {
