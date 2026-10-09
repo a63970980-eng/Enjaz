@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+
+const WorkspaceApp = lazy(() => import('./WorkspaceApp'));
 import {
   ArrowDownLeft, ArrowLeft, ArrowUpLeft, BadgeCheck, BarChart3, Bot,
   Building2, Check, ChevronDown, CircleHelp, Clock3, Command, FileCheck2,
@@ -27,9 +29,18 @@ const work = [
 ];
 
 function App() {
+  const [appRoute, setAppRoute] = useState(() => window.location.hash === '#app');
+  useEffect(() => {
+    const syncRoute = () => setAppRoute(window.location.hash === '#app');
+    window.addEventListener('hashchange', syncRoute);
+    return () => window.removeEventListener('hashchange', syncRoute);
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSector, setActiveSector] = useState('الشركات');
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  if (appRoute) return <Suspense fallback={<div className="wa-full-loader">جارٍ تحميل مساحة العمل…</div>}><WorkspaceApp onBack={() => { window.location.hash = '#home'; }} /></Suspense>;
+
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -50,7 +61,7 @@ function App() {
           <a href="#governance" onClick={closeMenu}>الحوكمة والأمان</a>
         </nav>
         <div className="header-actions">
-          <a className="login-link" href="#contact">تواصل معنا</a>
+          <a className="login-link" href="#app">دخول المنصة</a>
           <a className="button button-dark button-small" href="#platform">اكتشف إنجاز <ArrowLeft size={15} /></a>
         </div>
       </header>
