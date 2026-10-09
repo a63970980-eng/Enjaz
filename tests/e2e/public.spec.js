@@ -1,43 +1,39 @@
-import { test, expect } from '@playwright/test';
+import {test,expect} from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
-test('new public landing page boots with a clear ENJAZ product preview', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page).toHaveTitle(/إنجاز/);
-  await expect(page.getByRole('main')).toBeVisible();
-  await expect(page.getByRole('heading', { name: /أعمالك تتحرك/ })).toBeVisible();
-  await expect(page.getByText('PREVIEW')).toBeVisible();
-  await expect(page.getByRole('link', { name: /اكتشف المنصة/ }).first()).toBeVisible();
+test('public landing page boots and exposes working authentication CTAs',async({page})=>{
+  await page.goto('/',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#enjaz-public')).toBeVisible();
+  await expect(page.getByRole('heading',{name:/قوة عمل رقمية تعمل معك/})).toBeVisible();
+  await expect(page.locator('[data-public-login]').first()).toBeVisible();
+  await expect(page.locator('[data-public-signup]').first()).toBeVisible();
+  await expect(page.locator('.sf-command-card')).toBeVisible();
+  await page.getByRole('button',{name:'ابدأ مع إنجاز'}).first().click();
+  await expect(page.locator('#auth-gate #auth-form')).toBeVisible();
 });
 
-test('product preview disclosure explains that its content is illustrative', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: /شاهد معاينة المنتج/ }).click();
-  await expect(page.getByRole('status')).toContainText('معاينة توضيحية');
-  await expect(page.getByRole('button', { name: /إغلاق المعاينة/ })).toHaveAttribute('aria-expanded', 'true');
-});
-
-test('sector tabs update the sector context accessibly', async ({ page }) => {
-  await page.goto('/');
-  const governmentTab = page.getByRole('tab', { name: /الجهات الحكومية/ });
-  await governmentTab.click();
-  await expect(governmentTab).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('tabpanel').getByRole('heading', { name: 'الجهات الحكومية' })).toBeVisible();
-});
-
-test('mobile landing page has no horizontal overflow and retains core navigation', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/', { waitUntil: 'networkidle' });
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+test('public landing remains usable on a mobile viewport without horizontal overflow',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/landing.html',{waitUntil:'networkidle'});
+  await expect(page.locator('#enjaz-public')).toBeVisible();
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
-  await expect(page.getByRole('button', { name: 'فتح القائمة' })).toBeVisible();
-  await page.getByRole('button', { name: 'فتح القائمة' }).click();
-  await expect(page.getByRole('navigation', { name: 'التنقل الرئيسي' })).toBeVisible();
+  await expect(page.getByText('معاينة المنتج · PREVIEW')).toBeVisible();
 });
 
-test('primary actions and controls are keyboard reachable', async ({ page }) => {
-  await page.goto('/');
-  await page.keyboard.press('Tab');
-  await expect(page.locator(':focus')).toBeVisible();
-  await expect(page.locator('h1')).toHaveCount(1);
-  await expect(page.locator('main')).toHaveCount(1);
+test('public landing page has no serious automated accessibility violations',async({page})=>{
+  await page.goto('/',{waitUntil:'networkidle'});
+  const results=await new AxeBuilder({page}).analyze();
+  const serious=results.violations.filter(v=>v.impact==='critical'||v.impact==='serious');
+  expect(serious).toEqual([]);
+});
+
+test('login gate renders a real credential form and validates required fields',async({page})=>{
+  await page.goto('/?auth=1',{waitUntil:'domcontentloaded'});
+  await expect(page.locator('#auth-gate')).toBeVisible();
+  await expect(page.locator('#auth-form input[name="email"]')).toBeVisible();
+  await expect(page.locator('#auth-form input[name="password"]')).toBeVisible();
+  const button=page.getByRole('button',{name:'تسجيل الدخول'});
+  await button.click();
+  await expect(page.locator('#auth-form input[name="email"]:invalid')).toBeVisible();
 });
