@@ -14,7 +14,7 @@ export async function executeSecureIntegration({workspaceId,taskId,employee,empl
   await query('insert into audit_events (id,workspace_id,task_id,employee_id,event_type,actor_type,action,metadata) values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)',[randomUUID(),workspaceId,taskId,employeeId,'integration.executed','ai_employee',action,JSON.stringify({connectionId,durationMs:Date.now()-started,scope:requiredScope||null})]);
   return result;
  }catch(error){
-  await query('insert into audit_events (id,workspace_id,task_id,employee_id,event_type,actor_type,action,metadata) values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)',[randomUUID(),workspaceId,taskId,employeeId,'integration.failed','ai_employee',action,JSON.stringify({connectionId,durationMs:Date.now()-started,error:error.message})]);
+  await query('insert into audit_events (id,workspace_id,task_id,employee_id,event_type,actor_type,action,metadata) values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)',[randomUUID(),workspaceId,taskId,employeeId,'integration.failed','ai_employee',action,JSON.stringify({connectionId,durationMs:Date.now()-started,errorType:error instanceof Error ? error.name : 'UnknownError'})]);
   throw error;
  }
 }

@@ -3,6 +3,13 @@ import { query } from './db.js';
 import { claimJob, completeJob, blockJob, failJob, recoverStaleJobs, renewJobLease } from './job-queue.js';
 import { heartbeat, markAttemptStarted, markAttemptFinished } from './worker-observability.js';
 
+export function safeJobErrorCode(error) {
+ const code=typeof error?.code==='string'&&/^[A-Z0-9_.-]{1,64}$/.test(error.code)?error.code:null;
+ if(code)return `code:${code}`;
+ const name=typeof error?.name==='string'&&/^[A-Za-z][A-Za-z0-9]{0,63}Error$/.test(error.name)?error.name:null;
+ return name||'JobExecutionError';
+}
+
 async function dispatch(job){
  if(job.job_type==='workflow.run'){
   const {runWorkflow}=await import('./workflow-engine.js');
@@ -30,7 +37,7 @@ async function dispatch(job){
  }
  throw new Error(`Unknown job type: ${job.job_type}`);
 }
-export async function processOneJob({workerId=randomUUID(),workspaceId=null}){await heartbeat({workerId,metadata:{workspaceId}});const job=await claimJob({workerId,workspaceId});if(!job)return null;const attempt=await markAttemptStarted({jobId:job.id,workerId,attempt:job.attempts});const leaseTimer=setInterval(()=>{renewJobLease({jobId:job.id,workerId}).catch(()=>{});},30_000);try{const result=await dispatch(job);if(result?.status==='awaiting_approval'){await markAttemptFinished({attemptId:attempt.id,status:'blocked'});await blockJob({jobId:job.id,workerId,result});return {id:job.id,status:'blocked',result};}await markAttemptFinished({attemptId:attempt.id,status:'succeeded'});await completeJob({jobId:job.id,workerId,result});return {id:job.id,status:'succeeded',result};}catch(error){await markAttemptFinished({attemptId:attempt.id,status:'failed',error:error.message});const failed=await failJob({jobId:job.id,workerId,error});if(failed?.status==='queued'&&job.job_type==='employee.step'){const p=job.payload||{};if(p.taskId)await query("update tasks set status='executing' where id=$1 and workspace_id=$2 and status='failed'",[p.taskId,job.workspace_id]);if(p.graphId&&p.step?.id)await query("update execution_steps set status='running',error=null,updated_at=now() where graph_id=$1 and step_key=$2 and status='failed'",[p.graphId,p.step.id]);}return {id:job.id,status:'failed',error:error.message,retryScheduled:failed?.status==='queued'};}finally{clearInterval(leaseTimer);}}
+export async function processOneJob({workerId=randomUUID(),workspaceId=null}){await heartbeat({workerId,metadata:{workspaceId}});const job=await claimJob({workerId,workspaceId});if(!job)return null;const attempt=await markAttemptStarted({jobId:job.id,workerId,attempt:job.attempts});const leaseTimer=setInterval(()=>{renewJobLease({jobId:job.id,workerId}).catch(()=>{});},30_000);try{const result=await dispatch(job);if(result?.status==='awaiting_approval'){await markAttemptFinished({attemptId:attempt.id,status:'blocked'});await blockJob({jobId:job.id,workerId,result});return {id:job.id,status:'blocked',result};}await markAttemptFinished({attemptId:attempt.id,status:'succeeded'});await completeJob({jobId:job.id,workerId,result});return {id:job.id,status:'succeeded',result};}catch(error){const safeError=safeJobErrorCode(error);await markAttemptFinished({attemptId:attempt.id,status:'failed',error:safeError});const failed=await failJob({jobId:job.id,workerId,error:new Error(safeError)});if(failed?.status==='queued'&&job.job_type==='employee.step'){const p=job.payload||{};if(p.taskId)await query("update tasks set status='executing' where id=$1 and workspace_id=$2 and status='failed'",[p.taskId,job.workspace_id]);if(p.graphId&&p.step?.id)await query("update execution_steps set status='running',error=null,updated_at=now() where graph_id=$1 and step_key=$2 and status='failed'",[p.graphId,p.step.id]);}return {id:job.id,status:'failed',error:safeError,retryScheduled:failed?.status==='queued'};}finally{clearInterval(leaseTimer);}}
 export async function recoverQueue(workspaceId=null){return recoverStaleJobs({leaseSeconds:120,workspaceId});}
 export function installGracefulShutdown({controller}){const stop=()=>{if(!controller.signal.aborted)controller.abort();};process.once('SIGTERM',stop);process.once('SIGINT',stop);return ()=>{process.removeListener('SIGTERM',stop);process.removeListener('SIGINT',stop);};}
 export async function startWorker({workerId=randomUUID(),pollMs=1000,signal}={}){await heartbeat({workerId,pollMs});while(!signal?.aborted){await recoverQueue();await processOneJob({workerId});await heartbeat({workerId});await new Promise(resolve=>setTimeout(resolve,pollMs));}await heartbeat({workerId,status:'offline'});}
