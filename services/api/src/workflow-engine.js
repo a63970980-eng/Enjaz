@@ -63,6 +63,8 @@ export async function createWorkflow({workspaceId,name,steps=[]}){
 }
 
 export async function runWorkflow({workspaceId,workflowId,maxRetries=2,timeoutMs=120000}){
+ if(!Number.isInteger(maxRetries)||maxRetries<0||maxRetries>5)throw new Error('maxRetries must be an integer between 0 and 5');
+ if(!Number.isFinite(timeoutMs)||timeoutMs<1||timeoutMs>600000)throw new Error('timeoutMs must be between 1 and 600000 milliseconds');
  const workflow=(await query('select * from workflows where id=$1 and workspace_id=$2',[workflowId,workspaceId])).rows[0];
  if(!workflow)throw new Error('Workflow not found');
  await query("update workflows set status='running',updated_at=now() where id=$1 and workspace_id=$2",[workflowId,workspaceId]);
