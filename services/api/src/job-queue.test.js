@@ -44,7 +44,7 @@ test('enqueueJob returns the existing job when an idempotency key conflicts', as
   const client = {
     query: async (sql, args) => {
       calls.push({ sql, args });
-      if (calls.length === 1) throw Object.assign(new Error('duplicate key'), { code: '23505' });
+      if (calls.length === 1) return { rows: [], rowCount: 0 };
       return { rows: [existing], rowCount: 1 };
     }
   };
@@ -57,6 +57,7 @@ test('enqueueJob returns the existing job when an idempotency key conflicts', as
   });
   assert.deepEqual(job, existing);
   assert.equal(calls.length, 2);
+  assert.match(calls[0].sql, /on conflict do nothing returning \*/i);
   assert.match(calls[1].sql, /workspace_id=\$1 and job_type=\$2/);
   assert.deepEqual(calls[1].args, ['workspace-1', 'employee.step', 'graph-1:step-1']);
 });
