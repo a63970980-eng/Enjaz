@@ -3,6 +3,21 @@ import { query } from './db.js';
 import { runEmployeeTask } from './agent-runtime.js';
 
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+export const WORKFLOW_STEP_TIMEOUT='ENJAZ_WORKFLOW_STEP_TIMEOUT';
+
+export function runWithTimeout(operation,timeoutMs){
+ if(typeof operation!=='function')throw new Error('Workflow operation must be a function');
+ if(!Number.isFinite(timeoutMs)||timeoutMs<1)throw new Error('timeoutMs must be a positive number');
+ let timer;
+ const timeout=new Promise((_,reject)=>{
+  timer=setTimeout(()=>reject(Object.assign(new Error('Workflow step timeout'),{code:WORKFLOW_STEP_TIMEOUT})),timeoutMs);
+ });
+ return Promise.race([Promise.resolve().then(operation),timeout]).finally(()=>clearTimeout(timer));
+}
+
+export function shouldRetryWorkflowStep(error,attempt,maxRetries){
+ return error?.code!==WORKFLOW_STEP_TIMEOUT&&attempt<=maxRetries;
+}
 
 export function normalizeWorkflowSteps(steps){
  if(!Array.isArray(steps)||steps.length===0)throw new Error('Workflow requires at least one step');
@@ -48,6 +63,8 @@ export async function createWorkflow({workspaceId,name,steps=[]}){
 }
 
 export async function runWorkflow({workspaceId,workflowId,maxRetries=2,timeoutMs=120000}){
+ if(!Number.isInteger(maxRetries)||maxRetries<0||maxRetries>5)throw new Error('maxRetries must be an integer between 0 and 5');
+ if(!Number.isFinite(timeoutMs)||timeoutMs<1||timeoutMs>600000)throw new Error('timeoutMs must be between 1 and 600000 milliseconds');
  const workflow=(await query('select * from workflows where id=$1 and workspace_id=$2',[workflowId,workspaceId])).rows[0];
  if(!workflow)throw new Error('Workflow not found');
  await query("update workflows set status='running',updated_at=now() where id=$1 and workspace_id=$2",[workflowId,workspaceId]);
@@ -62,9 +79,9 @@ export async function runWorkflow({workspaceId,workflowId,maxRetries=2,timeoutMs
    while(true){
     attempt++;
     try{
-     result=await Promise.race([runEmployeeTask({workspaceId,taskId:task.id,employeeId:step.employeeId,action:step.action,input:step.input}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Workflow step timeout')),timeoutMs))]);
+     result=await runWithTimeout(()=>runEmployeeTask({workspaceId,taskId:task.id,employeeId:step.employeeId,action:step.action,input:step.input}),timeoutMs);
      break;
-    }catch(error){if(attempt>maxRetries)throw error;await delay(Math.min(1000*2**(attempt-1),10000));}
+    }catch(error){if(!shouldRetryWorkflowStep(error,attempt,maxRetries))throw error;await delay(Math.min(1000*2**(attempt-1),10000));}
    }
    results.push({step:step.order,taskId:task.id,attempts:attempt,result});
    if(result.status==='awaiting_approval'){
