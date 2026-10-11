@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeWorkflowSteps } from './workflow-engine.js';
+import { readFile } from 'node:fs/promises';
+import { normalizeWorkflowSteps, runWithTimeout, shouldRetryWorkflowStep, WORKFLOW_STEP_TIMEOUT } from './workflow-engine.js';
 
 test('normalizeWorkflowSteps assigns stable execution order and defaults', () => {
   const steps = normalizeWorkflowSteps([
@@ -51,11 +52,16 @@ test('normalizeWorkflowSteps rejects empty workflows and missing employee assign
   assert.throws(() => normalizeWorkflowSteps([{ id: 'a' }]), /requires employeeId/);
 });
 
-import { runWithTimeout, shouldRetryWorkflowStep, WORKFLOW_STEP_TIMEOUT } from './workflow-engine.js';
-
 test('runWithTimeout resolves successful work and validates the timeout', async () => {
   assert.deepEqual(await runWithTimeout(async () => ({ ok: true }), 100), { ok: true });
   assert.throws(() => runWithTimeout(() => Promise.resolve('unused'), 0), /timeoutMs must be a positive number/);
+});
+
+test('runWithTimeout rejects with a stable timeout code', async () => {
+  await assert.rejects(
+    runWithTimeout(() => new Promise(() => {}), 5),
+    error => error.code === WORKFLOW_STEP_TIMEOUT
+  );
 });
 
 test('runWithTimeout clears its timer when work finishes', async () => {
