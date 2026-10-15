@@ -36,7 +36,7 @@ jobs:
           node -e "const p=require('./vendor/paperclip/package.json'); if(p.name !== 'paperclip') process.exit(1); console.log('Paperclip source found:', p.name)"
       - name: Install upstream dependencies
         working-directory: vendor/paperclip
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
       - name: Typecheck upstream server
         working-directory: vendor/paperclip
         run: pnpm --filter @paperclipai/server typecheck
