@@ -4,14 +4,14 @@ import { resolveModelRoute, generateWithRoute } from '../src/ai-model-router.js'
 
 const KEY_NAMES = ['GEMINI_API_KEY', 'OPENROUTER_API_KEY', 'OPENAI_API_KEY'];
 
-function withProviderKeys(values, callback) {
+async function withProviderKeys(values, callback) {
   const previous = Object.fromEntries(KEY_NAMES.map((key) => [key, process.env[key]]));
   try {
     for (const key of KEY_NAMES) {
       if (values[key]) process.env[key] = values[key];
       else delete process.env[key];
     }
-    return callback();
+    return await callback();
   } finally {
     for (const key of KEY_NAMES) {
       if (previous[key] === undefined) delete process.env[key];
@@ -20,8 +20,8 @@ function withProviderKeys(values, callback) {
   }
 }
 
-test('automatic routing excludes providers without configured credentials', () => {
-  withProviderKeys({ GEMINI_API_KEY: 'test-gemini', OPENAI_API_KEY: 'test-openai' }, () => {
+test('automatic routing excludes providers without configured credentials', async () => {
+  await withProviderKeys({ GEMINI_API_KEY: 'test-gemini', OPENAI_API_KEY: 'test-openai' }, () => {
     assert.deepEqual(
       resolveModelRoute({ purpose: 'reasoning', provider: 'auto' }).map(({ provider }) => provider),
       ['gemini', 'openai'],
@@ -29,8 +29,8 @@ test('automatic routing excludes providers without configured credentials', () =
   });
 });
 
-test('explicit provider and model override automatic provider selection', () => {
-  withProviderKeys({}, () => {
+test('explicit provider and model override automatic provider selection', async () => {
+  await withProviderKeys({}, () => {
     assert.deepEqual(
       resolveModelRoute({ provider: 'openai', model: 'custom-model' }),
       [{ provider: 'openai', model: 'custom-model' }],
