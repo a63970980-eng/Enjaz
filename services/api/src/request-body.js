@@ -26,8 +26,9 @@ export function readJsonBody(req, { limitBytes = 1_000_000 } = {}) {
       if (settled) return;
       const raw = Buffer.concat(chunks).toString('utf8');
       try {
+        const parsed = raw ? JSON.parse(raw) : {};
         settled = true;
-        resolve(raw ? JSON.parse(raw) : {});
+        resolve(parsed);
       } catch {
         fail(Object.assign(new Error('Invalid JSON body'), { status: 400 }));
       }
