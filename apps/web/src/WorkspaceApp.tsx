@@ -34,7 +34,8 @@ async function apiRequest<T>(token: string, path: string, init: RequestInit = {}
   const headers = new Headers(init.headers);
   headers.set('Authorization', `Bearer ${token}`);
   if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
-  const response = await fetch(path, { ...init, headers, credentials: 'same-origin' });
+  const apiBase = (import.meta.env.VITE_ENJAZ_API_BASE || '').replace(/\\/+$/, '');
+  const response = await fetch(`${apiBase}${path}`, { ...init, headers, credentials: 'same-origin' });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(body?.error || `تعذر إكمال الطلب (${response.status})`);
   return (body?.data ?? body) as T;
