@@ -13,3 +13,5 @@ coverage/
 .idea/
 *.local
 .turbo/
+playwright-report/
+test-results/

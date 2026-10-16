@@ -50,8 +50,8 @@ function App() {
           <a href="#governance" onClick={closeMenu}>الحوكمة والأمان</a>
         </nav>
         <div className="header-actions">
-          <a className="login-link" href="#contact">تواصل معنا</a>
-          <a className="button button-dark button-small" href="#platform">اكتشف إنجاز <ArrowLeft size={15} /></a>
+          <a className="login-link" href="/workspace.html?auth=1">تسجيل الدخول</a>
+          <a className="button button-dark button-small" href="/workspace.html?signup=1">إنشاء حساب <ArrowLeft size={15} /></a>
         </div>
       </header>
 
@@ -61,7 +61,8 @@ function App() {
           <h1>أعمالك تتحرك.<br /><span>وموظفوك الرقميون</span><br />ينجزون العمل.</h1>
           <p className="hero-description">إنجاز يربط الموظفين البشريين والرقميين في منظومة تشغيل واحدة — من توزيع المهام إلى التنفيذ والمراجعة، مع وضوح كامل في الصلاحيات والنتائج.</p>
           <div className="hero-actions">
-            <a className="button button-dark" href="#platform">اكتشف المنصة <ArrowLeft size={17} /></a>
+            <a className="button button-dark" href="/workspace.html?signup=1">ابدأ الآن <ArrowLeft size={17} /></a>
+            <a className="button button-light" href="#platform">اكتشف المنصة <ArrowLeft size={17} /></a>
             <button className="button button-light" onClick={() => setPreviewOpen(!previewOpen)} aria-expanded={previewOpen}><Play size={16} /> {previewOpen ? 'إغلاق المعاينة' : 'شاهد معاينة المنتج'}</button>
           </div>
           <div className="hero-trust">
