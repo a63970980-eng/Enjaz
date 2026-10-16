@@ -1,10 +1,22 @@
 import { buildBrainContext, createDeterministicPlan, validatePlan } from './ai-brain.js';
-import { recall, remember } from './ai-memory.js';
+import { recall, remember } from './employee-memory.js';
 import { generatePlan } from './model-provider.js';
 import './openai-model-provider.js';
 import { materializePlan } from './execution-graph.js';
 import { listEmployeeGoals, listEmployeeKnowledge } from './workforce-repository.js';
 import { query } from './db.js';
+
+export function toPlanMemoryInput({ workspaceId, employeeId, taskId, plan }) {
+  return {
+    workspaceId,
+    employeeId,
+    type: 'summary',
+    key: `task-plan:${taskId}`,
+    content: JSON.stringify(plan),
+    importance: 3,
+    sourceTaskId: taskId,
+  };
+}
 
 function normalizeExecutionPlan(plan) {
   return {
@@ -46,6 +58,6 @@ export async function planEmployeeTask({ employee, workspaceId, employeeId, task
 
   plan = normalizeExecutionPlan(validatePlan(plan, employee));
   const execution = await materializePlan({ workspaceId, employeeId, taskId, plan });
-  await remember({ workspaceId, employeeId, taskId, type: 'plan', content: JSON.stringify(plan), metadata: { provider: effectiveProvider, goal, graphId: execution.graphId, knowledgeUsed: knowledge.length, objectivesUsed: goals.length } });
+  await remember(toPlanMemoryInput({ workspaceId, employeeId, taskId, plan }));
   return { plan, memoryUsed: memory.length, knowledgeUsed: knowledge.length, objectivesUsed: goals.length, provider: effectiveProvider, execution };
 }
