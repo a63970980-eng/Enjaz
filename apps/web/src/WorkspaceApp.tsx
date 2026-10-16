@@ -6,11 +6,14 @@ import {
 } from 'lucide-react';
 import { authClient } from '../auth-client.js';
 import { api, apiClient } from '../api-client.js';
+import EmployeeBuilder from './EmployeeBuilder';
+import AutomationPanel from './AutomationPanel';
+import AnalyticsBillingPanel from './AnalyticsBillingPanel';
 
 type Phase = 'checking' | 'auth' | 'verify' | 'onboarding' | 'provisioning' | 'provisioning-failed' | 'workspace' | 'recovery';
-type Tab = 'overview' | 'employees' | 'tasks' | 'approvals';
+type Tab = 'overview' | 'employees' | 'tasks' | 'approvals' | 'automations' | 'analytics';
 type WorkspaceRecord = { id: string; name: string; workspace_role?: string; role?: string; organization_name?: string };
-type DashboardData = { summary: Record<string, any>; employees: any[]; tasks: any[]; approvals: any[]; audit: any[] };
+type DashboardData = { summary: Record<string, any>; recent: any[]; subscription: Record<string, any> | null; usage: Record<string, any> | null; employees: any[]; tasks: any[]; approvals: any[]; audit: any[] };
 
 const API_BASE = (window as Window & { ENJAZ_API_BASE?: string }).ENJAZ_API_BASE || import.meta.env.VITE_ENJAZ_API_BASE || '';
 const workspaceApi = api as unknown as (path: string, options: { token: string; method: 'POST'; body: Record<string, unknown> }) => Promise<unknown>;
@@ -26,8 +29,10 @@ const navItems: { id: Tab; label: string; icon: typeof Activity }[] = [
   { id: 'employees', label: 'الموظفون الرقميون', icon: Bot },
   { id: 'tasks', label: 'المهام', icon: ClipboardList },
   { id: 'approvals', label: 'الموافقات', icon: FileCheck2 },
+  { id: 'automations', label: 'الأتمتة', icon: Workflow },
+  { id: 'analytics', label: 'التحليلات والفوترة', icon: Activity },
 ];
-const emptyDashboard: DashboardData = { summary: {}, employees: [], tasks: [], approvals: [], audit: [] };
+const emptyDashboard: DashboardData = { summary: {}, recent: [], subscription: null, usage: null, employees: [], tasks: [], approvals: [], audit: [] };
 
 function unwrap(value: any) { return value?.data ?? value; }
 function rows(value: any): any[] {
@@ -82,6 +87,7 @@ export default function WorkspaceApp() {
   const [workspace, setWorkspace] = useState<WorkspaceRecord | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData>(emptyDashboard);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [employeeBuilderOpen, setEmployeeBuilderOpen] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -108,12 +114,17 @@ export default function WorkspaceApp() {
       apiClient.tasks(target.id, authClient.token()),
       apiClient.approvals(target.id, authClient.token()),
       apiClient.audit(target.id, authClient.token()),
+      apiClient.billingSubscription(target.id, authClient.token()),
+      apiClient.billingUsage(target.id, authClient.token()),
     ]);
     if (version !== requestVersion.current) return;
     const value = (index: number) => results[index].status === 'fulfilled' ? unwrap(results[index].value) : null;
     const runtime = value(0);
     setDashboard({
       summary: runtime?.summary || {},
+      recent: Array.isArray(runtime?.recent) ? runtime.recent : [],
+      subscription: value(5) || null,
+      usage: value(6) || null,
       employees: rows(value(1)),
       tasks: rows(value(2)),
       approvals: rows(value(3)),
@@ -282,6 +293,21 @@ export default function WorkspaceApp() {
     }
   }
 
+  async function createEmployee(employee: Record<string, unknown>) {
+    if (!workspace) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      await apiClient.createEmployee(workspace.id, authClient.token(), employee);
+      setEmployeeBuilderOpen(false);
+      setNotice('حُفظ الموظف الرقمي في المساحة. راجع صلاحيات أدواته قبل إسناد مهام إنتاجية.');
+      await loadDashboard(workspace);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function startTask(task: any) {
     if (!workspace) return;
     setBusy(true);
@@ -439,9 +465,14 @@ export default function WorkspaceApp() {
           </section>
         </>}
 
-        {activeTab === 'employees' && <section className="workspace-panel"><div className="workspace-panel-heading"><div><h2>القوى العاملة الرقمية</h2><p>{dashboard.employees.length} سجل في هذه المساحة</p></div></div>
-          {dashboard.employees.length ? <div className="workspace-table-wrap"><table><thead><tr><th>الموظف</th><th>الدور</th><th>الحالة</th><th>تاريخ الإنشاء</th></tr></thead><tbody>{dashboard.employees.map(employee => <tr key={employee.id}><td><span className="table-primary"><span className="table-icon"><Bot size={17} /></span>{employee.name}</span></td><td>{employee.role || employee.role_code || '—'}</td><td><StatusPill status={employee.status} /></td><td>{formatDate(employee.created_at)}</td></tr>)}</tbody></table></div> : <EmptyState title="لا يوجد موظفون رقميون" body="فعّل حزمة القطاع أثناء الإعداد أو أعد محاولة تهيئتها." />}
-        </section>}
+        {activeTab === 'employees' && <>
+          {manager && employeeBuilderOpen && <EmployeeBuilder workspaceId={workspace!.id} token={authClient.token()} busy={busy} onCancel={() => setEmployeeBuilderOpen(false)} onCreate={createEmployee} />}
+          <section className="workspace-panel"><div className="workspace-panel-heading"><div><h2>القوى العاملة الرقمية</h2><p>{dashboard.employees.length} سجل في هذه المساحة</p></div>{manager && <button className="workspace-button primary" type="button" onClick={() => setEmployeeBuilderOpen(value => !value)}><Plus size={15} />{employeeBuilderOpen ? 'إخفاء المنشئ' : 'بناء موظف رقمي'}</button>}</div>
+            {dashboard.employees.length ? <div className="workspace-table-wrap"><table><thead><tr><th>الموظف</th><th>الدور</th><th>الحالة</th><th>تاريخ الإنشاء</th></tr></thead><tbody>{dashboard.employees.map(employee => <tr key={employee.id}><td><span className="table-primary"><span className="table-icon"><Bot size={17} /></span>{employee.name}</span></td><td>{employee.role || employee.role_code || '—'}</td><td><StatusPill status={employee.status} /></td><td>{formatDate(employee.created_at)}</td></tr>)}</tbody></table></div> : <EmptyState title="لا يوجد موظفون رقميون" body={manager ? 'أنشئ موظفًا من الكتالوج وحدد له هدفًا وأدوات وصلاحيات.' : 'لا توجد سجلات في هذه المساحة بعد.'} />}
+          </section>
+        </>}
+        {activeTab === 'automations' && workspace && <AutomationPanel workspaceId={workspace.id} token={authClient.token()} employees={dashboard.employees} manager={manager} onBuildEmployee={() => { setActiveTab('employees'); setEmployeeBuilderOpen(true); }} />}
+        {activeTab === 'analytics' && <AnalyticsBillingPanel summary={dashboard.summary} recent={dashboard.recent} subscription={dashboard.subscription} usage={dashboard.usage} />}
 
         {activeTab === 'tasks' && <div className="workspace-dashboard-grid task-page-grid">
           {manager && <section className="workspace-panel"><div className="workspace-panel-heading"><div><h2>مهمة جديدة</h2><p>تُحفظ المهمة داخل هذه المساحة فقط.</p></div><Plus size={18} /></div>
