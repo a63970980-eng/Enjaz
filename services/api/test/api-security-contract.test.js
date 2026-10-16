@@ -16,7 +16,7 @@ test('API source keeps security boundaries explicit', async () => {
   assert.match(source, /Internal server error/);
   assert.match(source, /required in production/);
   assert.match(source, /process\.env\.SUPABASE_URL\|\|''/);
-  assert.match(source, /process\.env\.SUPABASE_PUBLISHABLE_KEY\|\|process\.env\.SUPABASE_ANON_KEY/);
+  assert.match(source, /process\.env\.SUPABASE_PUBLISHABLE_KEY\|\|process\.env\.SUPABASE_ANON_KEY\|\|process\.env\.VITE_SUPABASE_PUBLISHABLE_KEY/);
   assert.doesNotMatch(source, /cqmwwrrmmqmgpnhnuxyu\.supabase\.co/);
   assert.doesNotMatch(source, /sb_publishable_[A-Za-z0-9_-]+/);
 });
