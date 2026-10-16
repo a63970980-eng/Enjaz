@@ -1,6 +1,6 @@
 # ENJAZ — Platform architecture and release map
 
-_Last reviewed: 2026-10-02_
+_Last reviewed: 2026-10-16_
 
 ## Product boundary
 
@@ -17,8 +17,8 @@ The UI must never imply that a public preview is a connected customer account or
 
 | Layer | Implemented source of truth | Notes |
 | --- | --- | --- |
-| Public / auth | `apps/web/landing.js`, `apps/web/landing.css`, `apps/web/auth-gate-v2.js` | RTL-first public experience; CTAs enter the real Supabase auth and onboarding path. |
-| Web shell | `apps/web/app-entry-v2.js`, `apps/web/workspace-app-v4.js` | Vite + vanilla ES modules. V4 is the canonical authenticated shell. |
+| Public / auth | `apps/web/src/App.tsx`, `apps/web/workspace.html`, `apps/web/src/WorkspaceApp.tsx`, `apps/web/auth-client.js` | RTL-first public entry; sign-in, email confirmation, workspace bootstrap, sector provisioning and Workspace UI use the existing Supabase/API clients. |
+| Web shell | `apps/web/vite.config.js`, `apps/web/src/workspace-main.tsx`, `apps/web/src/WorkspaceApp.tsx` | Multi-page Vite build emits the public pages and the authenticated Workspace document. |
 | API edge | `services/api/src/index.js`, `api/*.js` | HTTP API with request IDs, CORS allow-list, rate limits, auth and workspace checks. |
 | Identity | Supabase Auth + `auth-client.js` + `enjaz-auth-bridge` | Browser stores session tokens only; service credentials are not exposed. |
 | Tenant boundary | `workspace_members`, workspace-scoped repository queries, PostgreSQL RLS | UI filtering is not the security boundary. |
@@ -33,16 +33,15 @@ The UI must never imply that a public preview is a connected customer account or
 
 ## Workspace surfaces
 
-The V4 shell intentionally maps product surfaces to real API resources:
+The current authenticated portal is intentionally narrower than the platform API and maps only implemented UI surfaces to real API resources:
 
-- **Command Center:** runtime summary, employees, tasks, approvals and recent audit events.
-- **Digital Workforce:** real employee records; sector catalog provisions roles, departments, skills, tools, goals, knowledge and policies.
-- **AI Employee Builder:** creates an employee through `POST /api/v1/employees` with role, goal, model strategy metadata, autonomy, skills, tools, budget, policy and schedule. The server remains authoritative for permissions.
-- **Operations:** creates tasks, plans them through the AI route, runs them through the execution runtime, and opens Task 360 for inputs, plan, output and governance state.
-- **Workflow Control:** visualizes the actual execution contract. The composer creates a real task; planning produces the persisted execution graph. It does not claim to persist an unimplemented workflow designer.
-- **Governance:** approvals and audit are backed by the approval lifecycle and `audit_events`.
-- **Integrations:** catalog plus real vault connections; credentials are write-only from the UI.
-- **Analytics:** derives completion, execution and workforce-load indicators from loaded task/employee data. Empty states are explicit when no data exists.
+- **Command Center:** runtime summary, employee/task counts, pending approvals and recent audit events.
+- **Digital Workforce:** read-only employee list from the selected workspace; sector provisioning uses the canonical industry-pack service.
+- **Operations:** managers can create workspace-scoped tasks, then explicitly start planning/execution. The UI discloses that permitted steps may run and that sensitive actions remain approval-gated.
+- **Governance:** managers can approve or reject pending actions through the API; the server records the decision and audit event.
+- **Read-only access:** non-manager memberships see data but do not receive manager-only task or approval controls; API authorization remains the actual security boundary.
+
+Employee building/editing, saved workflow design, integrations management, analytics, global search, invitations and enterprise identity administration are not represented as completed UI capabilities in this portal yet, even where backend primitives exist.
 
 ## Industry provisioning
 
@@ -60,13 +59,13 @@ Provisioning is idempotent at the workspace + pack boundary and writes departmen
 
 ## Security and reliability preserved
 
-This product completion phase does not alter Supabase Auth, database migrations, RLS policies, tenant checks, API contracts, execution graph semantics, worker recovery, credential encryption, rate limiting, idempotency or environment variable names. The key product fix was aligning frontend sector IDs with the existing provisioning registry so onboarding reaches the actual backend pack.
+This product completion phase does not alter Supabase Auth, database migrations, RLS policies, tenant checks, API contracts, execution graph semantics, worker recovery, credential encryption, rate limiting, idempotency or environment variable names. The new portal uses the existing auth client, workspace-scoped API methods and industry provisioning contract; UI role checks improve clarity but do not replace server authorization.
 
 Sensitive actions remain approval-gated. Outbound webhook validation, tool allow-lists, model plan validation, workspace ownership checks and queue lease protections remain backend concerns.
 
 ## Deployment map
 
-- `apps/web/vite.config.js` binds preview development to `0.0.0.0` and permits the Arena/Vercel host.
+- `apps/web/vite.config.js` binds preview development to `0.0.0.0`, permits the Arena/Vercel host and emits the public and authenticated HTML entry points.
 - Root `vercel.json` builds the web output and bundles `services/api/src/index.js` into `api/server.cjs`; rewrites preserve `/api/v1/*` contracts.
 - `.github/workflows/web-ci.yml` runs web contract tests, Vite build, Playwright public E2E and axe checks.
 - `.github/workflows/api-ci.yml` provisions PostgreSQL roles/extensions, applies migrations and runs the API suite.
@@ -74,6 +73,6 @@ Sensitive actions remain approval-gated. Outbound webhook validation, tool allow
 
 ## Known release boundaries
 
-A clean frontend build and contract suite do not prove that a production Supabase project, AI provider, worker, database backup policy or Vercel environment is configured. Release still requires real-environment auth/workspace E2E, migrations, worker health, monitoring, provider credentials and Vercel Preview/Production checks.
+A clean frontend build and mocked browser E2E do not prove that a production Supabase project, AI provider, worker, database backup policy or Vercel environment is configured. Release still requires real-environment auth/workspace E2E, migrations, worker health, monitoring, provider credentials and Vercel Preview/Production checks. The current portal is the first connected workspace slice, not full Salesforce parity.
 
 The workflow composer is deliberately a governed task-entry surface until a persisted trigger/workflow authoring API exists. It must not be presented as a saved workflow when only an execution graph has been created.

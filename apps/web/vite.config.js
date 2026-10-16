@@ -11,6 +11,7 @@ export default defineConfig({
       input: {
         app: fileURLToPath(new URL('./index.html', import.meta.url)),
         landing: fileURLToPath(new URL('./landing.html', import.meta.url)),
+        workspace: fileURLToPath(new URL('./workspace.html', import.meta.url)),
       },
     },
   },
