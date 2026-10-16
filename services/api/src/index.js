@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { readJsonBody } from './request-body.js';
 import { createEmployee,listEmployees,getEmployee,updateEmployee,setEmployeeStatus,createTask,listTasks,getTask,cancelTask,createApproval,decideApproval,listApprovals,listAudit,getWorkspaceAccess,listDepartments,createDepartment,listEmployeeGoals,createEmployeeGoal,listEmployeeKnowledge,createEmployeeKnowledge,listTaskComments,createTaskComment,listHandoffs,createHandoff,listWorkforceRoles,listWorkforceIndustryContexts } from './workforce-repository.js';
 import { bootstrapWorkspace,getUserByAuthId,listUserWorkspaces } from './onboarding-repository.js';
 import { runEmployeeTask,executeApprovedTask } from './agent-runtime.js';
@@ -22,7 +23,7 @@ const supabaseKey=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_ANO
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean));
 const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
 const json=(res,code,data,origin='',requestId='')=>{const cors=origin&&allowedOrigins.has(origin)?origin:'null';res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':cors,'Vary':'Origin','Access-Control-Allow-Methods':'GET,POST,PATCH,DELETE,OPTIONS','Access-Control-Allow-Headers':'Authorization,Content-Type,X-Request-Id','X-Request-Id':requestId,'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer','Permissions-Policy':'camera=(),microphone=(),geolocation=()','Strict-Transport-Security':'max-age=63072000; includeSubDomains; preload'});res.end(JSON.stringify(data));};
-const body=req=>new Promise((resolve,reject)=>{let raw='';req.on('data',c=>{raw+=c;if(raw.length>1_000_000)reject(Object.assign(new Error('Request body too large'),{status:413}));});req.on('end',()=>{try{resolve(raw?JSON.parse(raw):{})}catch{reject(Object.assign(new Error('Invalid JSON body'),{status:400}))}});});
+const body=readJsonBody;
 async function supabaseGetUser(accessToken){if(!supabaseUrl||!supabaseKey)return null;const r=await fetch(`${supabaseUrl}/auth/v1/user`,{headers:{apikey:supabaseKey,Authorization:`Bearer ${accessToken}`}});if(!r.ok)return null;return r.json();}
 async function authIdentity(req){const h=req.headers.authorization||'';if(!h.startsWith('Bearer '))return null;const data=await supabaseGetUser(h.slice(7));if(!data?.id)return null;return {authId:data.id,email:data.email||'',name:data.user_metadata?.full_name||data.user_metadata?.name||data.email?.split('@')[0]||'Enjaz user'};}
 async function authUser(req){const identity=await authIdentity(req);if(!identity)return null;const profile=await getUserByAuthId(identity.authId);if(!profile)return null;return {...profile,authId:identity.authId};}
