@@ -47,7 +47,7 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 
 ## Production configuration
 
-API requires `SUPABASE_URL`, either `SUPABASE_ANON_KEY` or `SUPABASE_PUBLISHABLE_KEY`, and `DATABASE_URL`. Configure `ENJAZ_CREDENTIALS_KEY` as a base64-encoded 32-byte key before storing integration credentials, and set `CORS_ORIGINS` to the production web origin. Never expose database credentials, encryption keys, or service-role secrets to browser code.
+API requires `SUPABASE_URL`, either `SUPABASE_ANON_KEY` or `SUPABASE_PUBLISHABLE_KEY`, and `DATABASE_URL`. Configure `ENJAZ_CREDENTIALS_KEY` as a base64-encoded 32-byte key before storing integration credentials, and set `CORS_ORIGINS` to the production web origin. If database logs show `SELF_SIGNED_CERT_IN_CHAIN`, set `DATABASE_CA` to the trusted root CA PEM downloaded from Supabase Dashboard → Database → SSL Configuration; do not disable TLS verification. Never expose database credentials, encryption keys, or service-role secrets to browser code.
 
 The web console accepts `VITE_ENJAZ_API_BASE` at build time. Leave it empty for same-origin deployments using the Vercel `/api/v1` rewrite, or set it to the API origin for a separate API deployment. Workspace sign-in requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; without them, the authenticated workspace is intentionally unavailable. The landing-page preview is illustrative only, not a persistent local workspace. Production data must flow through the authenticated API and PostgreSQL.
 
