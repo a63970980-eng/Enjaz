@@ -15,6 +15,10 @@ test('API source keeps security boundaries explicit', async () => {
   assert.match(source, /Rate limit exceeded/);
   assert.match(source, /Internal server error/);
   assert.match(source, /required in production/);
+  assert.match(source, /process\.env\.SUPABASE_URL\|\|''/);
+  assert.match(source, /process\.env\.SUPABASE_PUBLISHABLE_KEY\|\|process\.env\.SUPABASE_ANON_KEY/);
+  assert.doesNotMatch(source, /cqmwwrrmmqmgpnhnuxyu\.supabase\.co/);
+  assert.doesNotMatch(source, /sb_publishable_[A-Za-z0-9_-]+/);
 });
 
 test('web entry point keeps executable code same-origin and framed content disabled', async () => {
