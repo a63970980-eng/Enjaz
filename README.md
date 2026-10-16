@@ -12,7 +12,7 @@ The production foundation includes PostgreSQL persistence, Supabase Auth, tenant
 
 ## Product surface
 
-The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTURE.md`](docs/ENJAZ_PLATFORM_ARCHITECTURE.md). The canonical public entry is the RTL-first `apps/web/landing.js` / `landing.css` experience; the authenticated product remains the V4 workspace shell.
+The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTURE.md`](docs/ENJAZ_PLATFORM_ARCHITECTURE.md). The canonical public entry is the RTL-first React/Vite app loaded from `apps/web/index.html` and `apps/web/src/main.tsx`; the main UI is implemented in `apps/web/src/App.tsx`. `apps/web/landing.html` is a legacy HTML entry and is not the configured Vite build input.
 
 - Executive operations dashboard
 - AI employee builder with role, goal, model strategy, autonomy, skills, tools, budget, policy and schedule
@@ -22,7 +22,7 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 - Human approval controls
 - Integration vault
 - Audit trail
-- Preview mode for evaluating the product before connecting a production workspace
+- An illustrative landing-page preview; workspace sign-in requires configured Supabase Auth
 
 ## Security baseline
 
@@ -47,9 +47,9 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 
 ## Production configuration
 
-API requires `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DATABASE_URL`, and the encryption key for credential storage. Configure `CORS_ORIGINS` to the production web origin. Never expose database credentials or service-role/secret keys to the browser.
+API requires `SUPABASE_URL`, either `SUPABASE_ANON_KEY` or `SUPABASE_PUBLISHABLE_KEY`, and `DATABASE_URL`. Configure `ENJAZ_CREDENTIALS_KEY` as a base64-encoded 32-byte key before storing integration credentials, and set `CORS_ORIGINS` to the production web origin. If database logs show `SELF_SIGNED_CERT_IN_CHAIN`, set `DATABASE_CA` to the trusted root CA PEM downloaded from Supabase Dashboard → Database → SSL Configuration; do not disable TLS verification. Never expose database credentials, encryption keys, or service-role secrets to browser code.
 
-The web console accepts `VITE_ENJAZ_API_BASE` at build time. Without a configured API it intentionally remains in preview mode and stores preview employees locally; production data must flow through the authenticated API and PostgreSQL.
+The web console accepts `VITE_ENJAZ_API_BASE` at build time. Leave it empty for same-origin deployments using the Vercel `/api/v1` rewrite, or set it to the API origin for a separate API deployment. Workspace sign-in requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; without them, the authenticated workspace is intentionally unavailable. The landing-page preview is illustrative only, not a persistent local workspace. Production data must flow through the authenticated API and PostgreSQL.
 
 ## Release gates
 

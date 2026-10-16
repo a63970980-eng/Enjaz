@@ -2,9 +2,9 @@ import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import { registerTool } from '../tool-registry.js';
 
-function privateIpv4(ip){const p=ip.split('.').map(Number);return p.length===4&&(p[0]===10||p[0]===127||p[0]===0||p[0]===169&&p[1]===254||p[0]===172&&p[1]>=16&&p[1]<=31||p[0]===192&&p[1]===168||p[0]>=224);}
-function privateIpv6(ip){const v=ip.toLowerCase().split('%')[0];return v==='::'||v==='::1'||v.startsWith('fc')||v.startsWith('fd')||v.startsWith('fe8')||v.startsWith('fe9')||v.startsWith('fea')||v.startsWith('feb')||v.startsWith('ff');}
-function unsafeAddress(ip){if(isIP(ip)===4)return privateIpv4(ip);if(isIP(ip)===6)return privateIpv6(ip);return true;}
+function privateIpv4(ip){const p=ip.split('.').map(Number);return p.length===4&&(p[0]===10||p[0]===127||p[0]===0||p[0]===169&&p[1]===254||p[0]===172&&p[1]>=16&&p[1]<=31||p[0]===192&&(p[1]===168||p[1]===0&&(p[2]===0||p[2]===2)||p[1]===88&&p[2]===99)||p[0]===100&&p[1]>=64&&p[1]<=127||p[0]===198&&(p[1]===18||p[1]===19||p[1]===51&&p[2]===100)||p[0]===203&&p[1]===0&&p[2]===113||p[0]>=224);}
+function privateIpv6(ip){const v=ip.toLowerCase().split('%')[0];return v==='::'||v==='::1'||v.startsWith('::ffff:')||v.startsWith('0:0:0:0:0:ffff:')||v.startsWith('fc')||v.startsWith('fd')||v.startsWith('fe8')||v.startsWith('fe9')||v.startsWith('fea')||v.startsWith('feb')||v.startsWith('fec')||v.startsWith('ff')||v.startsWith('2001:db8:')||v.startsWith('2002:');}
+export function unsafeAddress(ip){if(isIP(ip)===4)return privateIpv4(ip);if(isIP(ip)===6)return privateIpv6(ip);return true;}
 async function validateWebhookUrl(raw){
  let url;try{url=new URL(raw);}catch{throw new Error('Invalid webhook URL');}
  if(url.protocol!=='https:')throw new Error('Only HTTPS webhook URLs are allowed');

@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { readJsonBody } from './request-body.js';
 import { createEmployee,listEmployees,getEmployee,updateEmployee,setEmployeeStatus,createTask,listTasks,getTask,cancelTask,createApproval,decideApproval,listApprovals,listAudit,getWorkspaceAccess,listDepartments,createDepartment,listEmployeeGoals,createEmployeeGoal,listEmployeeKnowledge,createEmployeeKnowledge,listTaskComments,createTaskComment,listHandoffs,createHandoff,listWorkforceRoles,listWorkforceIndustryContexts } from './workforce-repository.js';
 import { bootstrapWorkspace,getUserByAuthId,listUserWorkspaces } from './onboarding-repository.js';
 import { runEmployeeTask,executeApprovedTask } from './agent-runtime.js';
@@ -16,13 +17,13 @@ import { listEmployeeRoutines,createEmployeeRoutine,updateEmployeeRoutine,delete
 import { listBillingPlans,getBillingSubscription,getBillingUsage,assertWorkspaceLimit } from './billing-repository.js';
 import './integrations/index.js';
 const port=process.env.PORT||4000;
-const supabaseUrl=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
-const supabaseKey=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_ANON_KEY||'sb_publishable_U12modLyDRQWV2sNAJHiqg_vJPOSoOz';
+const supabaseUrl=process.env.SUPABASE_URL||'';
+const supabaseKey=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.SUPABASE_ANON_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_ANON_KEY||'';
 // Supabase configuration is required in production; the health/version routes remain boot-safe when it is not provisioned.
 const allowedOrigins=new Set((process.env.CORS_ORIGINS||'').split(',').map(v=>v.trim()).filter(Boolean));
 const limiter=rateLimit({windowMs:60_000,max:Number(process.env.RATE_LIMIT_PER_MINUTE||120)});
 const json=(res,code,data,origin='',requestId='')=>{const cors=origin&&allowedOrigins.has(origin)?origin:'null';res.writeHead(code,{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':cors,'Vary':'Origin','Access-Control-Allow-Methods':'GET,POST,PATCH,DELETE,OPTIONS','Access-Control-Allow-Headers':'Authorization,Content-Type,X-Request-Id','X-Request-Id':requestId,'X-Content-Type-Options':'nosniff','X-Frame-Options':'DENY','Referrer-Policy':'no-referrer','Permissions-Policy':'camera=(),microphone=(),geolocation=()','Strict-Transport-Security':'max-age=63072000; includeSubDomains; preload'});res.end(JSON.stringify(data));};
-const body=req=>new Promise((resolve,reject)=>{let raw='';req.on('data',c=>{raw+=c;if(raw.length>1_000_000)reject(Object.assign(new Error('Request body too large'),{status:413}));});req.on('end',()=>{try{resolve(raw?JSON.parse(raw):{})}catch{reject(Object.assign(new Error('Invalid JSON body'),{status:400}))}});});
+const body=readJsonBody;
 async function supabaseGetUser(accessToken){if(!supabaseUrl||!supabaseKey)return null;const r=await fetch(`${supabaseUrl}/auth/v1/user`,{headers:{apikey:supabaseKey,Authorization:`Bearer ${accessToken}`}});if(!r.ok)return null;return r.json();}
 async function authIdentity(req){const h=req.headers.authorization||'';if(!h.startsWith('Bearer '))return null;const data=await supabaseGetUser(h.slice(7));if(!data?.id)return null;return {authId:data.id,email:data.email||'',name:data.user_metadata?.full_name||data.user_metadata?.name||data.email?.split('@')[0]||'Enjaz user'};}
 async function authUser(req){const identity=await authIdentity(req);if(!identity)return null;const profile=await getUserByAuthId(identity.authId);if(!profile)return null;return {...profile,authId:identity.authId};}
@@ -71,7 +72,7 @@ if(req.method==='POST'&&url.pathname.match(/^\/api\/v1\/tasks\/[^/]+\/run$/)){re
 if(req.method==='GET'&&url.pathname==='/api/v1/workflows')return json(res,200,{data:await listWorkflows(workspaceId)},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/approvals')return json(res,200,{data:await listApprovals(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/approvals'){requireManager(user);return json(res,201,{data:await createApproval({...await body(req),workspaceId})},origin,context.id);}
-const approvalMatch=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&approvalMatch){requireManager(user);const approvalId=approvalMatch[1],status=approvalMatch[2]==='approve'?'approved':'rejected';return json(res,200,{data:await decideApproval({workspaceId,approvalId,status,decidedBy:user.id})},origin,context.id);}
+const approvalMatch=url.pathname.match(/^\/api\/v1\/approvals\/([^/]+)\/(approve|reject)$/);if(req.method==='POST'&&approvalMatch){requireManager(user);const approvalId=approvalMatch[1],status=approvalMatch[2]==='approve'?'approved':'rejected';return json(res,200,{data:await decideApproval(approvalId,workspaceId,status,user.id)},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1/audit')return json(res,200,{data:await listAudit(workspaceId)},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/integrations')return json(res,200,{data:await listConnections(workspaceId)},origin,context.id);
 if(req.method==='POST'&&url.pathname==='/api/v1/integrations'){requireManager(user);await assertWorkspaceLimit(workspaceId,'integrations');const input=await body(req);return json(res,201,{data:await saveConnection({...input,workspaceId,actorUserId:user.id})},origin,context.id);}

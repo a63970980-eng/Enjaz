@@ -1,6 +1,6 @@
 [build]
   base = "."
-  command = "pnpm install --no-frozen-lockfile && pnpm --filter enjaz-platform build"
+  command = "pnpm install --frozen-lockfile && pnpm --filter enjaz-platform build"
   publish = "apps/web/dist"
 
 [build.environment]
