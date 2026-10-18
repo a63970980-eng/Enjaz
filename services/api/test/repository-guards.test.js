@@ -16,3 +16,23 @@ test('approval decisions are single-transition operations', async()=>{
   assert.match(source,/returning \*/);
   assert.match(source,/Pending approval not found/);
 });
+
+test('employee creation validates role templates and department ownership in the same workspace', async()=>{
+  const source=await readFile(new URL('../src/workforce-repository.js',import.meta.url),'utf8');
+  assert.match(source,/select role_code from employee_role_templates where role_code=\$1 and active=true/);
+  assert.match(source,/select id from departments where id=\$1 and workspace_id=\$2/);
+  assert.match(source,/insert into ai_employees \(id,workspace_id,department_id/);
+  assert.match(source,/ae\.department_id=d\.id or ae\.policy->>'departmentId'=d\.id::text/);
+});
+
+test('team creation rejects duplicate names and non-active or cross-workspace managers', async()=>{
+  const repository=await readFile(new URL('../src/workforce-repository.js',import.meta.url),'utf8');
+  const routes=await readFile(new URL('../src/index.js',import.meta.url),'utf8');
+  const createTeam=repository.slice(repository.indexOf('export async function createDepartment'),repository.indexOf('export async function listEmployeeGoals'));
+  assert.match(repository,/Team name must contain 1 to 160 characters/);
+  assert.match(repository,/lower\(name\)=lower\(\$2\)/);
+  assert.match(createTeam,/status='active' for share/);
+  assert.match(createTeam,/withTransaction/);
+  assert.match(createTeam,/workspaces where id=\$1 for update/);
+  assert.match(routes,/POST'&&url\.pathname==='\/api\/v1\/departments'\)\{requireManager\(user\)/);
+});

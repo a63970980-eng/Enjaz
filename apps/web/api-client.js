@@ -18,6 +18,8 @@ export const apiClient={
 	 runtimeOps:(workspaceId,token)=>api(`/api/v1/runtime/ops?workspaceId=${q(workspaceId)}`,{token}),
 	 tools:(workspaceId,token)=>api(`/api/v1/tools?workspaceId=${q(workspaceId)}`,{token}),
 	 workforceRoles:(workspaceId,token)=>api(`/api/v1/workforce/roles?workspaceId=${q(workspaceId)}`,{token}),
+	 departments:(workspaceId,token)=>api(`/api/v1/departments?workspaceId=${q(workspaceId)}`,{token}),
+	 createDepartment:(workspaceId,token,body)=>api(`/api/v1/departments?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
 	 routines:(workspaceId,token)=>api(`/api/v1/routines?workspaceId=${q(workspaceId)}`,{token}),
 	 createRoutine:(workspaceId,token,body)=>api(`/api/v1/routines?workspaceId=${q(workspaceId)}`,{token,method:'POST',body}),
 	 updateRoutine:(workspaceId,token,routineId,body)=>api(`/api/v1/routines/${q(routineId)}?workspaceId=${q(workspaceId)}`,{token,method:'PATCH',body}),

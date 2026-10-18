@@ -55,6 +55,71 @@ paths:
               schema: {$ref: '#/components/schemas/ToolListResponse'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/workforce/roles:
+    get:
+      tags: [Workforce]
+      summary: List active, versioned digital-employee role templates
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Active role templates with sector, objectives and least-privilege tool recommendations}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/industry-packs:
+    get:
+      tags: [Workforce]
+      summary: List sector starter packs backed by active role templates
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Sector packs with role, team and starter-employee counts}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/industry-packs/{pack}/provision:
+    post:
+      tags: [Workforce]
+      summary: Provision a workspace starter team within its subscription employee limit
+      parameters:
+        - name: pack
+          in: path
+          required: true
+          schema: {type: string}
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Existing starter team returned for an idempotent request}
+        '201': {description: Starter team provisioned}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '402': {description: Subscription inactive or employee quota exceeded}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Pack has no active starter templates}
+        '409': {description: Subscription is not configured or a partial earlier starter team needs reconciliation}
+  /api/v1/departments:
+    get:
+      tags: [Workforce]
+      summary: List teams belonging to the selected workspace
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Workspace teams and member counts}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [Workforce]
+      summary: Create a team in the selected workspace (manager only)
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DepartmentInput'}
+      responses:
+        '201': {description: Team created}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Workspace was not found}
+        '409': {description: A team with this name already exists in the workspace}
   /api/v1/employees:
     get:
       tags: [Workforce]
@@ -273,8 +338,12 @@ components:
       properties:
         name: {type: string, minLength: 1, maxLength: 200}
         role: {type: string, minLength: 1, maxLength: 200}
+        roleCode: {type: string, maxLength: 160, description: Stable code from the active workforce role catalog}
+        departmentId: {type: string, format: uuid, description: Must identify a department in the same workspace}
         goal: {type: string, maxLength: 5000}
+        mission: {type: string, maxLength: 5000}
         skills: {type: array, items: {type: string}}
+        responsibilities: {type: array, items: {type: string}}
         tools: {type: array}
         permissions: {type: array}
         memory: {type: object}
@@ -283,6 +352,13 @@ components:
         schedule: {type: object}
         status: {type: string, enum: [draft, active, paused, archived]}
         policy: {type: object}
+    DepartmentInput:
+      type: object
+      required: [name]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 160}
+        description: {type: string, maxLength: 5000}
+        managerEmployeeId: {type: [string, 'null'], format: uuid, description: Employee must be active and belong to the same workspace}
     TaskInput:
       type: object
       required: [employeeId, title, objective]

@@ -7,6 +7,12 @@
 - **Analytics and billing:** Initial usage dashboard is implemented. It reads current runtime, subscription, and limit data; it does **not** issue invoices or collect payments. See [Analytics and Billing Design](./ANALYTICS_AND_BILLING_DESIGN.md).
 - **Invitations, advanced RBAC, SSO, and SCIM:** Not implemented. The current identity/profile model and out-of-repository auth bridge must be resolved before a safe invite-acceptance flow. See [Enterprise Identity Design](./ENTERPRISE_IDENTITY_RBAC_SSO_SCIM_DESIGN.md).
 
+## Implementation update — 2026-10-18 (feature branch; not yet a production release)
+
+- **Teams and departments:** Workspace managers can create and list tenant-scoped teams, optionally assign an active employee as team manager, and add a new digital employee from a team card. Employee creation validates that the department belongs to the same workspace.
+- **Role and starter catalogs:** The API and Supabase migrations use versioned workforce role templates. Sector starter provisioning writes the starter team and employees through a quota-checked database transaction. Complete replays return the existing result; a partial legacy team now returns a conflict requiring reconciliation instead of appearing successful.
+- **Release gates:** These changes remain in the open feature PR. Apply and verify both database migration tracks in a real PostgreSQL/Supabase environment, then exercise tenant isolation, quota rejection, and concurrent provisioning before treating the feature as production-ready.
+
 ## Next enterprise gates
 
 1. Decide whether an Enjaz identity may belong to multiple organizations.

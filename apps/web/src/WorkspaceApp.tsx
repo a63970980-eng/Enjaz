@@ -9,9 +9,10 @@ import { api, apiClient } from '../api-client.js';
 import EmployeeBuilder from './EmployeeBuilder';
 import AutomationPanel from './AutomationPanel';
 import AnalyticsBillingPanel from './AnalyticsBillingPanel';
+import TeamPanel from './TeamPanel';
 
 type Phase = 'checking' | 'auth' | 'verify' | 'onboarding' | 'provisioning' | 'provisioning-failed' | 'workspace' | 'recovery';
-type Tab = 'overview' | 'employees' | 'tasks' | 'approvals' | 'automations' | 'analytics';
+type Tab = 'overview' | 'employees' | 'teams' | 'tasks' | 'approvals' | 'automations' | 'analytics';
 type WorkspaceRecord = { id: string; name: string; workspace_role?: string; role?: string; organization_name?: string };
 type DashboardData = { summary: Record<string, any>; recent: any[]; subscription: Record<string, any> | null; usage: Record<string, any> | null; employees: any[]; tasks: any[]; approvals: any[]; audit: any[] };
 
@@ -27,6 +28,7 @@ const sectorOptions = [
 const navItems: { id: Tab; label: string; icon: typeof Activity }[] = [
   { id: 'overview', label: 'مركز العمليات', icon: Activity },
   { id: 'employees', label: 'الموظفون الرقميون', icon: Bot },
+  { id: 'teams', label: 'الفرق والأقسام', icon: Users },
   { id: 'tasks', label: 'المهام', icon: ClipboardList },
   { id: 'approvals', label: 'الموافقات', icon: FileCheck2 },
   { id: 'automations', label: 'الأتمتة', icon: Workflow },
@@ -88,6 +90,7 @@ export default function WorkspaceApp() {
   const [dashboard, setDashboard] = useState<DashboardData>(emptyDashboard);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [employeeBuilderOpen, setEmployeeBuilderOpen] = useState(false);
+  const [employeeBuilderDepartment, setEmployeeBuilderDepartment] = useState<{ id: string; name: string } | null>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
@@ -97,6 +100,12 @@ export default function WorkspaceApp() {
   const [selectedSector, setSelectedSector] = useState('restaurant');
   const [taskDraft, setTaskDraft] = useState({ title: '', objective: '', employeeId: '' });
   const requestVersion = useRef(0);
+  const activeWorkspaceId = useRef<string | null>(null);
+  const workspaceActionVersion = useRef(0);
+
+  function isCurrentWorkspaceAction(target: WorkspaceRecord, actionVersion: number) {
+    return activeWorkspaceId.current === target.id && workspaceActionVersion.current === actionVersion;
+  }
 
   const manager = canManage(workspace);
   const activeEmployees = useMemo(() => dashboard.employees.filter(item => item.status === 'active'), [dashboard.employees]);
@@ -104,7 +113,7 @@ export default function WorkspaceApp() {
   const openTasks = useMemo(() => dashboard.tasks.filter(item => !['completed', 'succeeded', 'failed', 'cancelled'].includes(item.status)), [dashboard.tasks]);
 
   async function loadDashboard(target: WorkspaceRecord | null = workspace) {
-    if (!target?.id || !authClient.token()) return;
+    if (!target?.id || !authClient.token() || activeWorkspaceId.current !== target.id) return;
     const version = ++requestVersion.current;
     setLoadingData(true);
     setError('');
@@ -117,7 +126,7 @@ export default function WorkspaceApp() {
       apiClient.billingSubscription(target.id, authClient.token()),
       apiClient.billingUsage(target.id, authClient.token()),
     ]);
-    if (version !== requestVersion.current) return;
+    if (version !== requestVersion.current || activeWorkspaceId.current !== target.id) return;
     const value = (index: number) => results[index].status === 'fulfilled' ? unwrap(results[index].value) : null;
     const runtime = value(0);
     setDashboard({
@@ -140,12 +149,22 @@ export default function WorkspaceApp() {
     const spaces = profileWorkspaces(data);
     setWorkspaces(spaces);
     if (!spaces.length) {
+      activeWorkspaceId.current = null;
+      requestVersion.current += 1;
+      workspaceActionVersion.current += 1;
       setWorkspace(null);
+      setDashboard(emptyDashboard);
+      setLoadingData(false);
       setPhase('onboarding');
       return;
     }
     const selected = selectedWorkspace(spaces);
-    setWorkspace(selected);
+    activeWorkspaceId.current = selected!.id;
+      requestVersion.current += 1;
+      workspaceActionVersion.current += 1;
+      setDashboard(emptyDashboard);
+      setTaskDraft({ title: '', objective: '', employeeId: '' });
+      setWorkspace(selected);
     localStorage.setItem('ENJAZ_WORKSPACE_ID', selected!.id);
     setPhase('workspace');
     await loadDashboard(selected);
@@ -249,6 +268,10 @@ export default function WorkspaceApp() {
       const target = spaces[0] || result?.workspace || null;
       if (!target?.id) throw new Error('لم يعِد الخادم مساحة عمل بعد التهيئة. أعد المحاولة قبل المتابعة.');
       const nextSpaces = spaces.length ? spaces : [target];
+      activeWorkspaceId.current = target.id;
+      requestVersion.current += 1;
+      workspaceActionVersion.current += 1;
+      setDashboard(emptyDashboard);
       setWorkspaces(nextSpaces);
       setWorkspace(target);
       localStorage.setItem('ENJAZ_WORKSPACE_ID', target.id);
@@ -264,90 +287,127 @@ export default function WorkspaceApp() {
   async function chooseWorkspace(id: string) {
     const selected = workspaces.find(item => item.id === id);
     if (!selected) return;
+    activeWorkspaceId.current = selected.id;
+    requestVersion.current += 1;
+    workspaceActionVersion.current += 1;
+    setBusy(false);
+    setDashboard(emptyDashboard);
+    setTaskDraft({ title: '', objective: '', employeeId: '' });
+    setLoadingData(true);
+    setEmployeeBuilderOpen(false);
+    setEmployeeBuilderDepartment(null);
     setWorkspace(selected);
     localStorage.setItem('ENJAZ_WORKSPACE_ID', selected.id);
     setNotice('');
+    setError('');
     await loadDashboard(selected);
   }
 
   async function createTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!workspace || !taskDraft.employeeId) return;
+    const target = workspace;
+    const actionVersion = ++workspaceActionVersion.current;
     setBusy(true);
     setError('');
     setNotice('');
     try {
-      await apiClient.createTask(workspace.id, authClient.token(), {
+      await apiClient.createTask(target.id, authClient.token(), {
         title: taskDraft.title.trim(),
         objective: taskDraft.objective.trim(),
         employeeId: taskDraft.employeeId,
         priority: 5,
       });
+      if (!isCurrentWorkspaceAction(target, actionVersion)) return;
       setTaskDraft({ title: '', objective: '', employeeId: '' });
       setNotice('حُفظت المهمة في مساحة العمل. ابدأ التخطيط والتنفيذ من بطاقة المهمة عندما تكون جاهزًا.');
-      await loadDashboard(workspace);
+      await loadDashboard(target);
     } catch (cause: any) {
-      setError(cause?.message || 'تعذر إنشاء المهمة.');
+      if (isCurrentWorkspaceAction(target, actionVersion)) setError(cause?.message || 'تعذر إنشاء المهمة.');
     } finally {
-      setBusy(false);
+      if (actionVersion === workspaceActionVersion.current) setBusy(false);
     }
   }
 
   async function createEmployee(employee: Record<string, unknown>) {
     if (!workspace) return;
+    const target = workspace;
+    const actionVersion = ++workspaceActionVersion.current;
     setBusy(true);
     setError('');
     setNotice('');
     try {
-      await apiClient.createEmployee(workspace.id, authClient.token(), employee);
+      await apiClient.createEmployee(target.id, authClient.token(), employee);
+      if (!isCurrentWorkspaceAction(target, actionVersion)) return;
       setEmployeeBuilderOpen(false);
+      setEmployeeBuilderDepartment(null);
       setNotice('حُفظ الموظف الرقمي في المساحة. راجع صلاحيات أدواته قبل إسناد مهام إنتاجية.');
-      await loadDashboard(workspace);
+      await loadDashboard(target);
+    } catch (cause) {
+      if (isCurrentWorkspaceAction(target, actionVersion)) throw cause;
     } finally {
-      setBusy(false);
+      if (actionVersion === workspaceActionVersion.current) setBusy(false);
     }
+  }
+
+  function buildEmployeeForDepartment(department: { id: string; name: string } | null = null) {
+    setEmployeeBuilderDepartment(department);
+    setEmployeeBuilderOpen(true);
+    setActiveTab('employees');
   }
 
   async function startTask(task: any) {
     if (!workspace) return;
+    const target = workspace;
+    const actionVersion = ++workspaceActionVersion.current;
     setBusy(true);
     setError('');
     setNotice('');
     try {
-      await workspaceApi(`/api/v1/tasks/${encodeURIComponent(task.id)}/plan?workspaceId=${encodeURIComponent(workspace.id)}`, {
+      await workspaceApi(`/api/v1/tasks/${encodeURIComponent(task.id)}/plan?workspaceId=${encodeURIComponent(target.id)}`, {
         token: authClient.token(), method: 'POST', body: { goal: task.objective },
       });
+      if (!isCurrentWorkspaceAction(target, actionVersion)) return;
       setNotice('بدأ التخطيط والتنفيذ. راقب تقدم المهمة؛ الإجراءات الحساسة تبقى خلف بوابة الموافقة.');
-      await loadDashboard(workspace);
+      await loadDashboard(target);
     } catch (cause: any) {
-      setError(cause?.message || 'تعذر بدء المهمة.');
+      if (isCurrentWorkspaceAction(target, actionVersion)) setError(cause?.message || 'تعذر بدء المهمة.');
     } finally {
-      setBusy(false);
+      if (actionVersion === workspaceActionVersion.current) setBusy(false);
     }
   }
 
   async function decideApproval(approval: any, decision: 'approve' | 'reject') {
     if (!workspace) return;
+    const target = workspace;
+    const actionVersion = ++workspaceActionVersion.current;
     setBusy(true);
     setError('');
     setNotice('');
     try {
-      await apiClient.decideApproval(workspace.id, authClient.token(), approval.id, decision);
+      await apiClient.decideApproval(target.id, authClient.token(), approval.id, decision);
+      if (!isCurrentWorkspaceAction(target, actionVersion)) return;
       setNotice(decision === 'approve' ? 'سُجل الاعتماد وأُرسلت المهمة إلى طابور التنفيذ.' : 'سُجل الرفض وأُوقفت المهمة المرتبطة.');
-      await loadDashboard(workspace);
+      await loadDashboard(target);
     } catch (cause: any) {
-      setError(cause?.message || 'تعذر تسجيل قرار الموافقة.');
+      if (isCurrentWorkspaceAction(target, actionVersion)) setError(cause?.message || 'تعذر تسجيل قرار الموافقة.');
     } finally {
-      setBusy(false);
+      if (actionVersion === workspaceActionVersion.current) setBusy(false);
     }
   }
 
   function signOut() {
+    activeWorkspaceId.current = null;
+    requestVersion.current += 1;
+    workspaceActionVersion.current += 1;
     authClient.signOut();
     setProfile(null);
     setWorkspace(null);
     setWorkspaces([]);
     setDashboard(emptyDashboard);
+    setTaskDraft({ title: '', objective: '', employeeId: '' });
+    setLoadingData(false);
+    setBusy(false);
     setError('');
     setNotice('');
     setPhase('auth');
@@ -466,12 +526,13 @@ export default function WorkspaceApp() {
         </>}
 
         {activeTab === 'employees' && <>
-          {manager && employeeBuilderOpen && <EmployeeBuilder workspaceId={workspace!.id} token={authClient.token()} busy={busy} onCancel={() => setEmployeeBuilderOpen(false)} onCreate={createEmployee} />}
-          <section className="workspace-panel"><div className="workspace-panel-heading"><div><h2>القوى العاملة الرقمية</h2><p>{dashboard.employees.length} سجل في هذه المساحة</p></div>{manager && <button className="workspace-button primary" type="button" onClick={() => setEmployeeBuilderOpen(value => !value)}><Plus size={15} />{employeeBuilderOpen ? 'إخفاء المنشئ' : 'بناء موظف رقمي'}</button>}</div>
+          {manager && employeeBuilderOpen && <EmployeeBuilder workspaceId={workspace!.id} token={authClient.token()} busy={busy} department={employeeBuilderDepartment} onCancel={() => { setEmployeeBuilderOpen(false); setEmployeeBuilderDepartment(null); }} onCreate={createEmployee} />}
+          <section className="workspace-panel"><div className="workspace-panel-heading"><div><h2>القوى العاملة الرقمية</h2><p>{dashboard.employees.length} سجل في هذه المساحة</p></div>{manager && <button className="workspace-button primary" type="button" onClick={() => { if (employeeBuilderOpen) { setEmployeeBuilderOpen(false); setEmployeeBuilderDepartment(null); } else buildEmployeeForDepartment(null); }}><Plus size={15} />{employeeBuilderOpen ? 'إخفاء المنشئ' : 'بناء موظف رقمي'}</button>}</div>
             {dashboard.employees.length ? <div className="workspace-table-wrap"><table><thead><tr><th>الموظف</th><th>الدور</th><th>الحالة</th><th>تاريخ الإنشاء</th></tr></thead><tbody>{dashboard.employees.map(employee => <tr key={employee.id}><td><span className="table-primary"><span className="table-icon"><Bot size={17} /></span>{employee.name}</span></td><td>{employee.role || employee.role_code || '—'}</td><td><StatusPill status={employee.status} /></td><td>{formatDate(employee.created_at)}</td></tr>)}</tbody></table></div> : <EmptyState title="لا يوجد موظفون رقميون" body={manager ? 'أنشئ موظفًا من الكتالوج وحدد له هدفًا وأدوات وصلاحيات.' : 'لا توجد سجلات في هذه المساحة بعد.'} />}
           </section>
         </>}
-        {activeTab === 'automations' && workspace && <AutomationPanel workspaceId={workspace.id} token={authClient.token()} employees={dashboard.employees} manager={manager} onBuildEmployee={() => { setActiveTab('employees'); setEmployeeBuilderOpen(true); }} />}
+        {activeTab === 'teams' && workspace && <TeamPanel key={workspace.id} workspaceId={workspace.id} token={authClient.token()} employees={dashboard.employees} manager={manager} onAddEmployee={buildEmployeeForDepartment} />}
+        {activeTab === 'automations' && workspace && <AutomationPanel key={workspace.id} workspaceId={workspace.id} token={authClient.token()} employees={dashboard.employees} manager={manager} onBuildEmployee={() => buildEmployeeForDepartment(null)} />}
         {activeTab === 'analytics' && <AnalyticsBillingPanel summary={dashboard.summary} recent={dashboard.recent} subscription={dashboard.subscription} usage={dashboard.usage} />}
 
         {activeTab === 'tasks' && <div className="workspace-dashboard-grid task-page-grid">
