@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-async function mockWorkspaceSession(page, role = 'manager') {
+async function mockWorkspaceSession(page, role = 'manager', workspaceIds = ['workspace-1'], toolsHandler = null, tasksHandler = null) {
   await page.route(/\/auth\/v1\/token\?grant_type=password/, route => route.fulfill({
     status: 200,
     json: {
@@ -23,36 +23,83 @@ async function mockWorkspaceSession(page, role = 'manager') {
         data: {
           identity: { authId: 'auth-user-1', email: 'owner@example.com', name: 'نور' },
           profile: { id: 'user-1', name: 'نور', email: 'owner@example.com' },
-          workspaces: [{ id: 'workspace-1', name: 'شركة التجربة', workspace_role: role }],
+          workspaces: workspaceIds.map((id, index) => ({ id, name: index ? `شركة التجربة ${index + 1}` : 'شركة التجربة', workspace_role: role })),
         },
       },
     });
   });
 
   const tasks = [];
+  const tasksByWorkspace = new Map(workspaceIds.map((id, index) => [id, index === 0 ? tasks : []]));
+  const dashboardWorkspaceReads = [];
   const employees = [{ id: 'employee-1', name: 'محلل الأعمال', role: 'محلل', status: 'active' }];
+  const departments = [{ id: 'department-1', name: 'العمليات', description: 'فريق التشغيل', manager_name: 'محلل الأعمال', employee_count: 1 }];
+  const routines = [];
+  const routinesByWorkspace = new Map(workspaceIds.map((id, index) => [id, index === 0 ? routines : []]));
+  const createdEmployees = [];
+  const createdDepartments = [];
+  const tools = [
+    { name: 'data.analyze', description: 'تحليل بيانات للقراءة فقط', risk: 'low' },
+    { name: 'report.create', description: 'إنشاء تقرير', risk: 'low' },
+    { name: 'payment', description: 'دفعة مالية', risk: 'high' },
+  ];
   await page.route(/\/api\/v1\//, async route => {
     const request = route.request();
     const url = new URL(request.url());
     const path = url.pathname;
+    const workspaceId = url.searchParams.get('workspaceId');
     const headers = await request.allHeaders();
-    if (url.searchParams.get('workspaceId') !== 'workspace-1' || headers.authorization !== 'Bearer test-access-token') {
+    if (!workspaceIds.includes(workspaceId) || headers.authorization !== 'Bearer test-access-token') {
       return route.fulfill({ status: 403, json: { error: 'Workspace scope or bearer token missing' } });
     }
 
     if (path.endsWith('/runtime/summary')) {
-      return route.fulfill({ status: 200, json: { data: { summary: { runs: 4, successful_runs: 3, failed_runs: 1, cost_cents: 0 }, recent: [] } } });
+      dashboardWorkspaceReads.push(workspaceId);
+      return route.fulfill({ status: 200, json: { data: { summary: { runs: 4, successful_runs: 3, failed_runs: 1, avg_latency_ms: 1200, cost_cents: 75 }, recent: [] } } });
+    }
+    if (path.endsWith('/workforce/roles')) return route.fulfill({ status: 200, json: { data: [{ role_code: 'business_analyst', title: 'محلل أعمال', department: 'العمليات', sector: 'enterprise', sector_label: 'الشركات', default_goal: 'تحليل الأداء وتقديم توصيات قابلة للقياس', mission: 'تحليل الأداء', skills: ['تحليل', 'تقارير'], responsibilities: ['مراجعة المؤشرات'], tools: ['data.analyze', 'report.create'] }] } });
+    if (path.endsWith('/tools')) return toolsHandler ? toolsHandler(route) : route.fulfill({ status: 200, json: { data: tools } });
+    if (path.endsWith('/departments') && request.method() === 'GET') return route.fulfill({ status: 200, json: { data: workspaceId === workspaceIds[0] ? departments : [] } });
+    if (path.endsWith('/departments') && request.method() === 'POST') {
+      const input = request.postDataJSON();
+      const department = { id: `department-${departments.length + 1}`, workspace_id: workspaceId, name: input.name, description: input.description, manager_employee_id: input.managerEmployeeId, employee_count: 0 };
+      createdDepartments.push(input);
+      departments.push(department);
+      return route.fulfill({ status: 201, json: { data: department } });
     }
     if (path.endsWith('/employees') && request.method() === 'GET') {
-      return route.fulfill({ status: 200, json: { data: employees } });
+      return route.fulfill({ status: 200, json: { data: workspaceId === workspaceIds[0] ? employees : [] } });
+    }
+    if (path.endsWith('/employees') && request.method() === 'POST') {
+      const input = request.postDataJSON();
+      createdEmployees.push(input);
+      const employee = { id: `employee-${employees.length + 1}`, ...input, status: 'active' };
+      employees.unshift(employee);
+      return route.fulfill({ status: 201, json: { data: employee } });
+    }
+    if (path.endsWith('/routines') && request.method() === 'GET') return route.fulfill({ status: 200, json: { data: routinesByWorkspace.get(workspaceId) || [] } });
+    if (path.endsWith('/routines') && request.method() === 'POST') {
+      const input = request.postDataJSON();
+      const scopedRoutines = routinesByWorkspace.get(workspaceId) || [];
+      const routine = { id: `routine-${scopedRoutines.length + 1}`, employee_id: input.employeeId, employee_name: 'محلل الأعمال', timezone: input.timezone, schedule: { title: input.name, objective: input.objective, action: input.action, input: input.input, intervalMinutes: input.intervalMinutes }, enabled: input.enabled, next_run_at: new Date(Date.now() + Number(input.intervalMinutes) * 60_000).toISOString() };
+      scopedRoutines.unshift(routine);
+      return route.fulfill({ status: 201, json: { data: routine } });
+    }
+    const routineMatch = path.match(/\/routines\/([^/]+)$/);
+    if (routineMatch && request.method() === 'PATCH') {
+      const routine = (routinesByWorkspace.get(workspaceId) || []).find(item => item.id === routineMatch[1]);
+      Object.assign(routine, request.postDataJSON());
+      return route.fulfill({ status: 200, json: { data: routine } });
     }
     if (path.endsWith('/tasks') && request.method() === 'GET') {
-      return route.fulfill({ status: 200, json: { data: tasks } });
+      return route.fulfill({ status: 200, json: { data: tasksByWorkspace.get(workspaceId) || [] } });
     }
     if (path.endsWith('/tasks') && request.method() === 'POST') {
+      if (tasksHandler) return tasksHandler(route, workspaceId);
       const input = request.postDataJSON();
-      const task = { id: `task-${tasks.length + 1}`, ...input, employee_id: input.employeeId, employee_name: 'محلل الأعمال', status: 'queued' };
-      tasks.unshift(task);
+      const scopedTasks = tasksByWorkspace.get(workspaceId) || [];
+      const task = { id: `task-${scopedTasks.length + 1}`, ...input, employee_id: input.employeeId, employee_name: 'محلل الأعمال', status: 'queued' };
+      scopedTasks.unshift(task);
       return route.fulfill({ status: 201, json: { data: task } });
     }
     if (path.endsWith('/approvals')) {
@@ -61,8 +108,11 @@ async function mockWorkspaceSession(page, role = 'manager') {
     if (path.endsWith('/audit')) {
       return route.fulfill({ status: 200, json: { data: [] } });
     }
+    if (path.endsWith('/billing/subscription')) return route.fulfill({ status: 200, json: { data: { plan_name: 'Growth', status: 'active', current_period_end: '2026-11-16T00:00:00.000Z', max_employees: 15, max_tasks_month: 1000, max_integrations: 10, included_ai_cost_cents: 1000 } } });
+    if (path.endsWith('/billing/usage')) return route.fulfill({ status: 200, json: { data: { plan: 'growth', status: 'active', employees: workspaceId === workspaceIds[0] ? employees.length : 0, tasksThisMonth: (tasksByWorkspace.get(workspaceId) || []).length, integrations: 2, aiCostCents: 75, limits: { employees: 15, tasksMonth: 1000, integrations: 10, includedAiCostCents: 1000 } } } });
     return route.fulfill({ status: 404, json: { error: `Unhandled API request: ${request.method()} ${path}` } });
   });
+  return { employees, routines, departments, createdEmployees, createdDepartments, dashboardWorkspaceReads };
 }
 
 test('workspace route presents a sign-in flow without implying an authenticated session', async ({ page }) => {
@@ -105,6 +155,14 @@ test('read-only workspace role does not show manager-only task creation', async 
   await expect(page.getByRole('heading', { name: 'مركز العمليات' })).toBeVisible();
   await expect(page.getByRole('form', { name: 'إنشاء مهمة' })).toHaveCount(0);
   await expect(page.getByText(/صلاحية المدير/)).toBeVisible();
+  await page.getByRole('button', { name: 'الموظفون الرقميون' }).click();
+  await expect(page.getByRole('button', { name: 'بناء موظف رقمي' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'الأتمتة' }).click();
+  await expect(page.getByRole('form', { name: 'إنشاء أتمتة متكررة' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'الفرق والأقسام' }).click();
+  await expect(page.getByRole('button', { name: 'إنشاء فريق' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /إضافة موظف إلى فريق/ })).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'فرق وأقسام مساحة العمل' })).toBeVisible();
 });
 
 test('email confirmation callback restores a session and removes tokens from the address bar', async ({ page }) => {
@@ -157,6 +215,8 @@ test('new account can bootstrap a workspace and provision its selected sector', 
     if (url.pathname.endsWith('/tasks')) return route.fulfill({ status: 200, json: { data: [] } });
     if (url.pathname.endsWith('/approvals')) return route.fulfill({ status: 200, json: { data: [] } });
     if (url.pathname.endsWith('/audit')) return route.fulfill({ status: 200, json: { data: [] } });
+    if (url.pathname.endsWith('/billing/subscription')) return route.fulfill({ status: 200, json: { data: { plan_name: 'Starter', status: 'active', max_employees: 5, max_tasks_month: 100, max_integrations: 2, included_ai_cost_cents: 0 } } });
+    if (url.pathname.endsWith('/billing/usage')) return route.fulfill({ status: 200, json: { data: { plan: 'starter', status: 'active', employees: 0, tasksThisMonth: 0, integrations: 0, aiCostCents: 0, limits: { employees: 5, tasksMonth: 100, integrations: 2, includedAiCostCents: 0 } } } });
     return route.fulfill({ status: 404, json: { error: `Unhandled API request: ${request.method()} ${url.pathname}` } });
   });
 
@@ -191,4 +251,199 @@ test('workspace remains usable on mobile without horizontal overflow', async ({ 
   expect(overflow).toBeLessThanOrEqual(1);
   await page.getByRole('button', { name: 'فتح القائمة' }).click();
   await expect(page.getByRole('navigation', { name: 'التنقل داخل مساحة العمل' })).toBeVisible();
+  await page.getByRole('button', { name: 'التحليلات والفوترة' }).click();
+  await expect(page.getByRole('heading', { name: 'التحليلات والفوترة' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  await page.getByRole('button', { name: 'فتح القائمة' }).click();
+  await page.getByRole('button', { name: 'الأتمتة' }).click();
+  await expect(page.getByRole('heading', { name: 'الأتمتة', exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+  await page.getByRole('button', { name: 'فتح القائمة' }).click();
+  await page.getByRole('button', { name: 'الفرق والأقسام' }).click();
+  await expect(page.getByRole('heading', { name: 'إدارة الفرق' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+});
+
+
+test('manager can configure a digital employee with a role template and least-privilege tools', async ({ page }) => {
+  const state = await mockWorkspaceSession(page);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الموظفون الرقميون' }).click();
+  await page.getByRole('button', { name: 'بناء موظف رقمي' }).click();
+  await page.getByLabel('قالب الدور').selectOption('business_analyst');
+  await page.getByLabel('اسم الموظف').fill('محلل إنجاز');
+  await page.getByLabel('الهدف التشغيلي').fill('تحويل بيانات المبيعات إلى توصيات قابلة للقياس.');
+  await page.getByLabel('المسؤوليات').fill('مراجعة مؤشرات المبيعات\nإعداد ملخص أسبوعي');
+  await page.getByRole('button', { name: 'حفظ الموظف الرقمي' }).click();
+  await expect(page.getByText('محلل إنجاز')).toBeVisible();
+  expect(state.createdEmployees).toHaveLength(1);
+  expect(state.createdEmployees[0].roleCode).toBe('business_analyst');
+  expect(state.createdEmployees[0].tools).toContain('data.analyze');
+  expect(state.createdEmployees[0].policy.approvalMode).toBe('required');
+});
+
+test('employee builder shows catalog loading and allows retry after tool catalog failure', async ({ page }) => {
+  let toolRequests = 0;
+  let retryAllowed = false;
+  await mockWorkspaceSession(page, 'manager', ['workspace-1'], async route => {
+    toolRequests += 1;
+    await new Promise(resolve => setTimeout(resolve, 250));
+    if (!retryAllowed) return route.fulfill({ status: 503, json: { error: 'Temporarily unavailable' } });
+    return route.fulfill({ status: 200, json: { data: [{ name: 'data.analyze', description: 'تحليل بيانات للقراءة فقط', risk: 'low' }] } });
+  });
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الموظفون الرقميون' }).click();
+  await page.getByRole('button', { name: 'بناء موظف رقمي' }).click();
+  await expect(page.getByText('جارٍ تحميل كتالوج الأدوار والأدوات…')).toBeVisible();
+  await expect(page.getByText('تعذر تحميل كتالوج الأدوات. أعد المحاولة قبل حفظ الموظف.')).toBeVisible();
+  retryAllowed = true;
+  await page.getByRole('button', { name: 'إعادة المحاولة' }).click();
+  await expect(page.getByText('data.analyze').first()).toBeVisible();
+  expect(toolRequests).toBeGreaterThanOrEqual(2);
+});
+
+test('workspace owner can create a team and add a specialized employee to that team', async ({ page }) => {
+  const state = await mockWorkspaceSession(page, 'manager');
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الفرق والأقسام' }).click();
+
+  await page.getByLabel('اسم الفريق').fill('فريق المبيعات');
+  await page.getByLabel('وصف الفريق').fill('تأهيل الفرص ومراجعة الأداء التجاري.');
+  await page.getByLabel('مدير الفريق').selectOption('employee-1');
+  await page.getByRole('button', { name: 'إنشاء فريق' }).click();
+  await expect(page.getByRole('heading', { name: 'فريق المبيعات' })).toBeVisible();
+  await expect(page.locator('.team-meta dd').first()).toHaveText('محلل الأعمال');
+
+  await page.getByRole('button', { name: 'إضافة موظف إلى فريق فريق المبيعات' }).click();
+  await expect(page.getByText('الفريق المحدد: فريق المبيعات')).toBeVisible();
+  await page.getByLabel('قالب الدور').selectOption('business_analyst');
+  await expect(page.getByLabel('الهدف التشغيلي')).toHaveValue('تحليل الأداء وتقديم توصيات قابلة للقياس');
+  await page.getByLabel('اسم الموظف').fill('محلل المبيعات');
+  await page.getByRole('button', { name: 'حفظ الموظف الرقمي' }).click();
+
+  expect(state.createdDepartments[0]).toMatchObject({ name: 'فريق المبيعات', managerEmployeeId: 'employee-1' });
+  expect(state.createdEmployees[0].departmentId).toBe('department-2');
+  expect(state.createdEmployees[0].policy.departmentId).toBe('department-2');
+  expect(state.createdEmployees[0].roleCode).toBe('business_analyst');
+  expect(state.createdEmployees[0].tools).toEqual(['data.analyze', 'report.create']);
+});
+
+test('switching workspace clears old team cards and a team-bound employee builder', async ({ page }) => {
+  await mockWorkspaceSession(page, 'manager', ['workspace-1', 'workspace-2']);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الفرق والأقسام' }).click();
+  await expect(page.getByRole('heading', { name: 'العمليات' })).toBeVisible();
+
+  const workspaceSelect = page.getByLabel('مساحة العمل الحالية');
+  await workspaceSelect.selectOption('workspace-2');
+  await expect(page.getByRole('heading', { name: 'العمليات' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /إضافة موظف إلى فريق/ })).toHaveCount(0);
+
+  await workspaceSelect.selectOption('workspace-1');
+  await expect(page.getByRole('button', { name: 'إضافة موظف إلى فريق العمليات' })).toBeVisible();
+  await page.getByRole('button', { name: 'إضافة موظف إلى فريق العمليات' }).click();
+  await expect(page.getByText('الفريق المحدد: العمليات')).toBeVisible();
+  await workspaceSelect.selectOption('workspace-2');
+  await expect(page.getByRole('heading', { name: 'منشئ الموظف الرقمي' })).toHaveCount(0);
+});
+
+test('a late task response from the previous workspace cannot reload its dashboard', async ({ page }) => {
+  let markTaskStarted;
+  let releaseTask;
+  const taskStarted = new Promise(resolve => { markTaskStarted = resolve; });
+  const taskGate = new Promise(resolve => { releaseTask = resolve; });
+  const state = await mockWorkspaceSession(page, 'manager', ['workspace-1', 'workspace-2'], null, async route => {
+    markTaskStarted();
+    await taskGate;
+    const input = route.request().postDataJSON();
+    return route.fulfill({ status: 201, json: { data: { id: 'delayed-task', ...input, employee_id: input.employeeId, status: 'queued' } } });
+  });
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'المهام', exact: true }).click();
+  await page.getByLabel('عنوان المهمة').fill('مراجعة خاصة بالمساحة الأولى');
+  await page.getByLabel('الهدف والنتيجة المطلوبة').fill('تحليل داخلي للمساحة الأولى.');
+  await page.getByLabel('الموظف الرقمي').selectOption('employee-1');
+  const createResponse = page.waitForResponse(response => new URL(response.url()).pathname.endsWith('/tasks') && response.request().method() === 'POST');
+  await page.getByRole('button', { name: 'إنشاء المهمة' }).click();
+  await taskStarted;
+
+  const workspaceSelect = page.getByLabel('مساحة العمل الحالية');
+  await workspaceSelect.selectOption('workspace-2');
+  await expect(workspaceSelect).toHaveValue('workspace-2');
+  await expect(page.getByLabel('عنوان المهمة')).toHaveValue('');
+  await workspaceSelect.selectOption('workspace-1');
+  await expect(workspaceSelect).toHaveValue('workspace-1');
+  await expect(page.getByLabel('عنوان المهمة')).toHaveValue('');
+  const oldWorkspaceReads = state.dashboardWorkspaceReads.filter(id => id === 'workspace-1').length;
+  expect(state.dashboardWorkspaceReads).toContain('workspace-2');
+
+  releaseTask();
+  await createResponse;
+  await page.waitForLoadState('networkidle');
+  expect(state.dashboardWorkspaceReads.filter(id => id === 'workspace-1').length).toBe(oldWorkspaceReads);
+  await expect(page.getByText('حُفظت المهمة في مساحة العمل. ابدأ التخطيط والتنفيذ من بطاقة المهمة عندما تكون جاهزًا.')).toHaveCount(0);
+});
+
+test('scheduled routines from a previous workspace are hidden after switching workspaces', async ({ page }) => {
+  await mockWorkspaceSession(page, 'manager', ['workspace-1', 'workspace-2']);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الأتمتة' }).click();
+  await page.getByLabel('اسم الأتمتة').fill('روتين المساحة الأولى');
+  await page.getByLabel('هدف العملية').fill('مراجعة دورية خاصة بالمستأجر الأول.');
+  await page.getByLabel('الموظف المسؤول').selectOption('employee-1');
+  await page.getByRole('button', { name: 'حفظ الأتمتة' }).click();
+  await expect(page.getByText('روتين المساحة الأولى')).toBeVisible();
+
+  const workspaceSelect = page.getByLabel('مساحة العمل الحالية');
+  await workspaceSelect.selectOption('workspace-2');
+  await expect(workspaceSelect).toHaveValue('workspace-2');
+  await expect(page.getByText('لا توجد أتمتة بعد')).toBeVisible();
+  await expect(page.getByText('روتين المساحة الأولى')).toHaveCount(0);
+});
+
+test('manager can schedule and pause a recurring workspace routine', async ({ page }) => {
+  await mockWorkspaceSession(page);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الأتمتة' }).click();
+  await page.getByLabel('اسم الأتمتة').fill('مراجعة المبيعات اليومية');
+  await page.getByLabel('هدف العملية').fill('حلل أداء المبيعات وأبرز التغيرات.');
+  await page.getByLabel('الموظف المسؤول').selectOption('employee-1');
+  await page.getByLabel('التكرار').selectOption('1440');
+  await page.getByRole('button', { name: 'حفظ الأتمتة' }).click();
+  await expect(page.getByText('مراجعة المبيعات اليومية')).toBeVisible();
+  await page.getByRole('button', { name: 'إيقاف مؤقت' }).click();
+  await expect(page.getByRole('button', { name: 'استئناف' })).toBeVisible();
+});
+
+test('analytics tab presents workspace runtime and billing usage without implying invoicing', async ({ page }) => {
+  await mockWorkspaceSession(page);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'التحليلات والفوترة' }).click();
+  await expect(page.getByText('75٪')).toBeVisible();
+  await expect(page.getByText('Growth')).toBeVisible();
+  await expect(page.getByText(/الفوترة الحالية تعرض الاستخدام والحدود/)).toBeVisible();
 });

@@ -15,13 +15,17 @@ and (
  or name ilike '%خدمة%' or name ilike '%تجربة العملاء%' or name ilike '%تجربة المستفيد%'
  or name ilike '%مدير العمليات%' or name ilike '%مساعد تنفيذي%' or name ilike '%مدير المشاريع%'
 );
-update public.employee_role_templates
-set tools = case
- when jsonb_typeof(tools)='array' and not (tools @> '["app.api.read"]'::jsonb)
- then tools || '["app.api.read"]'::jsonb
- else tools
- end
-where name ilike '%محاسب%' or name ilike '%مالية%' or name ilike '%موارد بشرية%' or name ilike '%HR%'
- or name ilike '%تسويق%' or name ilike '%مبيعات%' or name ilike '%علاقات العملاء%'
- or name ilike '%خدمة%' or name ilike '%تجربة العملاء%' or name ilike '%تجربة المستفيد%'
- or name ilike '%مدير العمليات%' or name ilike '%مساعد تنفيذي%' or name ilike '%مدير المشاريع%';
+DO $$ BEGIN
+ IF to_regclass('public.employee_role_templates') IS NOT NULL THEN
+  UPDATE public.employee_role_templates
+  SET tools = case
+   when jsonb_typeof(tools)='array' and not (tools @> '["app.api.read"]'::jsonb)
+   then tools || '["app.api.read"]'::jsonb
+   else tools
+  end
+  WHERE name ilike '%محاسب%' or name ilike '%مالية%' or name ilike '%موارد بشرية%' or name ilike '%HR%'
+   or name ilike '%تسويق%' or name ilike '%مبيعات%' or name ilike '%علاقات العملاء%'
+   or name ilike '%خدمة%' or name ilike '%تجربة العملاء%' or name ilike '%تجربة المستفيد%'
+   or name ilike '%مدير العمليات%' or name ilike '%مساعد تنفيذي%' or name ilike '%مدير المشاريع%';
+ END IF;
+END $$;

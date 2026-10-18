@@ -1,96 +1,158 @@
 import { randomUUID } from 'node:crypto';
-import { withTransaction } from './db.js';
+import { query, withTransaction } from './db.js';
+import { getTool, needsApproval } from './tool-registry.js';
 
-const PACKS={
- hospital:{label:'المستشفيات',departments:[['الإدارة التنفيذية','قيادة المستشفى والقرارات',['مدير المستشفى','مساعد مدير المستشفى']],['العمليات والاستقبال','تشغيل اليوم والمواعيد والاستقبال',['مدير العمليات','موظف الاستقبال','منسق المواعيد']],['المرضى والتأمين والجودة','تجربة المرضى والتأمين والجودة',['مسؤول خدمة المرضى','موظف مطالبات وتأمين','مسؤول الجودة']],['المالية والموارد البشرية','المالية والقوى العاملة',['محلل مالي','موظف موارد بشرية']],['المشتريات والمخزون والتحليل','الإمداد والتحليل التشغيلي',['موظف مشتريات','مسؤول مخزون طبي','محلل عمليات']]]},
- restaurant:{label:'المطاعم',departments:[['الإدارة والتشغيل','قيادة الفروع والأداء',['مدير مطعم','مدير فروع']],['الاستقبال وخدمة العملاء','الحجوزات والطلبات وتجربة العميل',['موظف استقبال وحجوزات','موظف خدمة العملاء','منسق الطلبات والتوصيل']],['المشتريات والمخزون','التوريد والمخزون وتقليل الهدر',['موظف المشتريات','موظف المخزون']],['المالية والموارد البشرية','المالية والقوى العاملة',['المحاسب','موظف الموارد البشرية']],['التسويق والجودة','النمو والجودة وسلامة الغذاء',['مسؤول التسويق','مسؤول مراقبة الجودة','محلل أداء المطاعم']]]},
- hotel:{label:'الفنادق',departments:[['الإدارة والتشغيل','قيادة الفندق والتشغيل',['مدير فندق','مدير عمليات']],['الحجوزات والاستقبال','الحجوزات والوصول والمغادرة',['موظف حجوزات','موظف استقبال','موظف خدمة النزلاء']],['الإشغال والتدبير والصيانة','الإشغال وجاهزية الغرف والصيانة',['مدير الإشغال','مدير التدبير الفندقي','منسق الصيانة']],['المشتريات والمخزون','الإمداد والتوريد',['مسؤول المشتريات','مسؤول المخزون']],['المالية والموارد البشرية والتسويق','الإيرادات والقوى العاملة والنمو',['مسؤول المالية','مسؤول الموارد البشرية','مسؤول التسويق']]]},
- enterprise:{label:'الشركات',departments:[['الإدارة التنفيذية','الاستراتيجية ودعم القيادة',['CEO Assistant','المحلل التنفيذي']],['العمليات والمشاريع','التشغيل وإدارة المشاريع',['مدير عمليات','Project Manager']],['المبيعات ونجاح العملاء','الإيرادات والعملاء',['Sales Manager','Customer Success']],['التسويق والبيانات','النمو والتحليل',['Marketing Manager','Data Analyst']],['الوظائف المؤسسية','المالية والموارد البشرية والمشتريات والقانون',['Finance Manager','HR Manager','Procurement Manager','Legal Operations']]]},
- ecommerce:{label:'التجارة الإلكترونية',departments:[['الإدارة والمتجر','إدارة المتجر والأداء',['مدير التجارة الإلكترونية','مدير المتجر الرقمي']],['العملاء والمبيعات','المبيعات وخدمة العملاء والاحتفاظ',['موظف خدمة العملاء','موظف المبيعات','مسؤول نجاح العملاء']],['المنتجات والمخزون','كتالوج المنتجات والمخزون والتسعير',['مدير المنتجات','محلل المخزون','مسؤول التسعير']],['المشتريات واللوجستيات','الموردون والطلبات والشحن',['موظف المشتريات','منسق الطلبات والشحن']],['التسويق والتحليلات','النمو والإعلانات والتحليل',['مسؤول التسويق الرقمي','محلل التجارة الإلكترونية']]]}, government:{label:'الجهات الحكومية',departments:[['الخدمات والمعاملات','الخدمات المقدمة للمستفيدين',['موظف خدمات','موظف معاملات']],['الموارد البشرية والمشتريات','الدعم المؤسسي',['موظف موارد بشرية','موظف مشتريات']],['البيانات والمتابعة','القياس والمتابعة',['محلل بيانات','مسؤول متابعة','محلل التقارير الحكومية']],['الشكاوى والجودة','تجربة المستفيد والجودة',['مسؤول شكاوى','مسؤول جودة']],['العمليات والتدقيق','التشغيل والرقابة',['مدير عمليات','موظف تدقيق ومراجعة','محلل أداء الجهة']]]}
+const PACK_LABELS = {
+  hospital: 'المستشفيات', restaurant: 'المطاعم', hotel: 'الفنادق', enterprise: 'الشركات', government: 'الجهات الحكومية',
+  retail: 'التجزئة', ecommerce: 'التجارة الإلكترونية', finance: 'المالية', sales: 'المبيعات', customer_service: 'خدمة العملاء', hr: 'الموارد البشرية',
+  marketing: 'التسويق', operations: 'العمليات',
 };
+const SAFE_PERMISSIONS = new Set(['read_workspace', 'read_tasks', 'read_knowledge']);
+const asArray = value => Array.isArray(value) ? value.filter(item => typeof item === 'string') : [];
 
-const roleSkills={
- 'مدير المستشفى':['قيادة التشغيل','تحليل الأداء','إدارة المخاطر'],'مدير مطعم':['إدارة الفروع','تحليل المبيعات','تحسين التشغيل'],'مدير فندق':['إدارة الضيافة','الإشغال','الجودة'],
- 'CEO Assistant':['إدارة الأولويات','التقارير التنفيذية','تنسيق الاجتماعات'],'المحلل التنفيذي':['تحليل المؤشرات','التقارير التنفيذية','دعم القرار'],'مدير عمليات':['تصميم الإجراءات','إدارة الأولويات','تحسين الأداء'],'Project Manager':['تخطيط المشاريع','إدارة الاعتماديات','إدارة المخاطر'],'Data Analyst':['تحليل البيانات','المؤشرات','استخراج الرؤى'],'Legal Operations':['إدارة العمليات القانونية','المستندات','المتابعة'],
- 'موظف مطالبات وتأمين':['معالجة المطالبات','التحقق من المستندات','متابعة التأمين'],'مسؤول مراقبة الجودة':['التدقيق التشغيلي','مؤشرات الجودة','الإجراءات التصحيحية'],'موظف تدقيق ومراجعة':['المراجعة','الامتثال','التدقيق'],'محلل أداء المطاعم':['تحليل المبيعات','مؤشرات الفروع','تقارير الأداء'],'محلل أداء الجهة':['تحليل الأداء الحكومي','المؤشرات','التقارير'],'محلل التقارير الحكومية':['تحليل التقارير','المؤشرات','التدقيق']
-};
-
-const roleMission={
- 'مدير المستشفى':'قيادة التشغيل اليومي للمستشفى وتحسين سلامة المرضى وجودة الخدمة وكفاءة الموارد.',
- 'مدير مطعم':'رفع أداء المطعم والفروع وتحسين تجربة العميل والمبيعات وتقليل الهدر.',
- 'مدير فندق':'تعظيم جودة الضيافة والإشغال وكفاءة التشغيل وتجربة النزيل.',
- 'CEO Assistant':'دعم القيادة التنفيذية بالأولويات والملخصات والمتابعة والتنسيق المنظم.',
- 'المحلل التنفيذي':'تحويل بيانات المؤسسة إلى مؤشرات ورؤى وتوصيات قابلة للقرار.',
- 'مدير عمليات':'تحسين العمليات، كشف الاختناقات، ومتابعة التنفيذ بين الفرق.',
- 'Project Manager':'تخطيط المشاريع ومتابعة الاعتماديات والمخاطر والمخرجات حتى الإغلاق.',
- 'Data Analyst':'تحليل البيانات واكتشاف الاتجاهات والانحرافات وبناء تقارير دقيقة.',
- 'Legal Operations':'تنظيم العمليات القانونية والمستندات والمتابعات مع الالتزام بالصلاحيات.',
- 'موظف مطالبات وتأمين':'مراجعة المطالبات والتحقق من اكتمال المستندات ومتابعة الحالات وفق السياسة.',
- 'مسؤول مراقبة الجودة':'مراقبة مؤشرات الجودة واكتشاف الانحرافات واقتراح الإجراءات التصحيحية.',
- 'موظف تدقيق ومراجعة':'تنفيذ المراجعات والتحقق من الامتثال وتوثيق الملاحظات والأدلة.',
- 'محلل أداء المطاعم':'تحليل أداء المبيعات والفروع وتحويل النتائج إلى توصيات تشغيلية.',
- 'محلل أداء الجهة':'قياس أداء الجهة ومتابعة المؤشرات والتباينات والتقارير الإدارية.',
- 'محلل التقارير الحكومية':'إعداد وتحليل التقارير الحكومية والتحقق من الاتساق والمؤشرات.'
-};
-
-const ecommerceRoleSkills={
- 'مدير التجارة الإلكترونية':['إدارة المتجر','تحليل المبيعات','تحسين التحويل','إدارة العمليات'],
- 'مدير المتجر الرقمي':['إدارة الكتالوج','الطلبات','تجربة العميل','التشغيل اليومي'],
- 'موظف خدمة العملاء':['خدمة العملاء','معالجة الاستفسارات','متابعة الطلبات','الاحتفاظ بالعملاء'],
- 'موظف المبيعات':['إدارة العملاء المحتملين','التوصيات','المتابعة','تحويل المبيعات'],
- 'مسؤول نجاح العملاء':['رضا العملاء','الاحتفاظ','معالجة التصعيدات','تحليل تجربة العميل'],
- 'مدير المنتجات':['إدارة الكتالوج','تحسين أوصاف المنتجات','تصنيف المنتجات','جودة البيانات'],
- 'محلل المخزون':['مراقبة المخزون','التنبؤ بالنقص','تحليل الطلب','تنبيهات إعادة الطلب'],
- 'مسؤول التسعير':['تحليل الأسعار','مراقبة المنافسين','هوامش الربح','العروض'],
- 'موظف المشتريات':['البحث عن الموردين','مقارنة الأسعار','أوامر الشراء','متابعة التوريد'],
- 'منسق الطلبات والشحن':['معالجة الطلبات','التنسيق مع الشحن','تتبع التسليم','الاستثناءات'],
- 'مسؤول التسويق الرقمي':['الحملات الرقمية','المحتوى','التجزئة','تحليل الأداء'],
- 'محلل التجارة الإلكترونية':['تحليل المبيعات','التحويل','قيمة العميل','التقارير التنفيذية']
-};
-const defaultSkills=['إدارة المهام','إعداد التقارير','التعاون بين الأقسام'];
-const defaultTools=['data.analyze','report.create','task.comment','task.handoff'];
-const ecommerceTools=['commerce.orders.list','commerce.products.list','commerce.inventory.alerts','commerce.analytics.summary','commerce.customer.lookup'];
-const defaultPermissions=['read_workspace','read_tasks','create_tasks','read_knowledge','write_knowledge','read_reports'];
-const sensitive=r=>/مالية|مشتريات|تدقيق|مراجعة|جودة|موارد بشرية|تأمين|Legal|Finance|Procurement|HR/.test(r);
-
-function profileFor(role,pack,departmentId){
- const skills=[...new Set([...((pack==='ecommerce'&&ecommerceRoleSkills[role])||roleSkills[role]||[role,'إدارة الإجراءات','قياس الأداء']),...defaultSkills])];
- const mission=roleMission[role]||`تنفيذ مسؤوليات ${role} بكفاءة ووفق سياسات المؤسسة وتحقيق نتائج قابلة للقياس.`;
- const supervised=sensitive(role)||/مدير|CEO|Project Manager|Legal|تسعير|مشتريات|شحن/.test(role);
- return {
-  goal:mission,
-  skills,
-  tools:pack==='ecommerce'?[...defaultTools,...ecommerceTools]:defaultTools,
-  permissions:defaultPermissions,
-  policy:{industryPack:pack,departmentId,readyTemplate:true,autonomy:supervised?'supervised':'balanced',approvalMode:'required',sensitiveActionsRequireApproval:true,decisionPrinciples:['التزم بالدور والصلاحيات','تحقق من البيانات قبل القرار','وثّق النتيجة','صعّد المخاطر أو الغموض إلى المدير']},
-  knowledge:[
-   `المهمة الأساسية: ${mission}`,
-   `مسؤوليات الدور: ${skills.join('، ')}.`,
-   'طريقة العمل: افهم الهدف، حلله إلى خطوات قابلة للتنفيذ، استخدم الأدوات المسموح بها فقط، وثّق النتيجة، ونسّق مع الموظف المناسب عند الحاجة.',
-   'الحوكمة: لا تنفذ إجراءً ماليًا أو حذفًا أو شراءً أو مراسلة جماعية أو أي إجراء عالي المخاطر دون موافقة بشرية.'
-  ]
- };
+export async function listIndustryPacks() {
+  const result = await query(`
+    select sector as id, max(sector_label) as label,
+      count(*)::int as roles,
+      count(*) filter (where provision_by_default=true)::int as employees,
+      count(distinct department_name) filter (where provision_by_default=true)::int as departments
+    from employee_role_templates
+    where active=true
+    group by sector
+    having count(*) filter (where provision_by_default=true) > 0
+    order by sector
+  `);
+  const packs = result.rows.map(row => ({ ...row, label: row.label || PACK_LABELS[row.id] || row.id, ready: true }));
+  const retail = packs.find(pack => pack.id === 'retail');
+  return retail ? [...packs, { ...retail, id: 'ecommerce', label: PACK_LABELS.ecommerce }].sort((a, b) => a.id.localeCompare(b.id)) : packs;
 }
 
-export function listIndustryPacks(){return Object.entries(PACKS).map(([id,p])=>({id,label:p.label,departments:p.departments.length,roles:p.departments.reduce((n,d)=>n+d[2].length,0),employees:p.departments.reduce((n,d)=>n+d[2].length,0)}));}
+export async function provisionIndustryPack({ workspaceId, pack, actorUserId }) {
+  const label = PACK_LABELS[pack];
+  if (!label) throw Object.assign(new Error(`Unknown industry pack: ${pack}`), { status: 400 });
+  const catalogSector = pack === 'ecommerce' ? 'retail' : pack;
 
-export async function provisionIndustryPack({workspaceId,pack,actorUserId}){
- const template=PACKS[pack];if(!template)throw Object.assign(new Error(`Unknown industry pack: ${pack}`),{status:400});
- return withTransaction(async client=>{
-  const existing=await client.query("select id from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2 limit 1",[workspaceId,pack]);
-  if(existing.rowCount){const c=await client.query("select count(*)::int employees from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2",[workspaceId,pack]);const d=await client.query("select count(*)::int departments from public.departments where workspace_id=$1 and description like $2",[workspaceId,`${template.label} —%`]);return{created:false,pack,label:template.label,employees:c.rows[0].employees,departments:d.rows[0].departments,existingEmployeeId:existing.rows[0].id};}
-  await client.query("insert into public.workspace_profiles(workspace_id,sector,industry,operating_model,onboarding_stage,settings,updated_at) values($1,$2,$3,'digital_workforce','ready',$4::jsonb,now()) on conflict(workspace_id) do update set sector=excluded.sector,industry=excluded.industry,onboarding_stage='ready',settings=public.workspace_profiles.settings||excluded.settings,updated_at=now()",[workspaceId,pack,template.label,JSON.stringify({readyWorkforce:true,governance:'approval-gated',catalogVersion:'2026.09',operatingPrinciples:['role-first','least-privilege','audit-every-action','human-approval-for-risk']})]);
-  const createdDepartments=[],createdEmployees=[];
-  for(const [departmentName,description,roles] of template.departments){const departmentId=randomUUID();await client.query('insert into public.departments(id,workspace_id,name,description) values($1,$2,$3,$4)',[departmentId,workspaceId,departmentName,`${template.label} — ${description}`]);const ids=[];
-   for(const role of roles){const id=randomUUID(),profile=profileFor(role,pack,departmentId);
-    await client.query(`insert into public.ai_employees(id,workspace_id,name,role,goal,skills,tools,permissions,memory_config,model,budget_cents,schedule,status,policy) values($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,$9::jsonb,$10,$11,$12::jsonb,$13,$14::jsonb)`,[id,workspaceId,role,role,profile.goal,JSON.stringify(profile.skills),JSON.stringify(profile.tools),JSON.stringify(profile.permissions),JSON.stringify({enabled:true,retentionDays:365,contextScope:'workspace',memoryTypes:['facts','decisions','preferences','task_results']}),'default',5000,JSON.stringify({type:'always',timezone:'UTC'}),'active',JSON.stringify(profile.policy)]);
-    await client.query(`insert into public.employee_goals(id,workspace_id,employee_id,title,target,current_value,unit,period,status) values($1,$2,$3,$4,$5,0,$6,$7,'active')`,[randomUUID(),workspaceId,id,`مؤشر أداء ${role}`,100,'نسبة','شهري']);
-    await client.query(`insert into public.employee_knowledge(id,workspace_id,employee_id,title,content,source,metadata) values($1,$2,$3,$4,$5,$6,$7::jsonb)`,[randomUUID(),workspaceId,id,'دليل الدور',profile.knowledge.join('\n'),'ENJAZ ready workforce catalog',JSON.stringify({industryPack:pack,departmentId,readyTemplate:true,role,mission:profile.goal})]);
-    ids.push(id);createdEmployees.push({id,name:role,departmentId});
-   }
-   await client.query('update public.departments set manager_employee_id=$1,updated_at=now() where id=$2 and workspace_id=$3',[ids[0],departmentId,workspaceId]);createdDepartments.push({id:departmentId,name:departmentName,managerEmployeeId:ids[0]});
-  }
-  await client.query(`insert into public.audit_events(id,workspace_id,employee_id,event_type,actor_type,action,metadata) values($1,$2,$3,$4,$5,$6,$7::jsonb)`,[randomUUID(),workspaceId,createdEmployees[0]?.id||null,'industry.pack.provisioned','user','industry.provision',JSON.stringify({pack,actorUserId,employees:createdEmployees.length,departments:createdDepartments.length,readyTemplates:true,operatingSystem:'digital_workforce',roleAware:true})]);
-  return{created:true,pack,label:template.label,employees:createdEmployees.length,departments:createdDepartments.length,createdDepartments,createdEmployees};
- });
+  return withTransaction(async client => {
+    const workspace = await client.query('select id from public.workspaces where id=$1 for update', [workspaceId]);
+    if (!workspace.rowCount) throw Object.assign(new Error('Workspace not found'), { status: 404 });
+    const subscription = await client.query(`
+      select s.plan_id,s.status,p.max_employees
+      from workspace_subscriptions s
+      join billing_plans p on p.id=s.plan_id
+      where s.workspace_id=$1
+      for update of s
+    `, [workspaceId]);
+    if (!subscription.rowCount) throw Object.assign(new Error('Workspace subscription is not configured'), { status: 409, code: 'SUBSCRIPTION_NOT_CONFIGURED' });
+    if (!['active', 'trialing'].includes(subscription.rows[0].status)) {
+      throw Object.assign(new Error('Workspace subscription is not active'), { status: 402, code: 'SUBSCRIPTION_INACTIVE' });
+    }
+
+    const templates = await client.query(`
+      select * from employee_role_templates
+      where sector=$1 and active=true and provision_by_default=true
+      order by department_name,sort_order,name
+    `, [catalogSector]);
+    if (!templates.rowCount) throw Object.assign(new Error('No starter roles configured for this sector'), { status: 404 });
+
+    const existing = await client.query("select id from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2 limit 1", [workspaceId, catalogSector]);
+    if (existing.rowCount) {
+      const expectedRoleCodes = templates.rows.map(role => role.role_code).filter(Boolean);
+      const completeness = await client.query(`
+        select count(distinct coalesce(role_code,policy->>'roleCode'))::int as count
+        from public.ai_employees
+        where workspace_id=$1 and policy->>'industryPack'=$2
+          and coalesce(role_code,policy->>'roleCode')=any($3::text[])
+      `, [workspaceId, catalogSector, expectedRoleCodes]);
+      if (Number(completeness.rows[0]?.count || 0) < expectedRoleCodes.length) {
+        throw Object.assign(new Error('An incomplete starter team from an earlier provisioning attempt needs reconciliation'), { status: 409, code: 'INDUSTRY_PACK_INCOMPLETE' });
+      }
+      const employees = await client.query("select count(*)::int as count from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2", [workspaceId, catalogSector]);
+      const departments = await client.query("select count(distinct coalesce(department_id::text,policy->>'departmentId'))::int as count from public.ai_employees where workspace_id=$1 and policy->>'industryPack'=$2", [workspaceId, catalogSector]);
+      return { created: false, pack, label, employees: employees.rows[0].count, departments: departments.rows[0].count, existingEmployeeId: existing.rows[0].id };
+    }
+
+    const usage = await client.query('select count(*)::int as count from ai_employees where workspace_id=$1', [workspaceId]);
+    const currentEmployees = Number(usage.rows[0]?.count || 0);
+    const maxEmployees = Number(subscription.rows[0].max_employees);
+    const available = Math.max(0, maxEmployees - currentEmployees);
+    if (templates.rowCount > available) {
+      throw Object.assign(new Error('The selected starter team exceeds the employee limit on this plan'), {
+        status: 402, code: 'EMPLOYEE_LIMIT_EXCEEDED', required: templates.rowCount, available, planLimit: maxEmployees,
+      });
+    }
+
+    await client.query(`
+      insert into public.workspace_profiles(workspace_id,sector,industry,operating_model,onboarding_stage,settings,updated_at)
+      values($1,$2,$3,'digital_workforce','ready',$4::jsonb,now())
+      on conflict(workspace_id) do update set sector=excluded.sector,industry=excluded.industry,
+        onboarding_stage='ready',settings=coalesce(public.workspace_profiles.settings,'{}'::jsonb)||excluded.settings,updated_at=now()
+    `, [workspaceId, catalogSector, label, JSON.stringify({ readyWorkforce: true, governance: 'approval-gated', catalogVersion: '2026.10', operatingPrinciples: ['role-first', 'least-privilege', 'audit-every-action', 'human-approval-for-risk'] })]);
+
+    const byDepartment = new Map();
+    for (const role of templates.rows) {
+      const departmentName = role.department_name || 'فريق التشغيل';
+      if (!byDepartment.has(departmentName)) byDepartment.set(departmentName, []);
+      byDepartment.get(departmentName).push(role);
+    }
+
+    const createdDepartments = [];
+    const createdEmployees = [];
+    for (const [departmentName, roles] of byDepartment) {
+      const departmentId = randomUUID();
+      await client.query('insert into public.departments(id,workspace_id,name,description) values($1,$2,$3,$4)', [departmentId, workspaceId, departmentName, `فريق افتتاحي للقوى العاملة الرقمية في قطاع ${label}`]);
+      const employeeIds = [];
+      for (const role of roles) {
+        const tools = asArray(role.tools).filter(name => {
+          const tool = getTool(name);
+          return Boolean(tool) && tool.risk !== 'high' && !needsApproval(name);
+        });
+        if (!tools.length) throw new Error(`Starter template ${role.role_code} has no registered read-safe tools`);
+        const permissions = asArray(role.permissions).filter(permission => SAFE_PERMISSIONS.has(permission));
+        const employeeId = randomUUID();
+        const policy = {
+          industryPack: catalogSector,
+          templateId: role.id,
+          roleCode: role.role_code,
+          departmentId,
+          approvalMode: 'required',
+          sensitiveActionsRequireApproval: true,
+        };
+        await client.query(`
+          insert into public.ai_employees
+            (id,workspace_id,department_id,role_code,name,role,goal,mission,responsibilities,skills,tools,permissions,memory_config,model,budget_cents,schedule,status,policy)
+          values($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10::jsonb,$11::jsonb,$12::jsonb,$13::jsonb,$14,$15,$16::jsonb,$17,$18::jsonb)
+        `, [
+          employeeId, workspaceId, departmentId, role.role_code, role.name, role.name, role.default_goal,
+          role.mission || role.description || role.default_goal, JSON.stringify(asArray(role.responsibilities)),
+          JSON.stringify(asArray(role.skills)), JSON.stringify(tools), JSON.stringify(permissions),
+          JSON.stringify({ enabled: true, retentionDays: 365, contextScope: 'workspace', memoryTypes: ['facts', 'decisions', 'preferences', 'task_results'] }),
+          'default', Number(role.default_budget_cents) || 5000, JSON.stringify({ type: 'always', timezone: 'UTC' }), 'active', JSON.stringify(policy),
+        ]);
+        await client.query(`
+          insert into public.employee_goals(id,workspace_id,employee_id,title,target,current_value,unit,period,status)
+          values($1,$2,$3,$4,100,0,'نسبة','شهري','active')
+        `, [randomUUID(), workspaceId, employeeId, role.default_goal || `تحقيق الهدف التشغيلي لدور ${role.name}`]);
+        const knowledge = [
+          `الهدف التشغيلي: ${role.default_goal}`,
+          `رسالة الدور: ${role.mission || role.description || role.default_goal}`,
+          `المسؤوليات: ${asArray(role.responsibilities).join('، ')}.`,
+          'استخدم الأدوات المسموحة فقط، وثّق النتائج، وصعّد الإجراءات المالية أو الخارجية أو الحساسة إلى مدير المساحة.',
+        ].join('\n');
+        await client.query(`
+          insert into public.employee_knowledge(id,workspace_id,employee_id,title,content,source,metadata)
+          values($1,$2,$3,$4,$5,$6,$7::jsonb)
+        `, [randomUUID(), workspaceId, employeeId, 'الهوية المهنية والدور', knowledge, 'ENJAZ ready workforce catalog', JSON.stringify({ industryPack: catalogSector, templateId: role.id, roleCode: role.role_code, departmentId })]);
+        employeeIds.push(employeeId);
+        createdEmployees.push({ id: employeeId, name: role.name, roleCode: role.role_code, departmentId });
+      }
+      await client.query('update public.departments set manager_employee_id=$1,updated_at=now() where id=$2 and workspace_id=$3', [employeeIds[0], departmentId, workspaceId]);
+      createdDepartments.push({ id: departmentId, name: departmentName, managerEmployeeId: employeeIds[0] });
+    }
+
+    await client.query(`
+      insert into public.audit_events(id,workspace_id,employee_id,event_type,actor_type,action,metadata)
+      values($1,$2,$3,'industry.pack.provisioned','user','industry.provision',$4::jsonb)
+    `, [randomUUID(), workspaceId, createdEmployees[0]?.id || null, JSON.stringify({ pack: catalogSector, actorUserId, employees: createdEmployees.length, departments: createdDepartments.length, readyTemplates: true, catalogVersion: '2026.10' })]);
+    return { created: true, pack, label, employees: createdEmployees.length, departments: createdDepartments.length, createdDepartments, createdEmployees };
+  });
 }

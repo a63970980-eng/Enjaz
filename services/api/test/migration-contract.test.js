@@ -17,3 +17,90 @@ test('initial schema declares the core tenant boundary', async () => {
     assert.match(source, new RegExp(`create table ${table}`));
   }
 });
+
+test('workforce role templates are versioned for both API and Supabase databases', async () => {
+  const apiMigration = await readFile(new URL('../db/migrations/032_employee_role_template_catalog.sql', import.meta.url), 'utf8');
+  const supabaseMigration = await readFile(new URL('../../../supabase/migrations/20261018100000_employee_role_template_catalog.sql', import.meta.url), 'utf8');
+  for (const source of [apiMigration, supabaseMigration]) {
+    for (const column of ['role_code','sector','sector_label','department_name','default_goal','responsibilities','tools','provision_by_default']) {
+      assert.match(source, new RegExp(column));
+    }
+    assert.match(source, /create table if not exists public\.employee_role_templates/i);
+    assert.match(source, /create unique index|unique\s*\(/i);
+  }
+  assert.match(apiMigration, /restaurant_operations_lead/);
+  assert.match(supabaseMigration, /government_performance_analyst/);
+});
+
+test('workforce API reads the canonical role template catalog and not phantom tables', async () => {
+  const repository = await readFile(new URL('../src/workforce-repository.js', import.meta.url), 'utf8');
+  assert.match(repository, /employee_role_templates/);
+  assert.doesNotMatch(repository, /from workforce_roles|from workforce_role_industry_contexts/);
+});
+
+test('industry starter provisioning uses catalog-backed roles with normalized team assignments', async () => {
+  const source = await readFile(new URL('../../../supabase/migrations/20261018110000_atomic_industry_pack_provisioning.sql', import.meta.url), 'utf8');
+  assert.match(source, /provision_by_default=true/);
+  assert.match(source, /role_code/);
+  assert.match(source, /department_id/);
+  assert.match(source, /manager_employee_id/);
+  assert.match(source, /v_safe_tools/);
+  assert.match(source, /v_max_employees/);
+  assert.match(source, /EMPLOYEE_LIMIT_EXCEEDED/);
+});
+
+test('API starter provisioning is transactional, quota-gated, and validates registered low-risk tools', async () => {
+  const source = await readFile(new URL('../src/industry-provisioning.js', import.meta.url), 'utf8');
+  assert.match(source, /for update of s/i);
+  assert.match(source, /select id from public\.workspaces where id=\$1 for update/i);
+  assert.match(source, /provision_by_default=true/);
+  assert.match(source, /EMPLOYEE_LIMIT_EXCEEDED/);
+  assert.match(source, /getTool\(name\)/);
+  assert.match(source, /needsApproval\(name\)/);
+  assert.match(source, /department_id,role_code/);
+});
+
+test('Supabase starter provisioning delegates all writes to one locked database transaction', async () => {
+  const migration = await readFile(new URL('../../../supabase/migrations/20261018110000_atomic_industry_pack_provisioning.sql', import.meta.url), 'utf8');
+  const apiMigration = await readFile(new URL('../db/migrations/20261018110000_atomic_industry_pack_provisioning.sql', import.meta.url), 'utf8');
+  const edge = await readFile(new URL('../../../supabase/functions/enjaz-industry/index.ts', import.meta.url), 'utf8');
+  for (const source of [migration, apiMigration]) {
+    assert.match(source, /create or replace function public\.provision_industry_pack/i);
+    assert.match(source, /for update/i);
+    assert.match(source, /EMPLOYEE_LIMIT_EXCEEDED/);
+    assert.match(source, /employee_role_templates/);
+  }
+  assert.match(edge, /\.rpc\("provision_industry_pack"/);
+  assert.doesNotMatch(edge, /\.from\("ai_employees"\)\.insert/);
+});
+
+test('industry pack API distinguishes first provision from an idempotent replay', async () => {
+  const source = await readFile(new URL('../src/index.js', import.meta.url), 'utf8');
+  assert.match(source, /result\.created\?201:200/);
+});
+
+test('API schema adds employee department ownership before atomic starter provisioning', async () => {
+  const migration = await readFile(new URL('../db/migrations/033_employee_department_assignment.sql', import.meta.url), 'utf8');
+  assert.match(migration, /add column if not exists department_id uuid references public\.departments\(id\) on delete set null/i);
+  assert.match(migration, /create index if not exists ai_employees_department_id_idx/i);
+});
+
+test('starter provisioning does not report an incomplete legacy pack as a successful replay', async () => {
+  const api = await readFile(new URL('../src/industry-provisioning.js', import.meta.url), 'utf8');
+  const rpc = await readFile(new URL('../db/migrations/20261018110000_atomic_industry_pack_provisioning.sql', import.meta.url), 'utf8');
+  const supabase = await readFile(new URL('../../../supabase/migrations/20261018110000_atomic_industry_pack_provisioning.sql', import.meta.url), 'utf8');
+  const edge = await readFile(new URL('../../../supabase/functions/enjaz-industry/index.ts', import.meta.url), 'utf8');
+  for (const source of [api, rpc, supabase, edge]) assert.match(source, /INDUSTRY_PACK_INCOMPLETE/);
+  assert.match(api, /select count\(\*\)::int as count from ai_employees where workspace_id=\$1/);
+  assert.doesNotMatch(api, /status\s*<>\s*'deleted'/);
+  assert.match(rpc, /COALESCE\(department_id::text,policy->>'departmentId'\)/i);
+});
+
+test('OpenAPI documents actual industry and duplicate-team conflict responses', async () => {
+  const contract = await readFile(new URL('../openapi.yaml', import.meta.url), 'utf8');
+  assert.match(contract, /'400': \{\$ref: '#\/components\/responses\/BadRequest'\}[\s\S]*?'402':/);
+  assert.match(contract, /'409': \{description: Subscription is not configured or a partial earlier starter team needs reconciliation\}/);
+  assert.match(contract, /'409': \{description: A team with this name already exists in the workspace\}/);
+  assert.match(contract, /'404': \{description: Workspace was not found\}/);
+  assert.match(contract, /managerEmployeeId: \{type: \[string, 'null'\], format: uuid, description: Employee must be active and belong to the same workspace\}/);
+});
