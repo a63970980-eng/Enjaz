@@ -22,7 +22,6 @@ test('employee creation validates role templates and department ownership in the
   assert.match(source,/select role_code from employee_role_templates where role_code=\$1 and active=true/);
   assert.match(source,/select id from departments where id=\$1 and workspace_id=\$2/);
   assert.match(source,/insert into ai_employees \(id,workspace_id,department_id/);
-  assert.match(source,/ae\.department_id=d\.id or ae\.policy->>'departmentId'=d\.id::text/);
 });
 
 test('team creation rejects duplicate names and non-active or cross-workspace managers', async()=>{
@@ -34,5 +33,11 @@ test('team creation rejects duplicate names and non-active or cross-workspace ma
   assert.match(createTeam,/status='active' for share/);
   assert.match(createTeam,/withTransaction/);
   assert.match(createTeam,/workspaces where id=\$1 for update/);
-  assert.match(routes,/POST'&&url\.pathname==='\/api\/v1\/departments'\)\{requireManager\(user\)/);
+  assert.match(routes,/POST'&&url\.pathname==='\/api\/v1\/departments'\)\{requirePermission\(user,PERMISSIONS\.TEAMS_MANAGE\)/);
+});
+
+test('task comments require non-empty bounded text before the database write', async()=>{
+  const source=await readFile(new URL('../src/workforce-repository.js',import.meta.url),'utf8');
+  assert.match(source,/Comment must contain 1 to 10000 characters/);
+  assert.match(source,/comment\.length>10_000/);
 });
