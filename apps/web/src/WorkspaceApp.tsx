@@ -56,7 +56,7 @@ function formatDate(value: string | undefined) {
   return Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat('ar', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 function workspaceRole(workspace: WorkspaceRecord | null) { return workspace?.workspace_role || workspace?.role || ''; }
-function canManage(workspace: WorkspaceRecord | null) { return workspaceRole(workspace) === 'manager'; }
+function canManage(workspace: WorkspaceRecord | null) { return ['owner', 'admin', 'manager'].includes(workspaceRole(workspace)); }
 function profileName(data: any) {
   return data?.profile?.name || data?.identity?.name || data?.user?.name || 'مستخدم إنجاز';
 }

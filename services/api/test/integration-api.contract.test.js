@@ -7,7 +7,7 @@ const vault=await readFile(new URL('../src/credentials-vault.js',import.meta.url
 
 test('integration creation is manager-only and workspace scoped',()=>{
   assert.match(source,/url\.pathname==='\/api\/v1\/integrations'/);
-  assert.match(source,/if\(req\.method==='POST'&&url\.pathname==='\/api\/v1\/integrations'\)\{requireManager\(user\)/);
+  assert.match(source,/if\(req\.method==='POST'&&url\.pathname==='\/api\/v1\/integrations'\)\{requirePermission\(user,PERMISSIONS\.INTEGRATIONS_MANAGE\)/);
   assert.match(source,/saveConnection\(\{\.\.\.input,workspaceId,actorUserId:user\.id\}\)/);
 });
 
@@ -18,7 +18,7 @@ test('integration listing uses the credential-safe vault projection',()=>{
 
 test('integration revocation is manager-only, workspace scoped, and audited',()=>{
   assert.ok(source.includes("const integrationMatch=url.pathname.match(/^\\/api\\/v1\\/integrations\\/([^/]+)\\/revoke$/)"));
-  assert.match(source,/req\.method==='DELETE'&&integrationMatch\)\{requireManager\(user\)/);
+  assert.match(source,/req\.method==='DELETE'&&integrationMatch\)\{requirePermission\(user,PERMISSIONS\.INTEGRATIONS_MANAGE\)/);
   assert.match(source,/revokeConnection\(\{workspaceId,connectionId:integrationMatch\[1\],actorUserId:user\.id\}\)/);
   assert.match(vault,/update integration_connections set status='revoked',updated_at=now()/);
   assert.match(vault,/where id=\$1 and workspace_id=\$2/);

@@ -31,7 +31,7 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ApiMetadata'}
-  /ops/health:
+  /api/v1/ops/health:
     get:
       tags: [Operations]
       summary: Operational health snapshot
@@ -39,6 +39,16 @@ paths:
         - {$ref: '#/components/parameters/workspaceId'}
       responses:
         '200': {description: Operational snapshot}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/runtime/ops:
+    get:
+      tags: [Operations]
+      summary: Runtime operations snapshot (manager permission required)
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Operational runtime snapshot}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
   /api/v1/tools:
@@ -166,6 +176,34 @@ paths:
         '400': {$ref: '#/components/responses/BadRequest'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/tasks/{taskId}/comments:
+    get:
+      tags: [Execution]
+      summary: List task comments in the selected workspace
+      parameters:
+        - {$ref: '#/components/parameters/taskId'}
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Task comments}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [Execution]
+      summary: Add a comment (tasks.manage permission required)
+      parameters:
+        - {$ref: '#/components/parameters/taskId'}
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TaskCommentInput'}
+      responses:
+        '201': {description: Comment created}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Task was not found in the selected workspace}
   /api/v1/tasks/{taskId}/run:
     post:
       tags: [Execution]
@@ -311,7 +349,7 @@ components:
         application/json:
           schema: {$ref: '#/components/schemas/Error'}
     Forbidden:
-      description: Workspace or role access denied
+      description: Workspace membership or named permission denied
       content:
         application/json:
           schema: {$ref: '#/components/schemas/Error'}
@@ -332,6 +370,8 @@ components:
       properties:
         error: {type: string}
         requestId: {type: string}
+        code: {type: string, description: Stable machine-readable error code when available}
+        permission: {type: string, description: Permission required when code is PERMISSION_REQUIRED}
     EmployeeInput:
       type: object
       required: [name, role]
@@ -368,6 +408,12 @@ components:
         objective: {type: string, minLength: 1, maxLength: 10000}
         priority: {type: integer, minimum: 1, maximum: 10}
         input: {type: object}
+    TaskCommentInput:
+      type: object
+      required: [body]
+      properties:
+        body: {type: string, minLength: 1, maxLength: 10000}
+        employeeId: {type: [string, 'null'], format: uuid}
     RunTaskInput:
       type: object
       properties:
