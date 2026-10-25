@@ -7,9 +7,18 @@ const guard=await readFile(new URL('../src/credential-guard.js',import.meta.url)
 const migration=await readFile(new URL('../db/migrations/021_integration_credentials_metadata.sql',import.meta.url),'utf8');
 
 test('credential vault writes only the actual integration connection schema',()=>{
-  assert.match(vault,/insert into integration_connections \(id,workspace_id,provider,display_name,encrypted_credentials,config,auth_type,scopes,status,metadata,expires_at\)/);
-  
+  // The table column is `name`; `display_name` is only the public API alias. A former
+  // version inserted into a non-existent display_name column, which broke every save.
+  assert.match(vault,/insert into integration_connections \(id,workspace_id,provider,name,encrypted_credentials,config,auth_type,scopes,status,metadata,expires_at\)/);
+  assert.doesNotMatch(vault,/insert into integration_connections[\s\S]{0,120}display_name,encrypted_credentials/);
+  assert.match(vault,/name as display_name/);
   assert.match(vault,/AES-GCM/);
+});
+
+test('revoking a connection uses a status the database constraint accepts',async()=>{
+  const revocationMigration=await readFile(new URL('../db/migrations/035_integration_connection_revoked_status.sql',import.meta.url),'utf8');
+  assert.match(vault,/set status='revoked'/);
+  assert.match(revocationMigration,/check \(status in \('active','disabled','expired','error','revoked'\)\)/i);
 });
 
 test('credential guard requires the employee and integration to share a workspace',()=>{

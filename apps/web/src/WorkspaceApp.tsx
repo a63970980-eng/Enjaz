@@ -18,7 +18,7 @@ import {
   resetAnalyticsIdentity, setAnalyticsConsent, type AnalyticsConsent,
 } from './analytics';
 
-type Phase = 'checking' | 'auth' | 'verify' | 'onboarding' | 'provisioning' | 'provisioning-failed' | 'workspace' | 'recovery';
+type Phase = 'checking' | 'auth' | 'verify' | 'forgot' | 'reset' | 'onboarding' | 'provisioning' | 'provisioning-failed' | 'workspace' | 'recovery';
 type Tab = 'overview' | 'employees' | 'teams' | 'members' | 'tasks' | 'approvals' | 'automations' | 'integrations' | 'analytics';
 type WorkspaceRecord = { id: string; name: string; workspace_role?: string; role?: string; organization_name?: string };
 type DashboardData = { summary: Record<string, any>; recent: any[]; subscription: Record<string, any> | null; usage: Record<string, any> | null; employees: any[]; tasks: any[]; approvals: any[]; audit: any[] };
@@ -87,17 +87,17 @@ function selectedWorkspace(spaces: WorkspaceRecord[]) {
   const requested = new URLSearchParams(window.location.search).get('workspaceId') || localStorage.getItem('ENJAZ_WORKSPACE_ID');
   return (requested && spaces.find(item => String(item.id) === String(requested))) || spaces[0] || null;
 }
-function adoptAuthCallback() {
+function adoptAuthCallback(): string | null {
   const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
   const type = params.get('type') || '';
   const accessToken = params.get('access_token');
-  if (!accessToken || !['signup', 'invite', 'magiclink', 'email'].includes(type)) return false;
+  if (!accessToken || !['signup', 'invite', 'magiclink', 'email', 'recovery'].includes(type)) return null;
   sessionStorage.setItem('ENJAZ_ACCESS_TOKEN', accessToken);
   const refreshToken = params.get('refresh_token');
   if (refreshToken) sessionStorage.setItem('ENJAZ_REFRESH_TOKEN', refreshToken);
   (window as Window & { ENJAZ_ACCESS_TOKEN?: string }).ENJAZ_ACCESS_TOKEN = accessToken;
   history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`);
-  return true;
+  return type;
 }
 
 export default function WorkspaceApp() {
@@ -221,7 +221,8 @@ export default function WorkspaceApp() {
 
   useEffect(() => {
     initAnalytics();
-    adoptAuthCallback();
+    const callback = adoptAuthCallback();
+    if (callback === 'recovery') { setPhase('reset'); return; }
     if (authClient.token()) void restoreSession();
     else setPhase('auth');
     // Restore once on entry; workspace changes use the explicit selector below.
@@ -261,6 +262,44 @@ export default function WorkspaceApp() {
       setNotice('أُعيد إرسال رسالة التأكيد. افحص صندوق الوارد ومجلد الرسائل غير المرغوب فيها.');
     } catch (cause: any) {
       setError(cause?.message || 'تعذر إرسال رسالة التأكيد.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function requestPasswordReset(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError('');
+    setNotice('');
+    const enteredEmail = String(new FormData(event.currentTarget).get('email') || '').trim().toLowerCase();
+    try {
+      await authClient.requestPasswordReset(enteredEmail);
+      setEmail(enteredEmail);
+      setNotice('أرسلنا رابط استعادة كلمة المرور إن كان البريد مسجلًا. افحص صندوق الوارد ومجلد الرسائل غير المرغوب فيها.');
+    } catch (cause: any) {
+      setError(cause?.message || 'تعذر إرسال رابط الاستعادة. حاول مرة أخرى.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitNewPassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError('');
+    const form = new FormData(event.currentTarget);
+    const password = String(form.get('password') || '');
+    if (password !== String(form.get('confirmPassword') || '')) {
+      setError('كلمتا المرور غير متطابقتين.');
+      return;
+    }
+    setBusy(true);
+    try {
+      await authClient.updatePassword(password);
+      setNotice('حُدثت كلمة المرور. جارٍ فتح مساحة العمل…');
+      await restoreSession();
+    } catch (cause: any) {
+      setError(cause?.message || 'تعذر تحديث كلمة المرور. اطلب رابطًا جديدًا إن انتهت صلاحيته.');
     } finally {
       setBusy(false);
     }
@@ -474,7 +513,7 @@ export default function WorkspaceApp() {
     return <main className="workspace-status-screen" dir="rtl"><div className="workspace-status-card"><span className="workspace-mark"><Zap size={22} /></span><h1>{phase === 'provisioning' ? 'نجهز بيئة مؤسستك' : 'نتحقق من جلسة العمل'}</h1><p role="status" aria-live="polite">{phase === 'provisioning' ? 'ننشئ الأقسام والموظفين الرقميين وقواعدهم. لا تغلق هذه الصفحة.' : 'جارٍ استعادة الحساب والمساحة بأمان…'}</p><span className="workspace-spinner" /></div></main>;
   }
 
-  if (phase === 'auth' || phase === 'verify' || phase === 'recovery') {
+  if (phase === 'auth' || phase === 'verify' || phase === 'recovery' || phase === 'forgot' || phase === 'reset') {
     const signup = mode === 'signup' && phase === 'auth';
     return <main className="workspace-auth-page" dir="rtl">
       <a className="workspace-back-link" href="/" aria-label="العودة إلى موقع إنجاز"><ArrowRight size={17} /> العودة إلى إنجاز</a>
@@ -493,6 +532,27 @@ export default function WorkspaceApp() {
           {error && <div className="workspace-alert" role="alert"><CircleAlert size={17} />{error}</div>}
           <button className="workspace-button primary" type="button" onClick={() => void restoreSession()}>إعادة المحاولة</button>
           <button className="workspace-text-button" type="button" onClick={signOut}>العودة لتسجيل الدخول</button>
+        </> : phase === 'forgot' ? <>
+          <span className="workspace-kicker">استعادة كلمة المرور</span><h1>أعد تعيين كلمة المرور</h1>
+          <p>أدخل بريد حسابك وسنرسل رابطًا آمنًا لتعيين كلمة مرور جديدة. الرابط يفتح صفحة الاستعادة في هذا المتصفح.</p>
+          {notice && <div className="workspace-notice" role="status">{notice}</div>}
+          {error && <div className="workspace-alert" role="alert"><CircleAlert size={17} />{error}</div>}
+          <form className="workspace-form" aria-label="استعادة كلمة المرور" onSubmit={event => void requestPasswordReset(event)}>
+            <label>البريد الإلكتروني<input name="email" type="email" autoComplete="email" required maxLength={254} defaultValue={email} /></label>
+            <button className="workspace-button primary" type="submit" disabled={busy}>{busy ? 'جارٍ الإرسال…' : 'إرسال رابط الاستعادة'}</button>
+          </form>
+          <button className="workspace-text-button" type="button" onClick={() => { setPhase('auth'); setError(''); setNotice(''); }}>العودة لتسجيل الدخول</button>
+        </> : phase === 'reset' ? <>
+          <span className="workspace-kicker">رابط الاستعادة</span><h1>عيّن كلمة مرور جديدة</h1>
+          <p>اختر كلمة مرور قوية لا تستخدمها في خدمات أخرى. ستبقى جلستك على هذا الجهاز فقط.</p>
+          {notice && <div className="workspace-notice" role="status">{notice}</div>}
+          {error && <div className="workspace-alert" role="alert"><CircleAlert size={17} />{error}</div>}
+          <form className="workspace-form" aria-label="تعيين كلمة مرور جديدة" onSubmit={event => void submitNewPassword(event)}>
+            <label>كلمة المرور الجديدة<input name="password" type="password" autoComplete="new-password" required minLength={8} /></label>
+            <label>تأكيد كلمة المرور<input name="confirmPassword" type="password" autoComplete="new-password" required minLength={8} /></label>
+            <button className="workspace-button primary" type="submit" disabled={busy}>{busy ? 'جارٍ الحفظ…' : 'حفظ كلمة المرور'}</button>
+          </form>
+          <button className="workspace-text-button" type="button" onClick={() => { signOut(); setPhase('auth'); setMode('login'); setError(''); setNotice(''); }}>إلغاء وتسجيل الدخول</button>
         </> : <>
           <span className="workspace-kicker">بوابة آمنة للموظفين</span>
           <h1>{signup ? 'أنشئ حساب مؤسستك' : 'سجّل الدخول إلى مساحة العمل'}</h1>
@@ -505,6 +565,7 @@ export default function WorkspaceApp() {
             <button className="workspace-button primary" type="submit" disabled={busy}>{busy ? 'جارٍ التحقق…' : signup ? 'إنشاء الحساب' : 'تسجيل الدخول'}</button>
           </form>
           <p className="workspace-auth-switch">{signup ? 'لديك حساب بالفعل؟' : 'جديد على إنجاز؟'} <button type="button" className="workspace-text-button" onClick={() => { setMode(signup ? 'login' : 'signup'); setError(''); }}>{signup ? 'تسجيل الدخول' : 'إنشاء حساب'}</button></p>
+          {!signup && <button type="button" className="workspace-text-button" onClick={() => { setPhase('forgot'); setError(''); setNotice(''); }}>نسيت كلمة المرور؟</button>}
           <div className="workspace-security-note"><ShieldCheck size={15} /> صلاحيات مساحة العمل يتحقق منها الخادم عند كل طلب.</div>
         </>}
       </section>

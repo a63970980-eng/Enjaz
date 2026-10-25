@@ -20,7 +20,7 @@ test('integration revocation is manager-only, workspace scoped, and audited',()=
   assert.ok(source.includes("const integrationMatch=url.pathname.match(/^\\/api\\/v1\\/integrations\\/([^/]+)\\/revoke$/)"));
   assert.match(source,/req\.method==='DELETE'&&integrationMatch\)\{requirePermission\(user,PERMISSIONS\.INTEGRATIONS_MANAGE\)/);
   assert.match(source,/revokeConnection\(\{workspaceId,connectionId:integrationMatch\[1\],actorUserId:user\.id\}\)/);
-  assert.match(vault,/update integration_connections set status='revoked',updated_at=now()/);
+  assert.match(vault,/update integration_connections set status='revoked',enabled=false,updated_at=now()/);
   assert.match(vault,/where id=\$1 and workspace_id=\$2/);
   assert.match(vault,/integration\.revoked/);
   assert.doesNotMatch(vault,/returning[^;]*encrypted_credentials/);

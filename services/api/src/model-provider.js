@@ -1,5 +1,6 @@
 import { generateAI } from './ai-provider.js';
 import { validatePlan } from './employee-planner.js';
+import { readTokenUsage } from './model-usage.js';
 import { AgentTaskSchema, parseContract } from './contracts.js';
 
 const providers = new Map();
@@ -57,7 +58,7 @@ async function generateAIPlan(context, provider = process.env.AI_PROVIDER || 'au
     ],
   });
   const plan = normalizePlan(parsePlan(response.text), context);
-  return { ...plan, provider: response.provider, model: response.model };
+  return { ...plan, provider: response.provider, model: response.model, usage: readTokenUsage(response.usage) };
 }
 
 registerModelProvider('deterministic', { generate: async (context) => ({ goal: context.goal, version: 1, steps: [] }) });
