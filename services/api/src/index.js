@@ -12,6 +12,7 @@ import { requestContext } from './request-context.js';
 import { closeDb,query } from './db.js';
 import { listIndustryPacks,provisionIndustryPack } from './industry-provisioning.js';
 import { getAIProviderStatus } from './ai-provider.js';
+import { getPaperclipDashboard } from './paperclip-bridge.js';
 import { listEmployeeRoutines,createEmployeeRoutine,updateEmployeeRoutine,deleteEmployeeRoutine } from './employee-routines.js';
 import { listBillingPlans,getBillingSubscription,getBillingUsage,assertWorkspaceLimit } from './billing-repository.js';
 import { requirePermission,PERMISSIONS } from './permissions.js';
@@ -34,6 +35,7 @@ async function runtimeSummary(workspaceId){const summary=(await query('select * 
 const publicError=(e,status)=>{if(status>=500){console.error(e);return 'Internal server error';}return e?.message||'Request failed';};
 export const server=http.createServer(async(req,res)=>{const context=requestContext(req),origin=req.headers.origin||'';if(req.method==='OPTIONS')return json(res,204,{},origin,context.id);const rl=limiter(req.socket.remoteAddress||'unknown');if(!rl.allowed){res.setHeader('Retry-After',Math.ceil((rl.resetAt-Date.now())/1000));return json(res,429,{error:'Rate limit exceeded',requestId:context.id},origin,context.id);}const url=new URL(req.url,`http://${req.headers.host||'localhost'}`);try{
 if(req.method==='GET'&&url.pathname==='/health'){const h=await getHealth();return json(res,h.status==='unhealthy'?503:200,h,origin,context.id);}
+if(req.method==='GET'&&url.pathname==='/api/v1/paperclip/dashboard'){const workspaceId=url.searchParams.get('workspaceId');const user=await requireWorkspace(req,workspaceId);requireManager(user);return json(res,200,{data:await getPaperclipDashboard(workspaceId)},origin,context.id);}
 if(req.method==='GET'&&url.pathname==='/api/v1')return json(res,200,{name:'ENJAZ API',version:'0.8.0',storage:'postgresql',auth:'supabase',runtime:'enabled',integrations:'enabled',onboarding:'enabled',workforce:'enabled',billing:'enabled',aiProvider:process.env.ENJAZ_MODEL_PROVIDER||process.env.AI_PROVIDER||'auto',aiProviders:getAIProviderStatus(),status:'ready',configuration:{supabaseConfigured:Boolean(supabaseUrl&&supabaseKey),databaseConfigured:Boolean(process.env.DATABASE_URL)}},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/billing/plans')return json(res,200,{data:await listBillingPlans()},origin,context.id);
 if(req.method==='GET'&&url.pathname==='/api/v1/auth/me'){const identity=await authIdentity(req);if(!identity)throw Object.assign(new Error('Authentication required'),{status:401});const profile=await getUserByAuthId(identity.authId);return json(res,200,{data:{identity,profile,workspaces:profile?await listUserWorkspaces(profile.id):[]}},origin,context.id);}

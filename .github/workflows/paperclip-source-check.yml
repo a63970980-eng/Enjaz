@@ -1,0 +1,45 @@
+name: Paperclip Source Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".gitmodules"
+      - "vendor/paperclip"
+      - ".github/workflows/paperclip-source-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Enjaz and pinned upstream source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          package_json_file: vendor/paperclip/package.json
+      - name: Verify pinned source and license
+        run: |
+          test -f vendor/paperclip/package.json
+          test -f vendor/paperclip/LICENSE
+          node -e "const p=require('./vendor/paperclip/package.json'); if(p.name !== 'paperclip') process.exit(1); console.log('Paperclip source found:', p.name)"
+      - name: Install upstream dependencies
+        working-directory: vendor/paperclip
+        run: pnpm install --no-frozen-lockfile
+      - name: Typecheck upstream server
+        working-directory: vendor/paperclip
+        run: pnpm --filter @paperclipai/server typecheck
+      - name: Build upstream UI
+        working-directory: vendor/paperclip
+        run: pnpm --filter @paperclipai/ui build
