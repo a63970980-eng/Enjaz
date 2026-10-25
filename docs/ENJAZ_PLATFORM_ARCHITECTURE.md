@@ -41,7 +41,7 @@ The current authenticated portal is intentionally narrower than the platform API
 - **Governance:** managers can approve or reject pending actions through the API; the server records the decision and audit event.
 - **Read-only access:** non-manager memberships see data but do not receive manager-only task or approval controls; API authorization remains the actual security boundary.
 
-Employee building/editing, saved workflow design, integrations management, analytics, global search, invitations and enterprise identity administration are not represented as completed UI capabilities in this portal yet, even where backend primitives exist.
+Membership administration is represented: the Members and Permissions surface lists workspace members, changes roles, removes members, issues/revokes copy-only invitations and accepts an invitation through `?invite=<token>`; the API enforces `members.read`, `members.invite` and `members.manage` and guards the last manager. Saved workflow design, integrations management, global search, email delivery of invitations and enterprise identity administration (SSO/SCIM) are not represented as completed UI capabilities in this portal yet, even where backend primitives exist.
 
 ## Industry provisioning
 

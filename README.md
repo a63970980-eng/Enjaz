@@ -20,6 +20,7 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 - Smart teams
 - Workflow execution visibility
 - Human approval controls
+- Members, roles and invitations (hashed tokens, seven-day expiry, last-manager protection)
 - Integration vault
 - Audit trail
 - Preview mode for evaluating the product before connecting a production workspace

@@ -96,6 +96,32 @@ test('starter provisioning does not report an incomplete legacy pack as a succes
   assert.match(rpc, /COALESCE\(department_id::text,policy->>'departmentId'\)/i);
 });
 
+test('both migration tracks define the onboarding identity contract used by the API runtime', async () => {
+  const apiMigration = await readFile(new URL('../db/migrations/034_workspace_identity_and_invitations.sql', import.meta.url), 'utf8');
+  const supabaseMigration = await readFile(new URL('../../../supabase/migrations/20261025120000_workspace_identity_and_invitations.sql', import.meta.url), 'utf8');
+  for (const source of [apiMigration, supabaseMigration]) {
+    assert.match(source, /alter table public\.users add column if not exists platform_role text/i);
+    assert.match(source, /create or replace function public\.assign_first_platform_admin\(p_user_id uuid\)/i);
+    assert.match(source, /create table if not exists public\.workspace_invitations/i);
+    assert.match(source, /token_hash text not null unique/i);
+    assert.match(source, /enable row level security/i);
+    assert.match(source, /private\.has_workspace_role\(workspace_id, array\['manager'\]\)/i);
+  }
+});
+
+test('the Supabase track guards an early revoke that precedes the platform-admin function', async () => {
+  const source = await readFile(new URL('../../../supabase/migrations/20260926135518_optimize_commerce_rls_and_lock_admin_bootstrap.sql', import.meta.url), 'utf8');
+  assert.match(source, /do \$\$[\s\S]*?if exists[\s\S]*?revoke execute on function public\.assign_first_platform_admin\(uuid\) from anon;/i);
+});
+
+test('invitation storage never keeps a usable plaintext token', async () => {
+  const repository = await readFile(new URL('../src/membership-repository.js', import.meta.url), 'utf8');
+  assert.match(repository, /createHash\('sha256'\)/);
+  assert.match(repository, /token_hash/);
+  assert.doesNotMatch(repository, /insert into workspace_invitations[\s\S]{0,400}\bemail, role, token,/i);
+  assert.match(repository, /Never select token_hash/);
+});
+
 test('OpenAPI documents actual industry and duplicate-team conflict responses', async () => {
   const contract = await readFile(new URL('../openapi.yaml', import.meta.url), 'utf8');
   assert.match(contract, /'400': \{\$ref: '#\/components\/responses\/BadRequest'\}[\s\S]*?'402':/);

@@ -1,12 +1,20 @@
 # ENJAZ Roadmap
 
+## Implementation update — 2026-10-25 (membership + clean-install bootstrap repair)
+
+- **Clean-install blocker fixed:** migration `034_workspace_identity_and_invitations.sql` (mirrored to Supabase as `20261025120000_workspace_identity_and_invitations.sql`) defines `users.platform_role` and `public.assign_first_platform_admin(uuid)`, which `onboarding-repository.bootstrapWorkspace()` already required. Before this change, the first workspace of a new customer could not be created on any clean database. Verified by applying the full migration chain to an empty PostgreSQL database and running real workspace bootstrap (first user becomes platform admin, replay is idempotent).
+- **Member management and invitations:** the API now exposes `/api/v1/members`, `/api/v1/members/{userId}` (PATCH/DELETE), `/api/v1/members/invitations` (GET/POST), `/api/v1/members/invitations/{id}/revoke` and `/api/v1/members/invitations/accept`, gated by the centralized `MEMBERS_READ`, `MEMBERS_INVITE` and `MEMBERS_MANAGE` permissions. Invitation tokens are stored only as SHA-256 hashes, are bound to the invited email address, expire after seven days, and are shown once to the inviter (copy-only delivery). A workspace can never lose its last manager.
+- **Workspace console:** a Members and Permissions surface lists members, changes roles, removes members, issues and revokes invitations, and accepts an invitation through `?invite=<token>` on the workspace document. An Integrations surface lists, connects and revokes encrypted service credentials with an explicit scope disclosure; the server-side tool layer remains the execution boundary.
+- **Verification record:** see [Release readiness 2026-10-25](./RELEASE_READINESS_2026-10-25.md) for the exact checks executed, their results, and the blockers that still require external accounts or secrets.
+- **Known limitation:** an identity that already belongs to another organization is refused with `INVITATION_ORGANIZATION_CONFLICT`; joining a second organization needs the multi-organization identity decision below. Invitations are not emailed yet because no transactional email provider is configured.
+
 ## Implementation snapshot — 2026-10-18
 
 - **Workspace employee builder:** Implemented on `main` in PR #52 (not yet production-deployed). It uses the workforce/tool catalog endpoints when available, falls back to a custom role if the role catalog is unavailable, and preserves explicit tool assignment and the existing human-approval policy.
 - **Recurring automations:** Workspace UI is connected to the existing routine API and scheduler; managers can create, pause, and resume routines.
 - **Analytics and billing:** Initial usage dashboard is implemented. It reads current runtime, subscription, and limit data; it does **not** issue invoices or collect payments. See [Analytics and Billing Design](./ANALYTICS_AND_BILLING_DESIGN.md).
 - **Access-control baseline:** Implemented in the current RBAC feature branch; review/merge is pending. It uses a centralized, deny-by-default API permission resolver and domain-specific route gates. `member` and `viewer` remain read-only; custom role storage is not implemented.
-- **Invitations, SSO, and SCIM:** Not implemented. Invitation acceptance is blocked until the auth bridge source/contract and profile schema are reconciled. Neither migration track defines `users.platform_role` or `public.assign_first_platform_admin`; the Supabase track only revokes privileges on that function, while onboarding reads/calls both. A clean migration may fail and workspace bootstrap may fail at runtime. See [Enterprise Identity Design](./ENTERPRISE_IDENTITY_RBAC_SSO_SCIM_DESIGN.md).
+- **Invitations, SSO, and SCIM:** Invitations and member management are implemented as of 2026-10-25 (see the update above); SSO and SCIM remain unimplemented. The profile schema gap (`users.platform_role`, `public.assign_first_platform_admin`) is repaired in both migration tracks, and the earlier Supabase-only `REVOKE` now tolerates being applied before the function exists. The `enjaz-auth-bridge` Supabase function that the browser uses for signup and `/me` is still **not in this repository**; it remains a release blocker for a self-contained deployment. See [Enterprise Identity Design](./ENTERPRISE_IDENTITY_RBAC_SSO_SCIM_DESIGN.md).
 
 ## Implementation update — 2026-10-18 (merged to main; not yet a production release)
 
@@ -22,10 +30,10 @@
 
 ## Next enterprise gates
 
-1. Repair and synchronize the bootstrap/profile schema: define `users.platform_role` and `public.assign_first_platform_admin` in the correct migration tracks, with the platform-admin selection policy reviewed.
-2. Bring the authentication bridge source/contract under version control and verify bootstrap in clean and upgraded PostgreSQL/Supabase environments.
-3. Decide whether to preserve the current one-organization-per-user model or migrate to multi-organization identities.
-4. Implement email-confirmed, same-organization invitation acceptance, member management, token hashing, revocation, and copy-only delivery until an email provider is selected; then verify real tenant boundaries before enabling it.
+1. ~~Repair and synchronize the bootstrap/profile schema~~ — done 2026-10-25 in both migration tracks.
+2. Bring the authentication bridge source/contract under version control; it is still external to this repository.
+3. Decide whether to preserve the current one-organization-per-user model or migrate to multi-organization identities (invitation acceptance currently refuses cross-organization identities).
+4. Connect a transactional email provider so invitations are delivered directly instead of copy-only; the token flow and membership enforcement are already implemented and verified.
 5. Select an enterprise identity provider before implementing SSO/SCIM, and select billing markets/providers before financial collection.
 
 ## Phase 1 — Foundation

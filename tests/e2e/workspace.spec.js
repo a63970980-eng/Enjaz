@@ -38,6 +38,14 @@ async function mockWorkspaceSession(page, role = 'manager', workspaceIds = ['wor
   const routinesByWorkspace = new Map(workspaceIds.map((id, index) => [id, index === 0 ? routines : []]));
   const createdEmployees = [];
   const createdDepartments = [];
+  const members = [
+    { user_id: 'user-1', name: 'نور', email: 'owner@example.com', role, joined_at: '2026-10-01T09:00:00.000Z' },
+    { user_id: 'user-2', name: 'سامي', email: 'sami@example.com', role: 'viewer', joined_at: '2026-10-02T09:00:00.000Z' },
+  ];
+  const invitations = [];
+  const issuedInvitationRequests = [];
+  const connections = [];
+  const createdConnections = [];
   const tools = [
     { name: 'data.analyze', description: 'تحليل بيانات للقراءة فقط', risk: 'low' },
     { name: 'report.create', description: 'إنشاء تقرير', risk: 'low' },
@@ -77,6 +85,44 @@ async function mockWorkspaceSession(page, role = 'manager', workspaceIds = ['wor
       employees.unshift(employee);
       return route.fulfill({ status: 201, json: { data: employee } });
     }
+    if (path.endsWith('/integrations') && request.method() === 'GET') return route.fulfill({ status: 200, json: { data: connections } });
+    if (path.endsWith('/integrations') && request.method() === 'POST') {
+      const input = request.postDataJSON();
+      createdConnections.push(input);
+      const connection = { id: `connection-${connections.length + 1}`, workspace_id: workspaceId, provider: input.provider, display_name: input.displayName || input.name, status: 'active', created_at: new Date().toISOString() };
+      connections.unshift(connection);
+      return route.fulfill({ status: 201, json: { data: connection } });
+    }
+    if (/\/integrations\/[^/]+\/revoke$/.test(path) && request.method() === 'DELETE') {
+      const connection = connections.find(item => path.includes(item.id));
+      connection.status = 'revoked';
+      return route.fulfill({ status: 200, json: { data: connection } });
+    }
+    if (path.endsWith('/members/invitations') && request.method() === 'GET') return route.fulfill({ status: 200, json: { data: invitations } });
+    if (path.endsWith('/members/invitations') && request.method() === 'POST') {
+      const input = request.postDataJSON();
+      issuedInvitationRequests.push(input);
+      const invitation = { id: `invitation-${invitations.length + 1}`, workspace_id: workspaceId, email: input.email, role: input.role || 'member', status: 'pending', expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(), created_at: new Date().toISOString() };
+      invitations.unshift(invitation);
+      return route.fulfill({ status: 201, json: { data: { invitation, token: 'test-invitation-token-value-0123456789abcdef', workspace: { id: workspaceId, name: 'شركة التجربة' } } } });
+    }
+    if (/\/members\/invitations\/[^/]+\/revoke$/.test(path) && request.method() === 'POST') {
+      const invitation = invitations.find(item => path.includes(item.id));
+      invitation.status = 'revoked';
+      return route.fulfill({ status: 200, json: { data: invitation } });
+    }
+    if (path.endsWith('/members') && request.method() === 'GET') return route.fulfill({ status: 200, json: { data: members } });
+    const memberMatch = path.match(/\/members\/([^/]+)$/);
+    if (memberMatch && request.method() === 'PATCH') {
+      const member = members.find(item => item.user_id === memberMatch[1]);
+      member.role = request.postDataJSON().role;
+      return route.fulfill({ status: 200, json: { data: member } });
+    }
+    if (memberMatch && request.method() === 'DELETE') {
+      const index = members.findIndex(item => item.user_id === memberMatch[1]);
+      if (index >= 0) members.splice(index, 1);
+      return route.fulfill({ status: 200, json: { data: { userId: memberMatch[1] } } });
+    }
     if (path.endsWith('/routines') && request.method() === 'GET') return route.fulfill({ status: 200, json: { data: routinesByWorkspace.get(workspaceId) || [] } });
     if (path.endsWith('/routines') && request.method() === 'POST') {
       const input = request.postDataJSON();
@@ -112,7 +158,7 @@ async function mockWorkspaceSession(page, role = 'manager', workspaceIds = ['wor
     if (path.endsWith('/billing/usage')) return route.fulfill({ status: 200, json: { data: { plan: 'growth', status: 'active', employees: workspaceId === workspaceIds[0] ? employees.length : 0, tasksThisMonth: (tasksByWorkspace.get(workspaceId) || []).length, integrations: 2, aiCostCents: 75, limits: { employees: 15, tasksMonth: 1000, integrations: 10, includedAiCostCents: 1000 } } } });
     return route.fulfill({ status: 404, json: { error: `Unhandled API request: ${request.method()} ${path}` } });
   });
-  return { employees, routines, departments, createdEmployees, createdDepartments, dashboardWorkspaceReads };
+  return { employees, routines, departments, createdEmployees, createdDepartments, dashboardWorkspaceReads, members, invitations, issuedInvitationRequests, connections, createdConnections };
 }
 
 test('workspace route presents a sign-in flow without implying an authenticated session', async ({ page }) => {
@@ -434,6 +480,83 @@ test('manager can schedule and pause a recurring workspace routine', async ({ pa
   await expect(page.getByText('مراجعة المبيعات اليومية')).toBeVisible();
   await page.getByRole('button', { name: 'إيقاف مؤقت' }).click();
   await expect(page.getByRole('button', { name: 'استئناف' })).toBeVisible();
+});
+
+test('manager can invite a member and revoke the invitation from the members surface', async ({ page }) => {
+  const state = await mockWorkspaceSession(page);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الأعضاء والصلاحيات' }).click();
+
+  await expect(page.getByRole('heading', { name: 'أعضاء المساحة' })).toBeVisible();
+  await expect(page.locator('table').first().getByText('sami@example.com')).toBeVisible();
+  await page.getByLabel('بريد العضو المدعو').fill('new.member@example.com');
+  await page.getByLabel('دور العضو المدعو').selectOption('manager');
+  await page.getByRole('button', { name: 'إنشاء دعوة' }).click();
+
+  await expect(page.getByText(/أُنشئت الدعوة/)).toBeVisible();
+  await expect(page.getByRole('group', { name: 'رابط الدعوة' })).toContainText('new.member@example.com');
+  const link = await page.getByRole('group', { name: 'رابط الدعوة' }).locator('code').innerText();
+  expect(link).toContain('workspace.html?invite=');
+  expect(state.issuedInvitationRequests[0]).toMatchObject({ email: 'new.member@example.com', role: 'manager' });
+
+  await page.getByRole('button', { name: 'إلغاء الدعوة' }).click();
+  await expect(page.getByText('ملغاة')).toBeVisible();
+  expect(state.invitations[0].status).toBe('revoked');
+});
+
+test('read-only members cannot invite, change roles or remove members', async ({ page }) => {
+  await mockWorkspaceSession(page, 'viewer');
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'الأعضاء والصلاحيات' }).click();
+
+  await expect(page.getByRole('heading', { name: 'أعضاء المساحة' })).toBeVisible();
+  await expect(page.getByRole('form', { name: 'دعوة عضو' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /إزالة/ })).toHaveCount(0);
+  await expect(page.getByLabel('دور owner@example.com')).toHaveCount(0);
+  await expect(page.getByText(/إدارة الأعضاء والأدوار متاحة لمدير المساحة فقط/)).toBeVisible();
+});
+
+test('manager can connect and revoke an encrypted integration without exposing the secret', async ({ page }) => {
+  const state = await mockWorkspaceSession(page);
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'التكاملات' }).click();
+
+  await expect(page.getByRole('heading', { name: 'التكاملات المتصلة' })).toBeVisible();
+  await page.getByLabel('خدمة التكامل').selectOption('slack');
+  await page.getByLabel('اسم الاتصال').fill('قناة العمليات');
+  await page.getByLabel('Bot token').fill('xoxb-test-token-value');
+  await page.getByRole('button', { name: 'حفظ الاتصال' }).click();
+
+  await expect(page.getByText('قناة العمليات')).toBeVisible();
+  await expect(page.getByText(/حُفظ الاتصال بتشفير/)).toBeVisible();
+  expect(state.createdConnections[0]).toMatchObject({ provider: 'slack', displayName: 'قناة العمليات', credentials: { token: 'xoxb-test-token-value' } });
+  await expect(page.locator('body')).not.toContainText('xoxb-test-token-value');
+
+  await page.getByRole('button', { name: 'إلغاء' }).click();
+  await expect(page.getByText('ملغى')).toBeVisible();
+  expect(state.connections[0].status).toBe('revoked');
+});
+
+test('read-only members cannot connect or revoke integrations', async ({ page }) => {
+  await mockWorkspaceSession(page, 'viewer');
+  await page.goto('/workspace.html');
+  await page.getByLabel('البريد الإلكتروني').fill('owner@example.com');
+  await page.getByLabel('كلمة المرور').fill('valid-test-password');
+  await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
+  await page.getByRole('button', { name: 'التكاملات' }).click();
+
+  await expect(page.getByRole('heading', { name: 'التكاملات المتصلة' })).toBeVisible();
+  await expect(page.getByRole('form', { name: 'ربط تكامل جديد' })).toHaveCount(0);
+  await expect(page.getByText(/لا توجد تكاملات/)).toBeVisible();
 });
 
 test('analytics tab presents workspace runtime and billing usage without implying invoicing', async ({ page }) => {

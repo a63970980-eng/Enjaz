@@ -4,6 +4,9 @@ import { readFileSync } from 'node:fs';
 import { hasPermission, permissionsForRole, PERMISSIONS, requirePermission } from '../src/permissions.js';
 
 const apiSource = readFileSync(new URL('../src/index.js', import.meta.url), 'utf8');
+function tenantResolutionForRepositoryCheck() {
+  return apiSource.indexOf('const user=await requireWorkspace(req,workspaceId)');
+}
 const openapiSource = readFileSync(new URL('../openapi.yaml', import.meta.url), 'utf8');
 
 test('workspace managers receive the current write permissions and member invitation capability', () => {
@@ -64,9 +67,19 @@ test('mutating API routes use named permissions rather than bypassing the centra
   for (const permission of [
     'WORKSPACE_OPERATIONS_READ', 'WORKFORCE_MANAGE', 'TEAMS_MANAGE', 'EMPLOYEES_MANAGE',
     'AUTOMATIONS_MANAGE', 'TASKS_MANAGE', 'APPROVALS_DECIDE', 'INTEGRATIONS_MANAGE',
+    'MEMBERS_READ', 'MEMBERS_INVITE', 'MEMBERS_MANAGE',
   ]) assert.match(apiSource, new RegExp(`requirePermission\\(user,PERMISSIONS\\.${permission}\\)`));
   assert.match(apiSource,/if\(taskComments&&req\.method==='POST'\)\{requirePermission\(user,PERMISSIONS\.TASKS_MANAGE\)/);
   assert.doesNotMatch(apiSource, /requireManager\(user\);/);
+  // Repository intelligence is documented as authenticated and tenant-scoped, and must stay below tenant resolution.
+  const repositorySearch = apiSource.indexOf("url.pathname==='/api/v1/repository-intelligence/search'");
+  assert.ok(tenantResolutionForRepositoryCheck() < repositorySearch);
+  assert.match(apiSource, /repository-intelligence\/search'\)\{requirePermission\(user,PERMISSIONS\.WORKFORCE_READ\)/);
+  // Invitation acceptance is identity-scoped, so it must authenticate directly and run before tenant resolution.
+  const accept = apiSource.indexOf('/api/v1/members/invitations/accept');
+  const tenantResolution = apiSource.indexOf('const user=await requireWorkspace(req,workspaceId)');
+  assert.ok(accept > 0 && tenantResolution > accept);
+  assert.match(apiSource, /url\.pathname==='\/api\/v1\/members\/invitations\/accept'\)\{const identity=await authIdentity\(req\)/);
   assert.match(apiSource, /function requireManager\(user\)\{try\{return requirePermission\(user,PERMISSIONS\.WORKSPACE_MANAGE\)/);
 });
 

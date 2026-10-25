@@ -8,6 +8,7 @@ test('HTTP contract: security and operational controls remain wired at the serve
     "req.method==='OPTIONS'",
     "Authorization,Content-Type,X-Request-Id",
     "X-Content-Type-Options",
+    "Cache-Control':'no-store",
     "X-Frame-Options",
     "Referrer-Policy",
     "server.requestTimeout=30_000",

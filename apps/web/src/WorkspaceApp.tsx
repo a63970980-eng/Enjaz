@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   Activity, ArrowRight, Bot, Building2, Check, ChevronDown,
-  CircleAlert, ClipboardList, Clock3, FileCheck2, LogOut, Menu, Plus,
+  CircleAlert, ClipboardList, Clock3, FileCheck2, LogOut, Menu, Plus, Plug,
   RefreshCw, ShieldCheck, Users, Workflow, X, Zap,
 } from 'lucide-react';
 import { authClient } from '../auth-client.js';
@@ -10,9 +10,16 @@ import EmployeeBuilder from './EmployeeBuilder';
 import AutomationPanel from './AutomationPanel';
 import AnalyticsBillingPanel from './AnalyticsBillingPanel';
 import TeamPanel from './TeamPanel';
+import MembersPanel from './MembersPanel';
+import IntegrationsPanel from './IntegrationsPanel';
+import AnalyticsConsentNotice from './AnalyticsConsentNotice';
+import {
+  analytics, identifyAnalyticsUser, initAnalytics, readAnalyticsConsent,
+  resetAnalyticsIdentity, setAnalyticsConsent, type AnalyticsConsent,
+} from './analytics';
 
 type Phase = 'checking' | 'auth' | 'verify' | 'onboarding' | 'provisioning' | 'provisioning-failed' | 'workspace' | 'recovery';
-type Tab = 'overview' | 'employees' | 'teams' | 'tasks' | 'approvals' | 'automations' | 'analytics';
+type Tab = 'overview' | 'employees' | 'teams' | 'members' | 'tasks' | 'approvals' | 'automations' | 'integrations' | 'analytics';
 type WorkspaceRecord = { id: string; name: string; workspace_role?: string; role?: string; organization_name?: string };
 type DashboardData = { summary: Record<string, any>; recent: any[]; subscription: Record<string, any> | null; usage: Record<string, any> | null; employees: any[]; tasks: any[]; approvals: any[]; audit: any[] };
 
@@ -29,9 +36,11 @@ const navItems: { id: Tab; label: string; icon: typeof Activity }[] = [
   { id: 'overview', label: 'مركز العمليات', icon: Activity },
   { id: 'employees', label: 'الموظفون الرقميون', icon: Bot },
   { id: 'teams', label: 'الفرق والأقسام', icon: Users },
+  { id: 'members', label: 'الأعضاء والصلاحيات', icon: ShieldCheck },
   { id: 'tasks', label: 'المهام', icon: ClipboardList },
   { id: 'approvals', label: 'الموافقات', icon: FileCheck2 },
   { id: 'automations', label: 'الأتمتة', icon: Workflow },
+  { id: 'integrations', label: 'التكاملات', icon: Plug },
   { id: 'analytics', label: 'التحليلات والفوترة', icon: Activity },
 ];
 const emptyDashboard: DashboardData = { summary: {}, recent: [], subscription: null, usage: null, employees: [], tasks: [], approvals: [], audit: [] };
@@ -62,6 +71,17 @@ function profileName(data: any) {
 }
 function profileWorkspaces(data: any): WorkspaceRecord[] {
   return Array.isArray(data?.workspaces) ? data.workspaces : Array.isArray(data?.profile?.workspaces) ? data.profile.workspaces : [];
+}
+function profileUserId(data: any): string {
+  return String(data?.profile?.id || data?.user?.id || data?.id || '');
+}
+function pendingInviteToken(): string {
+  return new URLSearchParams(window.location.search).get('invite') || '';
+}
+function clearPendingInvite() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete('invite');
+  history.replaceState(history.state, '', `${url.pathname}${url.search}`);
 }
 function selectedWorkspace(spaces: WorkspaceRecord[]) {
   const requested = new URLSearchParams(window.location.search).get('workspaceId') || localStorage.getItem('ENJAZ_WORKSPACE_ID');
@@ -99,6 +119,7 @@ export default function WorkspaceApp() {
   const [email, setEmail] = useState('');
   const [selectedSector, setSelectedSector] = useState('restaurant');
   const [taskDraft, setTaskDraft] = useState({ title: '', objective: '', employeeId: '' });
+  const [analyticsConsent, setAnalyticsConsentState] = useState<AnalyticsConsent>(() => readAnalyticsConsent());
   const requestVersion = useRef(0);
   const activeWorkspaceId = useRef<string | null>(null);
   const workspaceActionVersion = useRef(0);
@@ -146,6 +167,8 @@ export default function WorkspaceApp() {
 
   async function acceptIdentity(data: any) {
     setProfile(data);
+    const analyticsUserId = profileUserId(data);
+    if (analyticsUserId) identifyAnalyticsUser(analyticsUserId);
     const spaces = profileWorkspaces(data);
     setWorkspaces(spaces);
     if (!spaces.length) {
@@ -174,6 +197,15 @@ export default function WorkspaceApp() {
     setPhase('checking');
     setError('');
     try {
+      const inviteToken = pendingInviteToken();
+      if (inviteToken) {
+        const accepted: any = await apiClient.acceptInvitation(inviteToken) as any;
+        const membership = accepted?.data ?? accepted;
+        if (!membership?.workspaceId) throw new Error('لم يؤكد الخادم قبول الدعوة. أعد المحاولة أو اطلب دعوة جديدة.');
+        clearPendingInvite();
+        localStorage.setItem('ENJAZ_WORKSPACE_ID', membership.workspaceId);
+        setNotice('قُبلت الدعوة وأصبح حسابك عضوًا في مساحة العمل.');
+      }
       const result = await authClient.me(API_BASE);
       if (!result) {
         setPhase('recovery');
@@ -188,6 +220,7 @@ export default function WorkspaceApp() {
   }
 
   useEffect(() => {
+    initAnalytics();
     adoptAuthCallback();
     if (authClient.token()) void restoreSession();
     else setPhase('auth');
@@ -308,6 +341,8 @@ export default function WorkspaceApp() {
     if (!workspace || !taskDraft.employeeId) return;
     const target = workspace;
     const actionVersion = ++workspaceActionVersion.current;
+    const taskRoleCode = activeEmployees.find(item => String(item.id) === String(taskDraft.employeeId))?.role_code;
+    const objectiveLength = taskDraft.objective.trim().length;
     setBusy(true);
     setError('');
     setNotice('');
@@ -319,6 +354,7 @@ export default function WorkspaceApp() {
         priority: 5,
       });
       if (!isCurrentWorkspaceAction(target, actionVersion)) return;
+      analytics.taskCreated({ workspaceId: target.id, roleCode: taskRoleCode, objectiveLength });
       setTaskDraft({ title: '', objective: '', employeeId: '' });
       setNotice('حُفظت المهمة في مساحة العمل. ابدأ التخطيط والتنفيذ من بطاقة المهمة عندما تكون جاهزًا.');
       await loadDashboard(target);
@@ -339,6 +375,12 @@ export default function WorkspaceApp() {
     try {
       await apiClient.createEmployee(target.id, authClient.token(), employee);
       if (!isCurrentWorkspaceAction(target, actionVersion)) return;
+      const employeeInput = employee as { roleCode?: unknown; tools?: unknown };
+      analytics.employeeCreated({
+        workspaceId: target.id,
+        roleCode: employeeInput.roleCode,
+        toolCount: Array.isArray(employeeInput.tools) ? employeeInput.tools.length : undefined,
+      });
       setEmployeeBuilderOpen(false);
       setEmployeeBuilderDepartment(null);
       setNotice('حُفظ الموظف الرقمي في المساحة. راجع صلاحيات أدواته قبل إسناد مهام إنتاجية.');
@@ -368,6 +410,7 @@ export default function WorkspaceApp() {
         token: authClient.token(), method: 'POST', body: { goal: task.objective },
       });
       if (!isCurrentWorkspaceAction(target, actionVersion)) return;
+      analytics.taskRunStarted({ workspaceId: target.id, roleCode: task.employee_role_code, taskStatus: task.status });
       setNotice('بدأ التخطيط والتنفيذ. راقب تقدم المهمة؛ الإجراءات الحساسة تبقى خلف بوابة الموافقة.');
       await loadDashboard(target);
     } catch (cause: any) {
@@ -387,6 +430,7 @@ export default function WorkspaceApp() {
     try {
       await apiClient.decideApproval(target.id, authClient.token(), approval.id, decision);
       if (!isCurrentWorkspaceAction(target, actionVersion)) return;
+      analytics.approvalDecided({ workspaceId: target.id, decision });
       setNotice(decision === 'approve' ? 'سُجل الاعتماد وأُرسلت المهمة إلى طابور التنفيذ.' : 'سُجل الرفض وأُوقفت المهمة المرتبطة.');
       await loadDashboard(target);
     } catch (cause: any) {
@@ -396,10 +440,23 @@ export default function WorkspaceApp() {
     }
   }
 
+  function decideAnalytics(decision: 'granted' | 'denied') {
+    setAnalyticsConsent(decision);
+    setAnalyticsConsentState(decision);
+    if (decision === 'granted') {
+      const analyticsUserId = profileUserId(profile);
+      if (analyticsUserId) identifyAnalyticsUser(analyticsUserId);
+      setNotice('فُعّلت تحليلات المنتج لهذه المساحة. يمكنك سحب الموافقة من نفس المكان.');
+    } else {
+      setNotice('أُوقفت تحليلات المنتج. لن يُرسل أي حدث من هذه المساحة.');
+    }
+  }
+
   function signOut() {
     activeWorkspaceId.current = null;
     requestVersion.current += 1;
     workspaceActionVersion.current += 1;
+    resetAnalyticsIdentity();
     authClient.signOut();
     setProfile(null);
     setWorkspace(null);
@@ -532,6 +589,8 @@ export default function WorkspaceApp() {
           </section>
         </>}
         {activeTab === 'teams' && workspace && <TeamPanel key={workspace.id} workspaceId={workspace.id} token={authClient.token()} employees={dashboard.employees} manager={manager} onAddEmployee={buildEmployeeForDepartment} />}
+        {activeTab === 'members' && workspace && <MembersPanel key={workspace.id} workspaceId={workspace.id} token={authClient.token()} manager={manager} currentUserId={profileUserId(profile)} />}
+        {activeTab === 'integrations' && workspace && <IntegrationsPanel key={workspace.id} workspaceId={workspace.id} token={authClient.token()} manager={manager} />}
         {activeTab === 'automations' && workspace && <AutomationPanel key={workspace.id} workspaceId={workspace.id} token={authClient.token()} employees={dashboard.employees} manager={manager} onBuildEmployee={() => buildEmployeeForDepartment(null)} />}
         {activeTab === 'analytics' && <AnalyticsBillingPanel summary={dashboard.summary} recent={dashboard.recent} subscription={dashboard.subscription} usage={dashboard.usage} />}
 
@@ -555,6 +614,8 @@ export default function WorkspaceApp() {
           {dashboard.approvals.length ? <ApprovalList approvals={dashboard.approvals} manager={manager} busy={busy} onDecision={decideApproval} /> : <EmptyState title="لا توجد موافقات" body="ستظهر هنا الإجراءات التي تتطلب مراجعة بشرية." />}
           {!manager && <p className="workspace-inline-hint">حسابك للقراءة فقط في هذه المساحة. اطلب من مدير المساحة تنفيذ القرار.</p>}
         </section>}
+
+        <AnalyticsConsentNotice decision={analyticsConsent} onDecision={decideAnalytics} />
       </div>
     </section>
   </main>;

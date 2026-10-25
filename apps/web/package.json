@@ -13,16 +13,17 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "lucide-react": "^1.51.0",
+    "posthog-js": "1.438.13",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "tailwindcss": "^4.1.17",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^5.0.4",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vite": "^7.3.6"
   }

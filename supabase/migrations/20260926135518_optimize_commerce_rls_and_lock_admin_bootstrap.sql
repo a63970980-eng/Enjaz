@@ -28,4 +28,17 @@ alter policy "commerce_events_member" on public.commerce_events
   with check ((exists (select 1 from workspace_members wm where wm.workspace_id = commerce_events.workspace_id and wm.user_id = (select auth.uid()))));
 
 -- This bootstrap RPC is used server-side during onboarding; anonymous callers do not need EXECUTE.
-revoke execute on function public.assign_first_platform_admin(uuid) from anon;
+-- Guarded because earlier clean installs reach this migration before the function exists
+-- (it is created by 20261025120000_workspace_identity_and_invitations.sql).
+do $$
+begin
+  if exists (
+    select 1 from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and p.proname = 'assign_first_platform_admin'
+      and pg_get_function_identity_arguments(p.oid) = 'uuid'
+  ) then
+    revoke execute on function public.assign_first_platform_admin(uuid) from anon;
+  end if;
+end $$;

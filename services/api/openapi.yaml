@@ -310,6 +310,102 @@ paths:
         '200': {description: Audit events}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/members:
+    get:
+      tags: [Workforce]
+      description: List workspace members visible to the caller.
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Workspace members without credential material}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /api/v1/members/{userId}:
+    parameters:
+      - {$ref: '#/components/parameters/workspaceId'}
+      - name: userId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    patch:
+      tags: [Workforce]
+      summary: Change a member workspace role (requires members.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [role], properties: {role: {type: string, enum: [viewer, member, manager]}}}
+      responses:
+        '200': {description: Updated membership}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Member not found in this workspace}
+        '409': {description: The workspace must keep at least one manager}
+    delete:
+      tags: [Workforce]
+      summary: Remove a member from the workspace (requires members.manage)
+      responses:
+        '200': {description: Membership removed and audited}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Member not found in this workspace}
+        '409': {description: The workspace must keep at least one manager}
+  /api/v1/members/invitations:
+    get:
+      tags: [Workforce]
+      description: List invitations without their tokens.
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      responses:
+        '200': {description: Invitations (token_hash is never returned)}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [Workforce]
+      summary: Create a copy-only invitation (requires members.invite)
+      parameters:
+        - {$ref: '#/components/parameters/workspaceId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: {type: string, format: email, maxLength: 254}
+                role: {type: string, enum: [viewer, member, manager], default: member}
+      responses:
+        '201': {description: Invitation created; the raw token is returned exactly once}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {description: Already a member, or a pending invitation exists for this email}
+  /api/v1/members/invitations/accept:
+    post:
+      tags: [Workforce]
+      description: Accept an invitation for the authenticated identity. No workspace parameter is accepted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [token], properties: {token: {type: string, minLength: 32}}}
+      responses:
+        '200': {description: Membership created or already present}
+        '400': {description: Invalid or expired invitation}
+        '403': {description: The invitation belongs to a different email address}
+        '409': {description: Identity already belongs to another organization}
+  /api/v1/members/invitations/{invitationId}/revoke:
+    parameters:
+      - {$ref: '#/components/parameters/workspaceId'}
+      - name: invitationId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    post:
+      tags: [Workforce]
+      summary: Revoke a pending invitation (requires members.manage)
+      responses:
+        '200': {description: Invitation revoked}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Pending invitation not found}
 components:
   securitySchemes:
     bearerAuth:
