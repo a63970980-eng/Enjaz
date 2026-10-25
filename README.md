@@ -41,7 +41,8 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 ## Reliability
 
 - Clean-database migration chain under `services/api/db/migrations`.
-- Real PostgreSQL RLS integration coverage.
+- Real PostgreSQL RLS integration coverage, including a sweep that fails if any workspace-scoped table loses row level security.
+- Plan → execution graph → queue → tool → stored result coverage, with the human approval gate, on a real database.
 - Queue leases, retries, recovery and dead-letter state.
 - Idempotency constraints for execution steps.
 - Graceful worker shutdown.
@@ -51,6 +52,8 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 API requires `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DATABASE_URL`, and the encryption key for credential storage. Configure `CORS_ORIGINS` to the production web origin. Never expose database credentials or service-role/secret keys to the browser.
 
 The web console accepts `VITE_ENJAZ_API_BASE` at build time. Without a configured API it intentionally remains in preview mode and stores preview employees locally; production data must flow through the authenticated API and PostgreSQL.
+
+Signup and password recovery call Supabase Auth directly (`/auth/v1/signup`, `/auth/v1/recover`, `/auth/v1/user`) and the session is read from `/api/v1/auth/me`, so no external profile function is required. Configure the Supabase email templates and redirect URLs to the workspace document before enabling production signups. Model spend is bounded per task: tokens are always recorded and `ENJAZ_MODEL_INPUT_CENTS_PER_1K` / `ENJAZ_MODEL_OUTPUT_CENTS_PER_1K` enable priced cost, with `ENJAZ_MAX_TASK_MODEL_TOKENS` as the ceiling.
 
 ## Release gates
 

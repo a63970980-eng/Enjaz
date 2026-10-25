@@ -20,7 +20,7 @@ The UI must never imply that a public preview is a connected customer account or
 | Public / auth | `apps/web/src/App.tsx`, `apps/web/workspace.html`, `apps/web/src/WorkspaceApp.tsx`, `apps/web/auth-client.js` | RTL-first public entry; sign-in, email confirmation, workspace bootstrap, sector provisioning and Workspace UI use the existing Supabase/API clients. |
 | Web shell | `apps/web/vite.config.js`, `apps/web/src/workspace-main.tsx`, `apps/web/src/WorkspaceApp.tsx` | Multi-page Vite build emits the public pages and the authenticated Workspace document. |
 | API edge | `services/api/src/index.js`, `api/*.js` | HTTP API with request IDs, CORS allow-list, rate limits, auth and workspace checks. |
-| Identity | Supabase Auth + `auth-client.js` + `enjaz-auth-bridge` | Browser stores session tokens only; service credentials are not exposed. |
+| Identity | Supabase Auth + `auth-client.js` + `/api/v1/auth/me` | Signup and password recovery call Supabase Auth directly; the API resolves the profile and workspaces from the verified token. Session tokens live in `sessionStorage`; service credentials are never exposed. `enjaz-auth-bridge` is an optional legacy fallback, not a dependency. |
 | Tenant boundary | `workspace_members`, workspace-scoped repository queries, PostgreSQL RLS | UI filtering is not the security boundary. |
 | Workforce | `workforce-repository.js`, `industry-provisioning.js` | Employee definitions, goals, knowledge, schedules, policies and usage are persisted. |
 | Planning | `brain-orchestrator.js`, `employee-planner.js`, `model-provider.js` | Plans are bounded and validated against the assigned tool catalog. |

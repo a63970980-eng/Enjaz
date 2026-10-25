@@ -1,5 +1,10 @@
 # ENJAZ release readiness — 2026-10-25
 
+> **Second engineering pass (same day).** The first pass fixed clean-install onboarding and added membership.
+> The second pass closed three production defects found by running the code against a real schema, and removed the
+> external signup dependency. See [Second pass](#second-pass--authentication-execution-and-tenant-isolation) below;
+> the earlier tables are kept for the record and their results are superseded where noted.
+
 This document records what was **actually executed** in this engineering pass, on which environment, and what
 remains before a real customer can be onboarded. Nothing in this file claims a check that was not run.
 
@@ -36,9 +41,10 @@ Environment: Linux, Node 24.21, PostgreSQL 18.6 (portable build) with pgvector 0
 
 ## Known blockers before the first real customer
 
-1. **`enjaz-auth-bridge` is not in this repository.** The browser (`apps/web/auth-client.js`) uses it for signup and
-   `/me`; only `enjaz-industry`, `enjaz-worker` and `enjaz-ai` edge functions are versioned. A self-contained deploy
-   is impossible until this function is committed, or signup/`me` is moved onto the API with real Supabase testing.
+1. **~~`enjaz-auth-bridge` blocks signup~~ — resolved on 2026-10-25 (second pass).** Signup, password recovery and
+   session resolution no longer require the bridge: the browser calls Supabase Auth directly and reads the session
+   from `/api/v1/auth/me`. The bridge remains an optional legacy fallback. What is still unverified is the real
+   Supabase round trip (email confirmation and recovery email delivery), which needs a provisioned project.
 2. **Email delivery of invitations.** Tokens are copy-only today; connecting a transactional email provider is
    required for self-service invitations.
 3. **Billing provider.** Plans, limits and usage metering exist; invoicing and collection do not. No payment provider
@@ -51,14 +57,66 @@ Environment: Linux, Node 24.21, PostgreSQL 18.6 (portable build) with pgvector 0
    semantic memory.
 7. **Monitoring, backups and alerting** are not configured in this environment; they remain operational prerequisites.
 
+## Second pass — authentication, execution and tenant isolation
+
+### Defects found and fixed
+
+| Defect | Evidence | Fix |
+| --- | --- | --- |
+| **Tenant data was readable across organizations.** `users`, `organizations`, `workspaces` and `workspace_members` carried policies but RLS was never enabled, while migration 016 grants table privileges to `authenticated`. | Live schema query showed `relrowsecurity = false` on all four tables, and `authenticated` could select every row. | `037_enable_tenant_rls.sql` (+ Supabase mirror) enables RLS, adds missing roster policies and moves predicates into SECURITY DEFINER helpers so policies cannot recurse. New test runs as the real `authenticated` role with JWT claims. |
+| **Every AI-planned task failed.** `brain-orchestrator.js` selected `integration_connections.display_name`, a column that does not exist; the failure surfaced inside `Promise.all` before planning. | End-to-end test: `column "display_name" does not exist`. | Queries use the real `name` column and keep `display_name` as the API alias. |
+| **Saving and revoking integrations failed.** `credentials-vault.js` inserted `display_name`, and revocation wrote `status='revoked'` against a check constraint allowing only `active/disabled/expired/error`. | `credentials-vault.integration.test.js` now exercises the real columns and constraint. | Vault uses `name`; `035_integration_connection_revoked_status.sql` (+ mirror) allows `revoked`, and duplicate names return `409 CONNECTION_NAME_TAKEN` instead of a 500. |
+| **Signup depended on a function that is not in the repository.** The browser posted to `functions/v1/enjaz-auth-bridge` for signup and `/me`. | `apps/web/test/auth-client.test.mjs` asserts the request target. | Signup and password recovery now go directly to Supabase Auth; `/api/v1/auth/me` is the authoritative session source and the bridge is a legacy fallback only. |
+| **No password recovery existed at all.** | UI inspection. | Recovery request, recovery callback handling and a set-new-password screen, with offline tests. |
+
+### Added capability
+
+- **Model usage accounting and a per-task ceiling.** `services/api/src/model-usage.js` normalizes OpenAI/Gemini token
+  payloads, records tokens per planning call in `runtime_metrics` (`036_runtime_metric_tokens.sql`), derives integer
+  cents only from configured rates (never invented), and refuses a plan above
+  `policy.maxModelTokensPerTask` / `ENJAZ_MAX_TASK_MODEL_TOKENS` with `429 MODEL_TOKEN_BUDGET_EXCEEDED`.
+- **End-to-end execution proof.** `services/api/test/ai-execution.e2e.test.js` drives the real path on PostgreSQL:
+  plan (registered provider) → execution graph → queued steps → worker → tool → stored task output → graph success →
+  audit events, plus the human-approval gate for a high-risk tool (`awaiting_approval` → approve → executed).
+- **Schema invariant test.** `tenant-rls-sweep.e2e.test.js` fails if any workspace-scoped table lacks RLS or a policy,
+  and checks the identity core explicitly.
+
+### Checks executed in the second pass
+
+Environment: same as above (Node 24.21, portable PostgreSQL 18.6, pgvector 0.8.1).
+
+| Check | Result |
+| --- | --- |
+| `node db/migrate.js` on a **brand-new** database (with CI roles) | 51 migrations applied, exit 0; second run applied nothing |
+| `node --test` in `services/api` against that fresh database | **203 tests, 203 pass, 0 fail, 0 skipped** |
+| `node --test` in `apps/web` | **31 pass, 0 fail** (12 new auth-client tests) |
+| `node scripts/verify-source.mjs lint` / `typecheck` | pass (169 source files) |
+| `tsc --noEmit` in `apps/web` | pass |
+| `pnpm build` (web + API bundle) | pass |
+| Tenant isolation as `authenticated` with JWT claims (two organizations) | pass — no cross-tenant rows, cross-tenant writes rejected by RLS |
+| AI execution end-to-end + approval gate on PostgreSQL | pass |
+| Integration vault: encrypt → list → decrypt → revoke, cross-tenant denial | pass |
+| Playwright E2E | **not executed** — no Chromium in this environment |
+| Supabase migration track from scratch | **not reproducible** — see below |
+| Real Supabase signup / email confirmation / recovery email | **not executed** — no Supabase project or inbox access here |
+| Real model provider call | **not executed** — no provider key; the pipeline is proven with a registered stub provider |
+
+### Supabase migration track — precise status
+
+The 20 files in `supabase/migrations/` are **incremental deltas against an existing Supabase project**, not a
+from-scratch schema: applying them to an empty database fails immediately on `pg_cron` and then on missing base
+objects (`users`, `workspaces`, `ai_employees`, `billing_customers`). The reproducible, authoritative track is
+`services/api/db/migrations/`, which builds a complete database and is what CI runs. The Supabase deltas added in
+this pass are guarded (`to_regclass`, existence checks) so they apply cleanly once the base objects exist.
+
 ## Minimum go-live checklist
 
 1. Provision Supabase (auth settings, email templates, redirect URLs) and PostgreSQL.
 2. Apply the API migration chain with `pnpm --filter @enjaz/api migrate` against the production database.
 3. Set API env: `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `ENJAZ_CREDENTIALS_KEY`, `CORS_ORIGINS`, and at
    least one model provider key.
-4. Commit or replace `enjaz-auth-bridge`; verify signup → email confirmation → login → bootstrap → workspace on a
-   real project.
+4. Verify signup → confirmation email → login → bootstrap → workspace, and password recovery end to end, on a real
+   Supabase project (redirect URLs and email templates configured).
 5. Run `tests/e2e` against the deployed preview with a real browser and a real workspace.
 6. Verify two-account isolation on the deployed origin (members, tasks, approvals, audit).
 7. Configure backups, uptime checks and error monitoring before announcing availability.

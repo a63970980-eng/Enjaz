@@ -1,5 +1,13 @@
 # ENJAZ Roadmap
 
+## Implementation update — 2026-10-25 (second pass: isolation, execution, real signup)
+
+- **Tenant isolation enforced in the database:** RLS was enabled on `users`, `organizations`, `workspaces` and `workspace_members` (their policies existed but were inert), with definer-backed membership predicates and a schema sweep test that fails if any workspace-scoped table loses enforcement.
+- **AI execution repaired and proven end to end:** the planner no longer queries a non-existent column, planning tokens are measured and bounded per task, and `test/ai-execution.e2e.test.js` runs plan → execution graph → queue → tools → stored result plus the human-approval gate on PostgreSQL.
+- **Integrations work again:** the credential vault uses the real `name` column and revocation uses a status the constraint accepts; duplicate connection names return a clear 409.
+- **Authentication is self-contained:** signup and password recovery call Supabase Auth directly, `/api/v1/auth/me` is the authoritative session source, and the external `enjaz-auth-bridge` is now optional. A real Supabase round trip is still unverified.
+- **Verification record:** see the second-pass section of [Release readiness 2026-10-25](./RELEASE_READINESS_2026-10-25.md).
+
 ## Implementation update — 2026-10-25 (membership + clean-install bootstrap repair)
 
 - **Clean-install blocker fixed:** migration `034_workspace_identity_and_invitations.sql` (mirrored to Supabase as `20261025120000_workspace_identity_and_invitations.sql`) defines `users.platform_role` and `public.assign_first_platform_admin(uuid)`, which `onboarding-repository.bootstrapWorkspace()` already required. Before this change, the first workspace of a new customer could not be created on any clean database. Verified by applying the full migration chain to an empty PostgreSQL database and running real workspace bootstrap (first user becomes platform admin, replay is idempotent).
@@ -31,7 +39,7 @@
 ## Next enterprise gates
 
 1. ~~Repair and synchronize the bootstrap/profile schema~~ — done 2026-10-25 in both migration tracks.
-2. Bring the authentication bridge source/contract under version control; it is still external to this repository.
+2. ~~Remove the signup dependency on the external authentication bridge~~ — done 2026-10-25; verify the real Supabase confirmation and recovery emails on a provisioned project.
 3. Decide whether to preserve the current one-organization-per-user model or migrate to multi-organization identities (invitation acceptance currently refuses cross-organization identities).
 4. Connect a transactional email provider so invitations are delivered directly instead of copy-only; the token flow and membership enforcement are already implemented and verified.
 5. Select an enterprise identity provider before implementing SSO/SCIM, and select billing markets/providers before financial collection.
