@@ -1,0 +1,18 @@
+schema: paperclip/v1
+agents:
+  engineering-lead:
+    adapter:
+      type: claude_local
+    inputs:
+      env:
+        GH_TOKEN:
+          kind: secret
+          requirement: required
+  crypto-analyst:
+    adapter:
+      type: claude_local
+    inputs:
+      env:
+        ALCHEMY_API_KEY:
+          kind: secret
+          requirement: optional
