@@ -1,0 +1,8 @@
+.DS_Store
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/company-creator
+.agents/skills/paperclip*
+.agents/skills/para-memory-files
+.paperclip/

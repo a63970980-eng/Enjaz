@@ -1,0 +1,14 @@
+schema: paperclip/v1
+agents:
+  app-engineer:
+    inputs:
+      env:
+        MINIMAX_API_KEY:
+          kind: secret
+          requirement: optional
+  graphics-engineer:
+    inputs:
+      env:
+        MINIMAX_API_KEY:
+          kind: secret
+          requirement: optional

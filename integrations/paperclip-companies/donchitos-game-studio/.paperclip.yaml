@@ -1,0 +1,58 @@
+schema: paperclip/v1
+agents:
+  ceo:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-opus-4-6
+  creative-director:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-opus-4-6
+  technical-director:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-opus-4-6
+  producer:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-opus-4-6
+  devops-engineer:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-haiku-4-5-20251001
+    inputs:
+      env:
+        GH_TOKEN:
+          kind: secret
+          requirement: optional
+  qa-tester:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-haiku-4-5-20251001
+  sound-designer:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-haiku-4-5-20251001
+  community-manager:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-haiku-4-5-20251001
+  accessibility-specialist:
+    adapter:
+      type: claude_local
+      config:
+        model: claude-haiku-4-5-20251001
+  release-manager:
+    inputs:
+      env:
+        GH_TOKEN:
+          kind: secret
+          requirement: optional
