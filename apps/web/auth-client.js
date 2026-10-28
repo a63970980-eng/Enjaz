@@ -1,5 +1,5 @@
-const supabaseUrl=window.ENJAZ_SUPABASE_URL||import.meta.env?.VITE_ENJAZ_SUPABASE_URL||'https://cqmwwrrmmqmgpnhnuxyu.supabase.co';
-const supabaseKey=window.ENJAZ_SUPABASE_ANON_KEY||window.ENJAZ_SUPABASE_KEY||import.meta.env?.VITE_SUPABASE_ANON_KEY||import.meta.env?.VITE_ENJAZ_SUPABASE_ANON_KEY||'sb_publishable_U12modLyDRQWV2sNAJHiqg_vJPOSoOz';
+const supabaseUrl=window.ENJAZ_SUPABASE_URL||import.meta.env?.VITE_ENJAZ_SUPABASE_URL||import.meta.env?.VITE_SUPABASE_URL||'';
+const supabaseKey=window.ENJAZ_SUPABASE_ANON_KEY||window.ENJAZ_SUPABASE_KEY||import.meta.env?.VITE_ENJAZ_SUPABASE_ANON_KEY||import.meta.env?.VITE_SUPABASE_ANON_KEY||'';
 const configured=Boolean(supabaseUrl&&supabaseKey);
 const AUTH_BRIDGE=`${supabaseUrl}/functions/v1/enjaz-auth-bridge`;
 const key='ENJAZ_ACCESS_TOKEN';
