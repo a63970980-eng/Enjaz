@@ -16,6 +16,6 @@ test('CI provisions Supabase-compatible roles and runs migrations before tests',
   assert.match(source,/postgres:16/);
   assert.match(source,/CREATE ROLE authenticated/);
   assert.match(source,/CREATE OR REPLACE FUNCTION auth\.uid/);
-  assert.match(source,/npm run migrate/);
-  assert.match(source,/npm test/);
+  assert.match(source,/pnpm --filter @enjaz\/api migrate/);
+  assert.match(source,/pnpm --filter @enjaz\/api test/);
 });

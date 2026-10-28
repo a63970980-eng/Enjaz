@@ -1,8 +1,9 @@
 import {readdirSync,statSync} from 'node:fs';
 import {join,relative} from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 
-const root=new URL('..',import.meta.url).pathname;
+const root=fileURLToPath(new URL('..',import.meta.url));
 const includeRoots=['apps/web','services/api/src','services/api/test','api','supabase/functions','packages'];
 const files=[];
 function walk(dir){
