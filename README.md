@@ -47,7 +47,7 @@ The current implementation map is documented in [`docs/ENJAZ_PLATFORM_ARCHITECTU
 
 ## Production configuration
 
-API requires `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `DATABASE_URL`, and the encryption key for credential storage. Configure `CORS_ORIGINS` to the production web origin. Never expose database credentials or service-role/secret keys to the browser.
+API requires `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` (or `SUPABASE_ANON_KEY`), `DATABASE_URL`, and `ENJAZ_CREDENTIALS_KEY` for credential storage. Missing Supabase configuration now fails closed instead of connecting to a baked-in project. Configure `CORS_ORIGINS` to the production web origin. Never expose database credentials or service-role/secret keys to the browser.
 
 The web console accepts `VITE_ENJAZ_API_BASE` at build time. Without a configured API it intentionally remains in preview mode and stores preview employees locally; production data must flow through the authenticated API and PostgreSQL.
 
